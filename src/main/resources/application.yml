@@ -1,0 +1,91 @@
+# Spring Boot Configuration
+# This file demonstrates YAML configuration, which is more readable than properties files
+
+spring:
+  application:
+    name: comprehensive-dev-portal
+  
+  # Database Configuration
+  datasource:
+    # H2 Database for development (in-memory)
+    url: jdbc:h2:mem:devportal
+    driverClassName: org.h2.Driver
+    username: sa
+    password: password
+    
+  # JPA/Hibernate Configuration
+  jpa:
+    database-platform: org.hibernate.dialect.H2Dialect
+    hibernate:
+      ddl-auto: create-drop  # Creates schema on startup, drops on shutdown
+    show-sql: true  # Shows SQL queries in console (great for learning!)
+    format-sql: true
+    properties:
+      hibernate:
+        format_sql: true
+        use_sql_comments: true
+        
+  # H2 Console (for database inspection during development)
+  h2:
+    console:
+      enabled: true
+      path: /h2-console
+      
+  # Security Configuration
+  security:
+    user:
+      name: admin
+      password: admin123
+      roles: ADMIN
+      
+  # Cache Configuration
+  cache:
+    type: simple
+    
+  # Development Tools
+  devtools:
+    restart:
+      enabled: true
+    livereload:
+      enabled: true
+
+# Server Configuration
+server:
+  port: 8080
+  servlet:
+    context-path: /api
+    
+# Actuator Configuration (for monitoring and health checks)
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics,env
+  endpoint:
+    health:
+      show-details: always
+      
+# Logging Configuration
+logging:
+  level:
+    com.learningportal: DEBUG
+    org.springframework.security: DEBUG
+    org.hibernate.SQL: DEBUG
+    org.hibernate.type.descriptor.sql.BasicBinder: TRACE
+  pattern:
+    console: "%d{yyyy-MM-dd HH:mm:ss} - %msg%n"
+    
+# Custom Application Properties
+app:
+  name: Comprehensive Developer Portal
+  version: 1.0.0
+  description: The most comprehensive learning portal for Java, Spring, React, and System Design
+  features:
+    - Java Fundamentals to Advanced
+    - Spring Framework Ecosystem
+    - React Development
+    - Data Structures & Algorithms
+    - System Design
+    - Interview Preparation
+    - Interactive Code Editor
+    - Progress Tracking
