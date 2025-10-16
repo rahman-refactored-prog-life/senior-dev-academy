@@ -100,9 +100,25 @@ public class LearningModule {
         INTERVIEW_PREP("Interview Preparation"),
         BEHAVIORAL_QUESTIONS("Behavioral Questions"),
         DESIGN_PATTERNS("Design Patterns"),
-        DATABASE_DESIGN("Database Design"),
-        MICROSERVICES("Microservices"),
-        PERFORMANCE_OPTIMIZATION("Performance Optimization");
+        
+        // Database Learning Modules
+        SQL_FUNDAMENTALS("SQL Fundamentals"),
+        ADVANCED_SQL("Advanced SQL"),
+        DATABASE_DESIGN("Database Design & Normalization"),
+        NOSQL_DATABASES("NoSQL Databases"),
+        DATABASE_PERFORMANCE("Database Performance & Optimization"),
+        DATABASE_ADMINISTRATION("Database Administration"),
+        DISTRIBUTED_DATABASES("Distributed Databases"),
+        DATABASE_SECURITY("Database Security"),
+        
+        // Additional Advanced Topics
+        MICROSERVICES("Microservices Architecture"),
+        PERFORMANCE_OPTIMIZATION("Performance Optimization"),
+        CLOUD_TECHNOLOGIES("Cloud Technologies"),
+        DEVOPS_PRACTICES("DevOps & CI/CD"),
+        SOFTWARE_ARCHITECTURE("Software Architecture"),
+        TESTING_STRATEGIES("Testing Strategies"),
+        SECURITY_BEST_PRACTICES("Security Best Practices");
         
         private final String displayName;
         

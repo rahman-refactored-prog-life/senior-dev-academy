@@ -1,0 +1,153 @@
+# Production Configuration with PostgreSQL
+# This configuration demonstrates production-ready settings
+
+spring:
+  application:
+    name: senior-dev-academy
+  
+  # PostgreSQL Database Configuration
+  datasource:
+    url: jdbc:postgresql://localhost:5432/senior_dev_academy
+    username: ${DB_USERNAME:postgres}
+    password: ${DB_PASSWORD:password}
+    driver-class-name: org.postgresql.Driver
+    
+    # Connection Pool Configuration (HikariCP)
+    hikari:
+      maximum-pool-size: 20
+      minimum-idle: 5
+      idle-timeout: 300000
+      connection-timeout: 20000
+      leak-detection-threshold: 60000
+      
+  # JPA/Hibernate Configuration for PostgreSQL
+  jpa:
+    database-platform: org.hibernate.dialect.PostgreSQLDialect
+    hibernate:
+      ddl-auto: validate  # Use validate in production, never create-drop
+    show-sql: false  # Disable SQL logging in production
+    properties:
+      hibernate:
+        format_sql: false
+        use_sql_comments: false
+        # Enable batch processing for better performance
+        jdbc:
+          batch_size: 25
+        order_inserts: true
+        order_updates: true
+        # Enable second-level cache
+        cache:
+          use_second_level_cache: true
+          use_query_cache: true
+          region:
+            factory_class: org.hibernate.cache.jcache.JCacheRegionFactory
+            
+  # Security Configuration
+  security:
+    user:
+      name: ${ADMIN_USERNAME:admin}
+      password: ${ADMIN_PASSWORD:SecurePassword123!}
+      roles: ADMIN
+      
+  # Cache Configuration (Redis in production)
+  cache:
+    type: redis
+    redis:
+      time-to-live: 600000  # 10 minutes
+      
+  # Redis Configuration
+  redis:
+    host: ${REDIS_HOST:localhost}
+    port: ${REDIS_PORT:6379}
+    password: ${REDIS_PASSWORD:}
+    timeout: 2000ms
+    jedis:
+      pool:
+        max-active: 8
+        max-idle: 8
+        min-idle: 0
+
+# Server Configuration
+server:
+  port: ${SERVER_PORT:8080}
+  servlet:
+    context-path: /api
+  # Enable compression
+  compression:
+    enabled: true
+    mime-types: text/html,text/xml,text/plain,text/css,text/javascript,application/javascript,application/json
+    min-response-size: 1024
+  # SSL Configuration (uncomment for HTTPS)
+  # ssl:
+  #   key-store: classpath:keystore.p12
+  #   key-store-password: ${SSL_PASSWORD:password}
+  #   key-store-type: PKCS12
+  #   key-alias: tomcat
+    
+# Actuator Configuration (Production monitoring)
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics,prometheus
+  endpoint:
+    health:
+      show-details: when-authorized
+  metrics:
+    export:
+      prometheus:
+        enabled: true
+        
+# Logging Configuration for Production
+logging:
+  level:
+    com.learningportal: INFO
+    org.springframework.security: WARN
+    org.hibernate.SQL: WARN
+    org.hibernate.type.descriptor.sql.BasicBinder: WARN
+  pattern:
+    console: "%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{36} - %msg%n"
+    file: "%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{36} - %msg%n"
+  file:
+    name: logs/senior-dev-academy.log
+    max-size: 10MB
+    max-history: 30
+    
+# Custom Application Properties
+app:
+  name: Senior Developer Academy
+  version: 1.0.0
+  description: The most comprehensive learning portal for senior developer preparation
+  
+  # Security settings
+  security:
+    jwt:
+      secret: ${JWT_SECRET:MySecretKey}
+      expiration: 86400000  # 24 hours
+      
+  # File upload settings
+  upload:
+    max-file-size: 10MB
+    max-request-size: 50MB
+    upload-dir: ${UPLOAD_DIR:./uploads}
+    
+  # Email configuration (for notifications)
+  mail:
+    host: ${MAIL_HOST:smtp.gmail.com}
+    port: ${MAIL_PORT:587}
+    username: ${MAIL_USERNAME:}
+    password: ${MAIL_PASSWORD:}
+    
+  # External API configurations
+  external-apis:
+    github:
+      token: ${GITHUB_TOKEN:}
+    stackoverflow:
+      key: ${STACKOVERFLOW_KEY:}
+      
+  # Feature flags
+  features:
+    code-execution: true
+    ai-assistance: true
+    progress-analytics: true
+    social-features: false

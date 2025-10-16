@@ -13,28 +13,29 @@ import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import java.time.LocalDateTime;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Interview Question Entity - Stores technical interview questions
  * 
- * This entity demonstrates several advanced JPA/Hibernate concepts:
- * - Complex enum handling with multiple attributes
- * - @ElementCollection for storing collections of basic types
- * - @CollectionTable for custom collection mapping
- * - JSON storage for complex data structures
- * - Multiple indexing strategies for performance
+ * This entity demonstrates advanced JPA concepts and real-world interview preparation data modeling.
+ * 
+ * Key Learning Points:
+ * - Complex enum usage with multiple attributes
+ * - JSON storage for flexible data structures
+ * - Many-to-One relationships with proper foreign key management
  * - Advanced validation constraints
+ * - Business logic methods within entities
+ * - Proper handling of collections and arrays in JPA
  */
 @Entity
-@Table(name = "interview_questions", 
-       indexes = {
-           @Index(name = "idx_question_difficulty", columnList = "difficulty"),
-           @Index(name = "idx_question_category", columnList = "category"),
-           @Index(name = "idx_question_company", columnList = "companies"),
-           @Index(name = "idx_question_topic", columnList = "topic_id")
-       })
+@Table(name = "interview_questions", indexes = {
+    @Index(name = "idx_question_difficulty", columnList = "difficulty"),
+    @Index(name = "idx_question_company", columnList = "company"),
+    @Index(name = "idx_question_category", columnList = "category"),
+    @Index(name = "idx_question_topic", columnList = "topic_id")
+})
 @EntityListeners(AuditingEntityListener.class)
 @Data
 @NoArgsConstructor
@@ -46,33 +47,55 @@ public class InterviewQuestion {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     
-    @NotBlank(message = "Question text is required")
-    @Size(max = 2000, message = "Question must not exceed 2000 characters")
-    @Column(name = "question_text", nullable = false, length = 2000)
-    private String questionText;
+    @NotBlank(message = "Question title is required")
+    @Size(max = 300, message = "Question title must not exceed 300 characters")
+    @Column(name = "title", nullable = false, length = 300)
+    private String title;
+    
+    @NotBlank(message = "Question description is required")
+    @Lob
+    @Column(name = "description", nullable = false, columnDefinition = "TEXT")
+    private String description;
     
     /**
-     * Detailed answer/explanation stored as HTML/Markdown
+     * Sample solution or approach to the question
+     * Stored as formatted text (HTML/Markdown)
      */
     @Lob
-    @Column(name = "answer", columnDefinition = "TEXT")
-    private String answer;
+    @Column(name = "solution", columnDefinition = "TEXT")
+    private String solution;
     
     /**
-     * Code solution if applicable (stored as JSON for multiple language support)
-     * Example: {"java": "public class...", "python": "def solution():..."}
+     * Code examples for the solution
+     * Stored as JSON: [{"language": "java", "code": "...", "explanation": "..."}]
      */
     @Lob
-    @Column(name = "code_solution", columnDefinition = "TEXT")
-    private String codeSolution;
+    @Column(name = "code_examples", columnDefinition = "TEXT")
+    private String codeExamples;
     
     /**
-     * Hints to help with the question (stored as JSON array)
-     * Example: ["Think about time complexity", "Consider edge cases"]
+     * Follow-up questions related to this main question
+     * Stored as JSON array: ["What if the input size is very large?", "How would you optimize this?"]
+     */
+    @Lob
+    @Column(name = "follow_up_questions", columnDefinition = "TEXT")
+    private String followUpQuestions;
+    
+    /**
+     * Hints to help solve the question
+     * Stored as JSON array: ["Think about using a HashMap", "Consider the two-pointer technique"]
      */
     @Lob
     @Column(name = "hints", columnDefinition = "TEXT")
     private String hints;
+    
+    /**
+     * Tags for categorization and search
+     * Stored as JSON array: ["array", "two-pointers", "hash-table"]
+     */
+    @Lob
+    @Column(name = "tags", columnDefinition = "TEXT")
+    private String tags;
     
     @NotNull(message = "Difficulty level is required")
     @Enumerated(EnumType.STRING)
@@ -84,56 +107,38 @@ public class InterviewQuestion {
     @Column(name = "category", nullable = false)
     private QuestionCategory category;
     
-    /**
-     * Companies that have asked this question
-     * Using @ElementCollection to store a collection of enums
-     * 
-     * Key Learning Points:
-     * - @ElementCollection: For collections of basic types or embeddables
-     * - @CollectionTable: Specifies the table for storing collection elements
-     * - @Enumerated: How to store enums in collection tables
-     */
-    @ElementCollection(targetClass = Company.class)
-    @CollectionTable(name = "question_companies", 
-                    joinColumns = @JoinColumn(name = "question_id"))
     @Enumerated(EnumType.STRING)
-    @Column(name = "companies")
-    private Set<Company> companies = new HashSet<>();
-    
-    /**
-     * Tags for better categorization and search
-     * Example: ["arrays", "sorting", "two-pointers"]
-     */
-    @ElementCollection
-    @CollectionTable(name = "question_tags", 
-                    joinColumns = @JoinColumn(name = "question_id"))
-    @Column(name = "tag")
-    private Set<String> tags = new HashSet<>();
-    
-    /**
-     * Time complexity of the optimal solution
-     */
-    @Column(name = "time_complexity", length = 50)
-    private String timeComplexity;
-    
-    /**
-     * Space complexity of the optimal solution
-     */
-    @Column(name = "space_complexity", length = 50)
-    private String spaceComplexity;
+    @Column(name = "company")
+    private Company company;
     
     /**
      * Frequency of this question being asked (1-10 scale)
+     * 10 = Very frequently asked, 1 = Rarely asked
      */
     @Column(name = "frequency_score")
     private Integer frequencyScore;
     
     /**
-     * Follow-up questions or variations
+     * Estimated time to solve in minutes
      */
-    @Lob
-    @Column(name = "follow_up_questions", columnDefinition = "TEXT")
-    private String followUpQuestions;
+    @Column(name = "estimated_time_minutes")
+    private Integer estimatedTimeMinutes;
+    
+    /**
+     * Time complexity of the optimal solution
+     * Example: "O(n)", "O(log n)", "O(n^2)"
+     */
+    @Size(max = 50)
+    @Column(name = "time_complexity", length = 50)
+    private String timeComplexity;
+    
+    /**
+     * Space complexity of the optimal solution
+     * Example: "O(1)", "O(n)", "O(log n)"
+     */
+    @Size(max = 50)
+    @Column(name = "space_complexity", length = 50)
+    private String spaceComplexity;
     
     @Column(name = "active", nullable = false)
     private Boolean active = true;
@@ -148,6 +153,7 @@ public class InterviewQuestion {
     
     /**
      * Many-to-One relationship with Topic
+     * Each question belongs to a specific topic
      */
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "topic_id")
@@ -157,52 +163,109 @@ public class InterviewQuestion {
      * Difficulty levels for interview questions
      */
     public enum Difficulty {
-        EASY("Easy", 1),
-        MEDIUM("Medium", 2),
-        HARD("Hard", 3),
-        EXPERT("Expert", 4);
+        EASY("Easy", 1, "#28a745"),
+        MEDIUM("Medium", 2, "#ffc107"),
+        HARD("Hard", 3, "#dc3545");
         
         private final String displayName;
         private final int level;
+        private final String colorCode;
         
-        Difficulty(String displayName, int level) {
+        Difficulty(String displayName, int level, String colorCode) {
             this.displayName = displayName;
             this.level = level;
+            this.colorCode = colorCode;
         }
         
-        public String getDisplayName() {
-            return displayName;
-        }
-        
-        public int getLevel() {
-            return level;
-        }
+        public String getDisplayName() { return displayName; }
+        public int getLevel() { return level; }
+        public String getColorCode() { return colorCode; }
     }
     
     /**
-     * Question categories based on computer science topics
+     * Question categories for organization
      */
     public enum QuestionCategory {
-        ARRAYS_AND_STRINGS("Arrays & Strings"),
-        LINKED_LISTS("Linked Lists"),
-        STACKS_AND_QUEUES("Stacks & Queues"),
-        TREES_AND_GRAPHS("Trees & Graphs"),
+        // Data Structures
+        ARRAY("Array"),
+        LINKED_LIST("Linked List"),
+        STACK("Stack"),
+        QUEUE("Queue"),
+        TREE("Tree"),
+        GRAPH("Graph"),
+        HASH_TABLE("Hash Table"),
+        HEAP("Heap"),
+        TRIE("Trie"),
+        
+        // Algorithms
+        SORTING("Sorting"),
+        SEARCHING("Search"),
         DYNAMIC_PROGRAMMING("Dynamic Programming"),
-        SORTING_AND_SEARCHING("Sorting & Searching"),
-        HASH_TABLES("Hash Tables"),
-        RECURSION("Recursion"),
-        GREEDY_ALGORITHMS("Greedy Algorithms"),
+        GREEDY("Greedy"),
         BACKTRACKING("Backtracking"),
-        BIT_MANIPULATION("Bit Manipulation"),
-        MATH_AND_LOGIC("Math & Logic"),
+        DIVIDE_CONQUER("Divide and Conquer"),
+        TWO_POINTERS("Two Pointers"),
+        SLIDING_WINDOW("Sliding Window"),
+        
+        // System Design
         SYSTEM_DESIGN("System Design"),
-        OBJECT_ORIENTED_DESIGN("Object Oriented Design"),
-        JAVA_SPECIFIC("Java Specific"),
-        SPRING_FRAMEWORK("Spring Framework"),
+        SCALABILITY("Scalability"),
+        CACHING("Caching"),
+        LOAD_BALANCING("Load Balancing"),
+        MICROSERVICES("Microservices"),
+        
+        // Database Categories
+        SQL_FUNDAMENTALS("SQL Fundamentals"),
+        ADVANCED_SQL("Advanced SQL"),
         DATABASE_DESIGN("Database Design"),
-        CONCURRENCY("Concurrency"),
-        PERFORMANCE_OPTIMIZATION("Performance Optimization"),
-        BEHAVIORAL("Behavioral Questions");
+        DATABASE_NORMALIZATION("Database Normalization"),
+        DATABASE_INDEXING("Database Indexing"),
+        QUERY_OPTIMIZATION("Query Optimization"),
+        TRANSACTIONS_ACID("Transactions & ACID"),
+        STORED_PROCEDURES("Stored Procedures & Functions"),
+        DATABASE_TRIGGERS("Database Triggers"),
+        
+        // NoSQL Categories
+        NOSQL_CONCEPTS("NoSQL Concepts"),
+        MONGODB("MongoDB"),
+        REDIS("Redis"),
+        CASSANDRA("Cassandra"),
+        ELASTICSEARCH("Elasticsearch"),
+        DYNAMODB("DynamoDB"),
+        
+        // Database Administration
+        DATABASE_PERFORMANCE("Database Performance"),
+        DATABASE_SECURITY("Database Security"),
+        BACKUP_RECOVERY("Backup & Recovery"),
+        DATABASE_MONITORING("Database Monitoring"),
+        DISTRIBUTED_DATABASES("Distributed Databases"),
+        DATABASE_SHARDING("Database Sharding"),
+        REPLICATION("Database Replication"),
+        
+        // Java Specific
+        JAVA_CORE("Java Core"),
+        JAVA_COLLECTIONS("Java Collections"),
+        JAVA_CONCURRENCY("Java Concurrency"),
+        JAVA_JVM("JVM Internals"),
+        JAVA_PERFORMANCE("Java Performance"),
+        
+        // Spring Framework
+        SPRING_CORE("Spring Core"),
+        SPRING_BOOT("Spring Boot"),
+        SPRING_SECURITY("Spring Security"),
+        SPRING_DATA("Spring Data"),
+        
+        // React
+        REACT_FUNDAMENTALS("React Fundamentals"),
+        REACT_HOOKS("React Hooks"),
+        REACT_PERFORMANCE("React Performance"),
+        REACT_TESTING("React Testing"),
+        
+        // Behavioral
+        BEHAVIORAL("Behavioral"),
+        LEADERSHIP("Leadership"),
+        PROBLEM_SOLVING("Problem Solving"),
+        COMMUNICATION("Communication");
         
         private final String displayName;
         
@@ -210,112 +273,141 @@ public class InterviewQuestion {
             this.displayName = displayName;
         }
         
-        public String getDisplayName() {
-            return displayName;
-        }
+        public String getDisplayName() { return displayName; }
     }
     
     /**
-     * Companies that commonly ask these questions
+     * Companies that frequently ask these questions
      */
     public enum Company {
-        AMAZON("Amazon"),
-        GOOGLE("Google"),
-        MICROSOFT("Microsoft"),
-        META("Meta"),
-        APPLE("Apple"),
-        NETFLIX("Netflix"),
-        UBER("Uber"),
-        AIRBNB("Airbnb"),
-        LINKEDIN("LinkedIn"),
-        TWITTER("Twitter"),
-        SALESFORCE("Salesforce"),
-        ORACLE("Oracle"),
-        IBM("IBM"),
-        ADOBE("Adobe"),
-        SPOTIFY("Spotify"),
-        DROPBOX("Dropbox"),
-        PALANTIR("Palantir"),
-        GOLDMAN_SACHS("Goldman Sachs"),
-        JP_MORGAN("JP Morgan"),
-        BLOOMBERG("Bloomberg"),
-        CITADEL("Citadel"),
-        TWO_SIGMA("Two Sigma"),
-        JANE_STREET("Jane Street"),
-        STRIPE("Stripe"),
-        SQUARE("Square"),
-        COINBASE("Coinbase"),
-        ROBINHOOD("Robinhood");
+        AMAZON("Amazon", "AMZN"),
+        GOOGLE("Google", "GOOGL"),
+        MICROSOFT("Microsoft", "MSFT"),
+        META("Meta", "META"),
+        APPLE("Apple", "AAPL"),
+        NETFLIX("Netflix", "NFLX"),
+        UBER("Uber", "UBER"),
+        AIRBNB("Airbnb", "ABNB"),
+        LINKEDIN("LinkedIn", "LNKD"),
+        TWITTER("Twitter", "TWTR"),
+        SALESFORCE("Salesforce", "CRM"),
+        ADOBE("Adobe", "ADBE"),
+        ORACLE("Oracle", "ORCL"),
+        IBM("IBM", "IBM"),
+        INTEL("Intel", "INTC"),
+        NVIDIA("NVIDIA", "NVDA"),
+        TESLA("Tesla", "TSLA"),
+        SPOTIFY("Spotify", "SPOT"),
+        DROPBOX("Dropbox", "DBX"),
+        SLACK("Slack", "WORK"),
+        ZOOM("Zoom", "ZM"),
+        PALANTIR("Palantir", "PLTR"),
+        SNOWFLAKE("Snowflake", "SNOW"),
+        DATABRICKS("Databricks", "DBRX"),
+        STRIPE("Stripe", "STRP"),
+        COINBASE("Coinbase", "COIN"),
+        ROBINHOOD("Robinhood", "HOOD"),
+        DOORDASH("DoorDash", "DASH"),
+        LYFT("Lyft", "LYFT"),
+        PINTEREST("Pinterest", "PINS"),
+        SNAP("Snap", "SNAP"),
+        TIKTOK("TikTok", "TKTK"),
+        BYTEDANCE("ByteDance", "BDNC"),
+        SHOPIFY("Shopify", "SHOP"),
+        SQUARE("Square", "SQ"),
+        PAYPAL("PayPal", "PYPL"),
+        VISA("Visa", "V"),
+        MASTERCARD("Mastercard", "MA"),
+        GOLDMAN_SACHS("Goldman Sachs", "GS"),
+        JPMORGAN("JPMorgan Chase", "JPM"),
+        MORGAN_STANLEY("Morgan Stanley", "MS"),
+        CITADEL("Citadel", "CTDL"),
+        TWO_SIGMA("Two Sigma", "TSIG"),
+        JANE_STREET("Jane Street", "JANE"),
+        DE_SHAW("D.E. Shaw", "DESH"),
+        RENAISSANCE("Renaissance Technologies", "RENT"),
+        BRIDGEWATER("Bridgewater Associates", "BRDG");
         
         private final String displayName;
+        private final String ticker;
         
-        Company(String displayName) {
+        Company(String displayName, String ticker) {
             this.displayName = displayName;
+            this.ticker = ticker;
         }
         
-        public String getDisplayName() {
-            return displayName;
+        public String getDisplayName() { return displayName; }
+        public String getTicker() { return ticker; }
+    }
+    
+    /**
+     * Get difficulty level as integer for sorting/filtering
+     */
+    public int getDifficultyLevel() {
+        return difficulty != null ? difficulty.getLevel() : 0;
+    }
+    
+    /**
+     * Check if this is a high-frequency question
+     */
+    public boolean isHighFrequency() {
+        return frequencyScore != null && frequencyScore >= 7;
+    }
+    
+    /**
+     * Get estimated difficulty for time planning
+     */
+    public String getEstimatedTimeFormatted() {
+        if (estimatedTimeMinutes == null) {
+            return "Unknown";
+        }
+        
+        if (estimatedTimeMinutes < 60) {
+            return estimatedTimeMinutes + " minutes";
+        } else {
+            int hours = estimatedTimeMinutes / 60;
+            int minutes = estimatedTimeMinutes % 60;
+            if (minutes == 0) {
+                return hours + " hour" + (hours > 1 ? "s" : "");
+            } else {
+                return hours + "h " + minutes + "m";
+            }
         }
     }
     
     /**
-     * Add a company to the list of companies that ask this question
+     * Get complexity information formatted for display
      */
-    public void addCompany(Company company) {
-        if (companies == null) {
-            companies = new HashSet<>();
+    public String getComplexityInfo() {
+        StringBuilder sb = new StringBuilder();
+        if (timeComplexity != null) {
+            sb.append("Time: ").append(timeComplexity);
         }
-        companies.add(company);
-    }
-    
-    /**
-     * Add a tag to this question
-     */
-    public void addTag(String tag) {
-        if (tags == null) {
-            tags = new HashSet<>();
+        if (spaceComplexity != null) {
+            if (sb.length() > 0) sb.append(", ");
+            sb.append("Space: ").append(spaceComplexity);
         }
-        tags.add(tag.toLowerCase().trim());
+        return sb.toString();
     }
     
     /**
-     * Check if this question has a code solution
+     * Check if this question has code examples
      */
-    public boolean hasCodeSolution() {
-        return codeSolution != null && !codeSolution.trim().isEmpty();
+    public boolean hasCodeExamples() {
+        return codeExamples != null && !codeExamples.trim().isEmpty();
     }
     
     /**
-     * Check if this question has hints
+     * Check if this question has hints available
      */
     public boolean hasHints() {
         return hints != null && !hints.trim().isEmpty();
     }
     
     /**
-     * Get difficulty color for UI display
+     * Check if this question has follow-up questions
      */
-    public String getDifficultyColor() {
-        return switch (difficulty) {
-            case EASY -> "#28a745";      // Green
-            case MEDIUM -> "#ffc107";    // Yellow
-            case HARD -> "#dc3545";      // Red
-            case EXPERT -> "#6f42c1";    // Purple
-        };
-    }
-    
-    /**
-     * Get a formatted string of companies that ask this question
-     */
-    public String getCompaniesFormatted() {
-        if (companies == null || companies.isEmpty()) {
-            return "Various Companies";
-        }
-        
-        return companies.stream()
-                .map(Company::getDisplayName)
-                .sorted()
-                .reduce((a, b) -> a + ", " + b)
-                .orElse("Various Companies");
+    public boolean hasFollowUpQuestions() {
+        return followUpQuestions != null && !followUpQuestions.trim().isEmpty();
     }
 }
