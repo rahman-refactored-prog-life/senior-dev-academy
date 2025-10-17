@@ -6,6 +6,50 @@ const ModuleDetail = () => {
   const { moduleId } = useParams()
   
   const moduleData = {
+    nodejs: {
+      title: 'Node.js Complete Mastery',
+      description: '🎉 100% COMPLETE! Master Node.js from zero to FAANG senior level with 25 comprehensive topics, 700+ interview questions, and production projects.',
+      icon: Zap,
+      difficulty: 'Beginner to Expert',
+      estimatedHours: 50,
+      progress: 100,
+      topics: [
+        // ZeroToMastery Foundation (1-5)
+        { id: 1, title: 'Node.js Core Concepts and Event Loop', completed: true, duration: '180 min', questions: 25 },
+        { id: 2, title: 'Asynchronous Programming: Callbacks, Promises, Async/Await', completed: true, duration: '200 min', questions: 25 },
+        { id: 3, title: 'Node.js Modules and Package Management', completed: true, duration: '160 min', questions: 25 },
+        { id: 4, title: 'Express.js Framework and Middleware', completed: true, duration: '180 min', questions: 25 },
+        { id: 5, title: 'Node.js Performance Optimization and Scaling', completed: true, duration: '200 min', questions: 25 },
+        
+        // ZeroToMastery Foundation (6-10)
+        { id: 6, title: 'File I/O & Streams: Planets Project', completed: true, duration: '180 min', questions: 40 },
+        { id: 7, title: 'Web Servers & HTTP Fundamentals', completed: true, duration: '150 min', questions: 35 },
+        { id: 8, title: 'Full-Stack NASA Project', completed: true, duration: '240 min', questions: 50 },
+        { id: 9, title: 'Testing APIs with Jest & Supertest', completed: true, duration: '180 min', questions: 45 },
+        { id: 10, title: 'Database Integration: MongoDB & Mongoose', completed: true, duration: '200 min', questions: 50 },
+        
+        // Advanced Topics (11-15)
+        { id: 11, title: 'REST API Integration: SpaceX Project', completed: true, duration: '180 min', questions: 45 },
+        { id: 12, title: 'Authentication & Security: JWT, OAuth2, Auth0', completed: true, duration: '200 min', questions: 50 },
+        { id: 13, title: 'Deployment & CI/CD Pipelines', completed: true, duration: '180 min', questions: 40 },
+        { id: 14, title: 'GraphQL Implementation', completed: true, duration: '200 min', questions: 35 },
+        { id: 15, title: 'WebSockets & Real-Time Applications', completed: true, duration: '180 min', questions: 45 },
+        
+        // Expert Topics (16-20)
+        { id: 16, title: 'Microservices Architecture', completed: true, duration: '240 min', questions: 50 },
+        { id: 17, title: 'Serverless & Cloud: AWS Lambda', completed: true, duration: '200 min', questions: 40 },
+        { id: 18, title: 'Docker & Kubernetes', completed: true, duration: '220 min', questions: 45 },
+        { id: 19, title: 'Monitoring & Logging', completed: true, duration: '180 min', questions: 35 },
+        { id: 20, title: 'Security Best Practices', completed: true, duration: '200 min', questions: 40 },
+        
+        // FAANG Senior Enhancement (21-25)
+        { id: 21, title: 'Advanced Performance Tuning', completed: true, duration: '240 min', questions: 50 },
+        { id: 22, title: 'Distributed Systems', completed: true, duration: '260 min', questions: 55 },
+        { id: 23, title: 'Event-Driven Architecture', completed: true, duration: '240 min', questions: 50 },
+        { id: 24, title: 'Production Debugging', completed: true, duration: '220 min', questions: 45 },
+        { id: 25, title: 'Scalability Patterns', completed: true, duration: '260 min', questions: 55 }
+      ]
+    },
     java: {
       title: 'Java Fundamentals',
       description: 'Master Java programming from basics to advanced concepts including OOP, collections, and concurrency.',
