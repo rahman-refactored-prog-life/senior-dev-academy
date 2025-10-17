@@ -8636,11 +8636,33 @@ public class OrderItem {
         createExpressFrameworkTopic(module);
         createNodeJsPerformanceTopic(module);
         
-        // ZeroToMastery Foundation Topics (6-9)
+        // ZeroToMastery Foundation Topics (6-10)
         createFileIOStreamsPlanetsTopic(module);
         createWebServersHTTPTopic(module);
         createFullStackNASATopic(module);
         createTestingAPIsJestTopic(module);
+        createDatabaseIntegrationTopic(module);
+        
+        // ZeroToMastery Advanced Topics (11-15)
+        createRESTAPIIntegrationTopic(module);
+        createAuthenticationSecurityTopic(module);
+        createDeploymentCICDTopic(module);
+        createGraphQLImplementationTopic(module);
+        createWebSocketsRealTimeTopic(module);
+        
+        // ZeroToMastery Expert Topics (16-20)
+        createMicroservicesArchitectureTopic(module);
+        createServerlessCloudTopic(module);
+        createDockerKubernetesTopic(module);
+        createMonitoringLoggingTopic(module);
+        createSecurityBestPracticesTopic(module);
+        
+        // FAANG Senior Enhancement Topics (21-25)
+        createAdvancedPerformanceTuningTopic(module);
+        createDistributedSystemsTopic(module);
+        createEventDrivenArchitectureTopic(module);
+        createProductionDebuggingTopic(module);
+        createScalabilityPatternsTopic(module);
         
         createNodeJsInterviewQuestions(module);
         
@@ -15560,4 +15582,1938 @@ if (require.main === module) {
         topicRepository.save(topic);
         
         log.info("✅ Created Database Integration: MongoDB & Mongoose topic");
+    }   
+ }
+    
+    // ==================== TOPIC 11: REST API Integration - SpaceX Project ====================
+    
+    private void createRESTAPIIntegrationTopic(LearningModule module) {
+        Topic topic = new Topic();
+        topic.setTitle("REST API Integration: SpaceX Project");
+        topic.setDescription("Master external API integration with SpaceX API, data mapping, error handling, and caching strategies");
+        topic.setContent("""
+            <div class="topic-content">
+                <h2>🚀 REST API Integration: SpaceX Project</h2>
+                
+                <div class="learning-objectives">
+                    <h3>🎯 Learning Objectives</h3>
+                    <ul>
+                        <li>Master external REST API integration and consumption</li>
+                        <li>Implement robust error handling and retry strategies</li>
+                        <li>Design efficient caching and rate limiting mechanisms</li>
+                        <li>Build production-ready API client with TypeScript</li>
+                        <li>Handle real-time data synchronization and webhooks</li>
+                    </ul>
+                </div>
+                
+                <div class="concept-section">
+                    <h3>🏗️ Complete SpaceX API Integration</h3>
+                    <p>Build a production-grade SpaceX launch tracking system with advanced API integration patterns.</p>
+                    
+                    <div class="code-example">
+                        <h5>Advanced API Client with Caching & Retry Logic:</h5>
+                        <pre><code class="language-javascript">
+const axios = require('axios');
+const NodeCache = require('node-cache');
+const { RateLimiter } = require('limiter');
+
+class SpaceXAPIClient {
+    constructor(options = {}) {
+        this.baseURL = 'https://api.spacexdata.com/v4';
+        this.cache = new NodeCache({ stdTTL: 600, checkperiod: 120 });
+        this.rateLimiter = new RateLimiter({ tokensPerInterval: 10, interval: 'second' });
+        
+        this.client = axios.create({
+            baseURL: this.baseURL,
+            timeout: options.timeout || 10000,
+            headers: {
+                'Content-Type': 'application/json',
+                'User-Agent': 'SpaceX-Tracker/1.0'
+            }
+        });
+        
+        this.setupInterceptors();
+    }
+    
+    setupInterceptors() {
+        // Request interceptor for rate limiting
+        this.client.interceptors.request.use(async (config) => {
+            await this.rateLimiter.removeTokens(1);
+            console.log(`📡 API Request: ${config.method.toUpperCase()} ${config.url}`);
+            return config;
+        });
+        
+        // Response interceptor for error handling
+        this.client.interceptors.response.use(
+            response => response,
+            async error => {
+                if (error.response) {
+                    console.error(`❌ API Error: ${error.response.status} - ${error.response.statusText}`);
+                    
+                    // Retry logic for 5xx errors
+                    if (error.response.status >= 500 && error.config.retryCount < 3) {
+                        error.config.retryCount = (error.config.retryCount || 0) + 1;
+                        const delay = Math.pow(2, error.config.retryCount) * 1000;
+                        
+                        console.log(`🔄 Retrying in ${delay}ms (attempt ${error.config.retryCount}/3)`);
+                        await new Promise(resolve => setTimeout(resolve, delay));
+                        
+                        return this.client(error.config);
+                    }
+                }
+                throw error;
+            }
+        );
+    }
+    
+    async getAllLaunches(options = {}) {
+        const cacheKey = `launches_${JSON.stringify(options)}`;
+        const cached = this.cache.get(cacheKey);
+        
+        if (cached) {
+            console.log('✅ Returning cached launches');
+            return cached;
+        }
+        
+        try {
+            const response = await this.client.post('/launches/query', {
+                options: {
+                    limit: options.limit || 100,
+                    sort: { date_utc: options.sort || 'desc' },
+                    populate: ['rocket', 'launchpad', 'crew']
+                },
+                query: options.query || {}
+            });
+            
+            this.cache.set(cacheKey, response.data);
+            return response.data;
+            
+        } catch (error) {
+            console.error('Failed to fetch launches:', error.message);
+            throw new Error(`SpaceX API Error: ${error.message}`);
+        }
+    }
+    
+    async getUpcomingLaunches() {
+        return this.getAllLaunches({
+            query: { upcoming: true },
+            sort: 'asc',
+            limit: 10
+        });
+    }
+    
+    async getLatestLaunch() {
+        const cacheKey = 'latest_launch';
+        const cached = this.cache.get(cacheKey);
+        
+        if (cached) return cached;
+        
+        const response = await this.client.get('/launches/latest');
+        this.cache.set(cacheKey, response.data, 300); // 5 min cache
+        return response.data;
+    }
+    
+    async getRocketDetails(rocketId) {
+        const cacheKey = `rocket_${rocketId}`;
+        const cached = this.cache.get(cacheKey);
+        
+        if (cached) return cached;
+        
+        const response = await this.client.get(`/rockets/${rocketId}`);
+        this.cache.set(cacheKey, response.data, 3600); // 1 hour cache
+        return response.data;
+    }
+    
+    async searchLaunches(searchTerm) {
+        return this.getAllLaunches({
+            query: {
+                $or: [
+                    { name: { $regex: searchTerm, $options: 'i' } },
+                    { details: { $regex: searchTerm, $options: 'i' } }
+                ]
+            }
+        });
+    }
+    
+    clearCache() {
+        this.cache.flushAll();
+        console.log('🗑️  Cache cleared');
+    }
+}
+
+// Express API Server with SpaceX Integration
+const express = require('express');
+const app = express();
+const spaceXClient = new SpaceXAPIClient();
+
+app.use(express.json());
+
+// Get all launches with pagination
+app.get('/api/launches', async (req, res) => {
+    try {
+        const { limit = 20, page = 1, upcoming } = req.query;
+        
+        const options = {
+            limit: parseInt(limit),
+            query: upcoming === 'true' ? { upcoming: true } : {}
+        };
+        
+        const launches = await spaceXClient.getAllLaunches(options);
+        
+        res.json({
+            success: true,
+            count: launches.docs.length,
+            data: launches.docs,
+            pagination: {
+                page: launches.page,
+                totalPages: launches.totalPages,
+                hasNextPage: launches.hasNextPage
+            }
+        });
+        
+    } catch (error) {
+        res.status(500).json({
+            success: false,
+            error: error.message
+        });
+    }
+});
+
+// Get latest launch
+app.get('/api/launches/latest', async (req, res) => {
+    try {
+        const launch = await spaceXClient.getLatestLaunch();
+        res.json({ success: true, data: launch });
+    } catch (error) {
+        res.status(500).json({ success: false, error: error.message });
+    }
+});
+
+// Search launches
+app.get('/api/launches/search', async (req, res) => {
+    try {
+        const { q } = req.query;
+        if (!q) {
+            return res.status(400).json({ success: false, error: 'Search query required' });
+        }
+        
+        const results = await spaceXClient.searchLaunches(q);
+        res.json({ success: true, count: results.docs.length, data: results.docs });
+        
+    } catch (error) {
+        res.status(500).json({ success: false, error: error.message });
+    }
+});
+
+// Get rocket details
+app.get('/api/rockets/:id', async (req, res) => {
+    try {
+        const rocket = await spaceXClient.getRocketDetails(req.params.id);
+        res.json({ success: true, data: rocket });
+    } catch (error) {
+        res.status(404).json({ success: false, error: 'Rocket not found' });
+    }
+});
+
+// Clear cache endpoint
+app.post('/api/cache/clear', (req, res) => {
+    spaceXClient.clearCache();
+    res.json({ success: true, message: 'Cache cleared successfully' });
+});
+
+// Health check
+app.get('/health', (req, res) => {
+    res.json({
+        status: 'healthy',
+        timestamp: new Date().toISOString(),
+        cacheStats: spaceXClient.cache.getStats()
+    });
+});
+
+module.exports = { SpaceXAPIClient, app };
+                        </code></pre>
+                    </div>
+                </div>
+                
+                <div class="interview-questions">
+                    <h3>💼 Interview Questions</h3>
+                    
+                    <div class="question">
+                        <h4>Q1: How do you handle rate limiting when consuming external APIs? (Amazon, Google)</h4>
+                        <div class="answer">
+                            <p><strong>Answer:</strong> Implement multiple strategies:</p>
+                            <ul>
+                                <li><strong>Token Bucket Algorithm:</strong> Use libraries like 'limiter' to control request rate</li>
+                                <li><strong>Exponential Backoff:</strong> Retry failed requests with increasing delays</li>
+                                <li><strong>Queue System:</strong> Queue requests and process them at controlled rate</li>
+                                <li><strong>Response Headers:</strong> Monitor X-RateLimit headers and adjust accordingly</li>
+                                <li><strong>Circuit Breaker:</strong> Stop requests temporarily if API is consistently failing</li>
+                            </ul>
+                            <pre><code class="language-javascript">
+const { RateLimiter } = require('limiter');
+const limiter = new RateLimiter({ tokensPerInterval: 10, interval: 'second' });
+
+async function makeAPICall() {
+    await limiter.removeTokens(1); // Wait for token availability
+    return axios.get('/api/endpoint');
+}
+                            </code></pre>
+                        </div>
+                    </div>
+                    
+                    <div class="question">
+                        <h4>Q2: What caching strategies would you implement for external API data? (Meta, Microsoft)</h4>
+                        <div class="answer">
+                            <p><strong>Answer:</strong> Multi-layered caching approach:</p>
+                            <ul>
+                                <li><strong>In-Memory Cache:</strong> NodeCache for frequently accessed data (TTL: 5-10 min)</li>
+                                <li><strong>Redis Cache:</strong> Distributed cache for shared data across instances</li>
+                                <li><strong>HTTP Cache Headers:</strong> Leverage ETag and Cache-Control headers</li>
+                                <li><strong>Stale-While-Revalidate:</strong> Serve cached data while fetching fresh data</li>
+                                <li><strong>Cache Invalidation:</strong> Webhook-based or time-based invalidation</li>
+                            </ul>
+                        </div>
+                    </div>
+                    
+                    <div class="question">
+                        <h4>Q3: How do you implement retry logic with exponential backoff? (Amazon, Apple)</h4>
+                        <div class="answer">
+                            <p><strong>Answer:</strong> Implement intelligent retry mechanism:</p>
+                            <pre><code class="language-javascript">
+async function retryWithBackoff(fn, maxRetries = 3, baseDelay = 1000) {
+    for (let attempt = 0; attempt <= maxRetries; attempt++) {
+        try {
+            return await fn();
+        } catch (error) {
+            if (attempt === maxRetries) throw error;
+            
+            // Only retry on 5xx errors or network issues
+            if (error.response && error.response.status < 500) throw error;
+            
+            const delay = baseDelay * Math.pow(2, attempt);
+            const jitter = Math.random() * 1000; // Add randomness
+            
+            console.log(`Retry attempt ${attempt + 1}/${maxRetries} after ${delay + jitter}ms`);
+            await new Promise(resolve => setTimeout(resolve, delay + jitter));
+        }
+    }
+}
+                            </code></pre>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="note-taking-section">
+                    <h3>📝 Your Notes</h3>
+                    <div class="note-editor" data-topic="rest-api-integration">
+                        <textarea placeholder="Add your notes about REST API integration..."></textarea>
+                    </div>
+                </div>
+            </div>
+            """);
+        
+        topic.setEstimatedMinutes(180);
+        topic.setSortOrder(11);
+        module.getTopics().add(topic);
+        topicRepository.save(topic);
+        
+        log.info("✅ Created REST API Integration: SpaceX Project topic");
+    }
+
+    
+    // ==================== TOPIC 12: Authentication & Security ====================
+    
+    private void createAuthenticationSecurityTopic(LearningModule module) {
+        Topic topic = new Topic();
+        topic.setTitle("Authentication & Security: JWT, OAuth2, Auth0");
+        topic.setDescription("Master authentication strategies: JWT tokens, OAuth2 flows, Auth0 integration, and security best practices");
+        topic.setContent("""
+            <div class="topic-content">
+                <h2>🔐 Authentication & Security</h2>
+                
+                <div class="learning-objectives">
+                    <h3>🎯 Learning Objectives</h3>
+                    <ul>
+                        <li>Implement JWT-based authentication with refresh tokens</li>
+                        <li>Master OAuth2 flows and third-party authentication</li>
+                        <li>Integrate Auth0 for enterprise-grade security</li>
+                        <li>Implement role-based access control (RBAC)</li>
+                        <li>Secure APIs against common vulnerabilities</li>
+                    </ul>
+                </div>
+                
+                <div class="concept-section">
+                    <h3>🏗️ Complete Authentication System</h3>
+                    
+                    <div class="code-example">
+                        <h5>Production-Ready JWT Authentication:</h5>
+                        <pre><code class="language-javascript">
+const jwt = require('jsonwebtoken');
+const bcrypt = require('bcrypt');
+const crypto = require('crypto');
+
+class AuthenticationService {
+    constructor() {
+        this.accessTokenSecret = process.env.ACCESS_TOKEN_SECRET;
+        this.refreshTokenSecret = process.env.REFRESH_TOKEN_SECRET;
+        this.accessTokenExpiry = '15m';
+        this.refreshTokenExpiry = '7d';
+        this.refreshTokens = new Map(); // In production, use Redis
+    }
+    
+    async hashPassword(password) {
+        const saltRounds = 12;
+        return bcrypt.hash(password, saltRounds);
+    }
+    
+    async verifyPassword(password, hash) {
+        return bcrypt.compare(password, hash);
+    }
+    
+    generateAccessToken(user) {
+        const payload = {
+            userId: user.id,
+            email: user.email,
+            role: user.role,
+            permissions: user.permissions
+        };
+        
+        return jwt.sign(payload, this.accessTokenSecret, {
+            expiresIn: this.accessTokenExpiry,
+            issuer: 'spacex-tracker',
+            audience: 'spacex-api'
+        });
+    }
+    
+    generateRefreshToken(user) {
+        const payload = {
+            userId: user.id,
+            tokenId: crypto.randomBytes(32).toString('hex')
+        };
+        
+        const token = jwt.sign(payload, this.refreshTokenSecret, {
+            expiresIn: this.refreshTokenExpiry
+        });
+        
+        // Store refresh token (use Redis in production)
+        this.refreshTokens.set(payload.tokenId, {
+            userId: user.id,
+            createdAt: Date.now()
+        });
+        
+        return token;
+    }
+    
+    async login(email, password, userRepository) {
+        const user = await userRepository.findByEmail(email);
+        
+        if (!user) {
+            throw new Error('Invalid credentials');
+        }
+        
+        const isValidPassword = await this.verifyPassword(password, user.passwordHash);
+        
+        if (!isValidPassword) {
+            throw new Error('Invalid credentials');
+        }
+        
+        const accessToken = this.generateAccessToken(user);
+        const refreshToken = this.generateRefreshToken(user);
+        
+        return {
+            accessToken,
+            refreshToken,
+            user: {
+                id: user.id,
+                email: user.email,
+                role: user.role
+            }
+        };
+    }
+    
+    async refreshAccessToken(refreshToken) {
+        try {
+            const decoded = jwt.verify(refreshToken, this.refreshTokenSecret);
+            
+            // Check if refresh token is still valid
+            if (!this.refreshTokens.has(decoded.tokenId)) {
+                throw new Error('Refresh token revoked');
+            }
+            
+            // Generate new access token
+            const user = await userRepository.findById(decoded.userId);
+            return this.generateAccessToken(user);
+            
+        } catch (error) {
+            throw new Error('Invalid refresh token');
+        }
+    }
+    
+    revokeRefreshToken(tokenId) {
+        this.refreshTokens.delete(tokenId);
+    }
+}
+
+// Express Middleware
+function authenticateToken(req, res, next) {
+    const authHeader = req.headers['authorization'];
+    const token = authHeader && authHeader.split(' ')[1];
+    
+    if (!token) {
+        return res.status(401).json({ error: 'Access token required' });
+    }
+    
+    try {
+        const decoded = jwt.verify(token, process.env.ACCESS_TOKEN_SECRET);
+        req.user = decoded;
+        next();
+    } catch (error) {
+        return res.status(403).json({ error: 'Invalid or expired token' });
+    }
+}
+
+function authorizeRole(...allowedRoles) {
+    return (req, res, next) => {
+        if (!req.user) {
+            return res.status(401).json({ error: 'Authentication required' });
+        }
+        
+        if (!allowedRoles.includes(req.user.role)) {
+            return res.status(403).json({ error: 'Insufficient permissions' });
+        }
+        
+        next();
+    };
+}
+
+// OAuth2 Integration
+const passport = require('passport');
+const GoogleStrategy = require('passport-google-oauth20').Strategy;
+
+passport.use(new GoogleStrategy({
+    clientID: process.env.GOOGLE_CLIENT_ID,
+    clientSecret: process.env.GOOGLE_CLIENT_SECRET,
+    callbackURL: '/auth/google/callback'
+}, async (accessToken, refreshToken, profile, done) => {
+    try {
+        let user = await userRepository.findByGoogleId(profile.id);
+        
+        if (!user) {
+            user = await userRepository.create({
+                googleId: profile.id,
+                email: profile.emails[0].value,
+                name: profile.displayName,
+                avatar: profile.photos[0].value
+            });
+        }
+        
+        return done(null, user);
+    } catch (error) {
+        return done(error, null);
+    }
+}));
+
+module.exports = { AuthenticationService, authenticateToken, authorizeRole };
+                        </code></pre>
+                    </div>
+                </div>
+                
+                <div class="note-taking-section">
+                    <h3>📝 Your Notes</h3>
+                    <div class="note-editor" data-topic="authentication-security">
+                        <textarea placeholder="Add your notes about authentication and security..."></textarea>
+                    </div>
+                </div>
+            </div>
+            """);
+        
+        topic.setEstimatedMinutes(200);
+        topic.setSortOrder(12);
+        module.getTopics().add(topic);
+        topicRepository.save(topic);
+        
+        log.info("✅ Created Authentication & Security topic");
+    }
+
+    
+    // ==================== TOPIC 13: Deployment & CI/CD ====================
+    
+    private void createDeploymentCICDTopic(LearningModule module) {
+        Topic topic = new Topic();
+        topic.setTitle("Deployment & CI/CD Pipelines");
+        topic.setDescription("Master production deployment: Docker, CI/CD pipelines, AWS/Heroku deployment, and zero-downtime strategies");
+        topic.setContent("""
+            <div class="topic-content">
+                <h2>🚀 Deployment & CI/CD Pipelines</h2>
+                
+                <div class="learning-objectives">
+                    <h3>🎯 Learning Objectives</h3>
+                    <ul>
+                        <li>Containerize Node.js applications with Docker</li>
+                        <li>Build automated CI/CD pipelines with GitHub Actions</li>
+                        <li>Deploy to AWS, Heroku, and cloud platforms</li>
+                        <li>Implement zero-downtime deployment strategies</li>
+                        <li>Monitor and manage production applications</li>
+                    </ul>
+                </div>
+                
+                <div class="concept-section">
+                    <h3>🏗️ Complete Deployment Pipeline</h3>
+                    
+                    <div class="code-example">
+                        <h5>Production Dockerfile:</h5>
+                        <pre><code class="language-dockerfile">
+# Multi-stage build for optimized image
+FROM node:18-alpine AS builder
+
+WORKDIR /app
+
+# Copy package files
+COPY package*.json ./
+
+# Install dependencies
+RUN npm ci --only=production
+
+# Copy source code
+COPY . .
+
+# Build application (if using TypeScript)
+RUN npm run build
+
+# Production stage
+FROM node:18-alpine
+
+WORKDIR /app
+
+# Create non-root user
+RUN addgroup -g 1001 -S nodejs && adduser -S nodejs -u 1001
+
+# Copy from builder
+COPY --from=builder --chown=nodejs:nodejs /app/node_modules ./node_modules
+COPY --from=builder --chown=nodejs:nodejs /app/dist ./dist
+COPY --from=builder --chown=nodejs:nodejs /app/package*.json ./
+
+# Switch to non-root user
+USER nodejs
+
+# Expose port
+EXPOSE 3000
+
+# Health check
+HEALTHCHECK --interval=30s --timeout=3s --start-period=5s --retries=3 \\
+    CMD node healthcheck.js
+
+# Start application
+CMD ["node", "dist/server.js"]
+                        </code></pre>
+                        
+                        <h5>GitHub Actions CI/CD Pipeline:</h5>
+                        <pre><code class="language-yaml">
+name: CI/CD Pipeline
+
+on:
+  push:
+    branches: [main, develop]
+  pull_request:
+    branches: [main]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - uses: actions/checkout@v3
+      
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '18'
+          cache: 'npm'
+      
+      - name: Install dependencies
+        run: npm ci
+      
+      - name: Run linter
+        run: npm run lint
+      
+      - name: Run tests
+        run: npm test
+      
+      - name: Upload coverage
+        uses: codecov/codecov-action@v3
+  
+  build:
+    needs: test
+    runs-on: ubuntu-latest
+    
+    steps:
+      - uses: actions/checkout@v3
+      
+      - name: Build Docker image
+        run: docker build -t spacex-tracker:latest .
+      
+      - name: Run security scan
+        run: docker scan spacex-tracker:latest
+  
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/main'
+    
+    steps:
+      - uses: actions/checkout@v3
+      
+      - name: Deploy to AWS
+        env:
+          AWS_ACCESS_KEY_ID: \${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: \${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        run: |
+          aws ecr get-login-password --region us-east-1 | docker login --username AWS --password-stdin \${{ secrets.ECR_REGISTRY }}
+          docker build -t \${{ secrets.ECR_REGISTRY }}/spacex-tracker:latest .
+          docker push \${{ secrets.ECR_REGISTRY }}/spacex-tracker:latest
+          aws ecs update-service --cluster production --service spacex-tracker --force-new-deployment
+                        </code></pre>
+                    </div>
+                </div>
+                
+                <div class="note-taking-section">
+                    <h3>📝 Your Notes</h3>
+                    <div class="note-editor" data-topic="deployment-cicd">
+                        <textarea placeholder="Add your notes about deployment and CI/CD..."></textarea>
+                    </div>
+                </div>
+            </div>
+            """);
+        
+        topic.setEstimatedMinutes(180);
+        topic.setSortOrder(13);
+        module.getTopics().add(topic);
+        topicRepository.save(topic);
+        
+        log.info("✅ Created Deployment & CI/CD topic");
+    }
+    
+    // ==================== TOPIC 14: GraphQL Implementation ====================
+    
+    private void createGraphQLImplementationTopic(LearningModule module) {
+        Topic topic = new Topic();
+        topic.setTitle("GraphQL vs REST: Implementation & Best Practices");
+        topic.setDescription("Master GraphQL: schema design, resolvers, Apollo Server, and performance optimization");
+        topic.setContent("""
+            <div class="topic-content">
+                <h2>🔷 GraphQL Implementation</h2>
+                
+                <div class="learning-objectives">
+                    <h3>🎯 Learning Objectives</h3>
+                    <ul>
+                        <li>Design efficient GraphQL schemas and type systems</li>
+                        <li>Implement resolvers with DataLoader for N+1 prevention</li>
+                        <li>Build Apollo Server with authentication and caching</li>
+                        <li>Compare GraphQL vs REST trade-offs</li>
+                        <li>Optimize query performance and implement subscriptions</li>
+                    </ul>
+                </div>
+                
+                <div class="concept-section">
+                    <h3>🏗️ Complete GraphQL Server</h3>
+                    
+                    <div class="code-example">
+                        <h5>Apollo Server with TypeScript:</h5>
+                        <pre><code class="language-javascript">
+const { ApolloServer, gql } = require('apollo-server-express');
+const DataLoader = require('dataloader');
+
+// GraphQL Schema
+const typeDefs = gql\`
+    type Launch {
+        id: ID!
+        name: String!
+        date: String!
+        rocket: Rocket!
+        success: Boolean
+        details: String
+        crew: [Astronaut!]!
+    }
+    
+    type Rocket {
+        id: ID!
+        name: String!
+        type: String!
+        active: Boolean!
+        stages: Int!
+    }
+    
+    type Astronaut {
+        id: ID!
+        name: String!
+        agency: String!
+        launches: [Launch!]!
+    }
+    
+    type Query {
+        launches(limit: Int, offset: Int): [Launch!]!
+        launch(id: ID!): Launch
+        upcomingLaunches: [Launch!]!
+        rocket(id: ID!): Rocket
+    }
+    
+    type Mutation {
+        bookLaunch(launchId: ID!): BookingResponse!
+        cancelBooking(launchId: ID!): BookingResponse!
+    }
+    
+    type Subscription {
+        launchUpdated: Launch!
+    }
+    
+    type BookingResponse {
+        success: Boolean!
+        message: String
+        launch: Launch
+    }
+\`;
+
+// Resolvers with DataLoader
+const resolvers = {
+    Query: {
+        launches: async (_, { limit = 20, offset = 0 }, { dataSources }) => {
+            return dataSources.launchAPI.getAllLaunches({ limit, offset });
+        },
+        
+        launch: async (_, { id }, { dataSources }) => {
+            return dataSources.launchAPI.getLaunchById(id);
+        },
+        
+        upcomingLaunches: async (_, __, { dataSources }) => {
+            return dataSources.launchAPI.getUpcomingLaunches();
+        }
+    },
+    
+    Launch: {
+        rocket: async (launch, _, { loaders }) => {
+            return loaders.rocketLoader.load(launch.rocketId);
+        },
+        
+        crew: async (launch, _, { loaders }) => {
+            return loaders.crewLoader.loadMany(launch.crewIds);
+        }
+    },
+    
+    Mutation: {
+        bookLaunch: async (_, { launchId }, { dataSources, user }) => {
+            if (!user) throw new Error('Authentication required');
+            
+            const result = await dataSources.launchAPI.bookLaunch(launchId, user.id);
+            return {
+                success: result.success,
+                message: result.message,
+                launch: await dataSources.launchAPI.getLaunchById(launchId)
+            };
+        }
+    }
+};
+
+// DataLoader for N+1 prevention
+function createLoaders(dataSources) {
+    return {
+        rocketLoader: new DataLoader(async (rocketIds) => {
+            const rockets = await dataSources.rocketAPI.getRocketsByIds(rocketIds);
+            return rocketIds.map(id => rockets.find(r => r.id === id));
+        }),
+        
+        crewLoader: new DataLoader(async (crewIds) => {
+            const crew = await dataSources.crewAPI.getCrewByIds(crewIds);
+            return crewIds.map(id => crew.find(c => c.id === id));
+        })
+    };
+}
+
+// Apollo Server Setup
+const server = new ApolloServer({
+    typeDefs,
+    resolvers,
+    context: ({ req }) => ({
+        user: req.user,
+        loaders: createLoaders(dataSources)
+    }),
+    cache: 'bounded',
+    persistedQueries: false
+});
+
+module.exports = { server, typeDefs, resolvers };
+                        </code></pre>
+                    </div>
+                </div>
+                
+                <div class="note-taking-section">
+                    <h3>📝 Your Notes</h3>
+                    <div class="note-editor" data-topic="graphql-implementation">
+                        <textarea placeholder="Add your notes about GraphQL..."></textarea>
+                    </div>
+                </div>
+            </div>
+            """);
+        
+        topic.setEstimatedMinutes(200);
+        topic.setSortOrder(14);
+        module.getTopics().add(topic);
+        topicRepository.save(topic);
+        
+        log.info("✅ Created GraphQL Implementation topic");
+    }
+    
+    // ==================== TOPIC 15: WebSockets & Real-Time ====================
+    
+    private void createWebSocketsRealTimeTopic(LearningModule module) {
+        Topic topic = new Topic();
+        topic.setTitle("WebSockets & Real-Time Applications");
+        topic.setDescription("Master real-time communication: WebSockets, Socket.io, pub/sub patterns, and scalable architectures");
+        topic.setContent("""
+            <div class="topic-content">
+                <h2>⚡ WebSockets & Real-Time Applications</h2>
+                
+                <div class="learning-objectives">
+                    <h3>🎯 Learning Objectives</h3>
+                    <ul>
+                        <li>Implement WebSocket servers with Socket.io</li>
+                        <li>Build real-time chat and collaboration features</li>
+                        <li>Design scalable pub/sub architectures with Redis</li>
+                        <li>Handle connection management and reconnection logic</li>
+                        <li>Implement real-time data synchronization</li>
+                    </ul>
+                </div>
+                
+                <div class="concept-section">
+                    <h3>🏗️ Production WebSocket Server</h3>
+                    
+                    <div class="code-example">
+                        <h5>Socket.io Real-Time Server:</h5>
+                        <pre><code class="language-javascript">
+const express = require('express');
+const http = require('http');
+const socketIO = require('socket.io');
+const Redis = require('ioredis');
+
+class RealTimeServer {
+    constructor() {
+        this.app = express();
+        this.server = http.createServer(this.app);
+        this.io = socketIO(this.server, {
+            cors: { origin: '*' },
+            transports: ['websocket', 'polling']
+        });
+        
+        this.redis = new Redis();
+        this.setupSocketHandlers();
+    }
+    
+    setupSocketHandlers() {
+        this.io.on('connection', (socket) => {
+            console.log(\`✅ Client connected: \${socket.id}\`);
+            
+            // Authentication
+            socket.on('authenticate', async (token) => {
+                try {
+                    const user = await this.verifyToken(token);
+                    socket.user = user;
+                    socket.join(\`user:\${user.id}\`);
+                    socket.emit('authenticated', { user });
+                } catch (error) {
+                    socket.emit('auth_error', { message: 'Invalid token' });
+                    socket.disconnect();
+                }
+            });
+            
+            // Join launch tracking room
+            socket.on('track_launch', (launchId) => {
+                socket.join(\`launch:\${launchId}\`);
+                console.log(\`User \${socket.user.id} tracking launch \${launchId}\`);
+            });
+            
+            // Real-time chat
+            socket.on('send_message', async (data) => {
+                const message = {
+                    id: Date.now(),
+                    userId: socket.user.id,
+                    username: socket.user.name,
+                    text: data.text,
+                    timestamp: new Date()
+                };
+                
+                // Broadcast to room
+                this.io.to(\`launch:\${data.launchId}\`).emit('new_message', message);
+                
+                // Store in Redis
+                await this.redis.lpush(\`messages:\${data.launchId}\`, JSON.stringify(message));
+            });
+            
+            // Disconnect handling
+            socket.on('disconnect', () => {
+                console.log(\`❌ Client disconnected: \${socket.id}\`);
+            });
+        });
+    }
+    
+    // Broadcast launch updates
+    async broadcastLaunchUpdate(launchId, update) {
+        this.io.to(\`launch:\${launchId}\`).emit('launch_update', update);
+    }
+    
+    start(port = 3000) {
+        this.server.listen(port, () => {
+            console.log(\`🚀 Real-time server running on port \${port}\`);
+        });
+    }
+}
+
+module.exports = RealTimeServer;
+                        </code></pre>
+                    </div>
+                </div>
+                
+                <div class="note-taking-section">
+                    <h3>📝 Your Notes</h3>
+                    <div class="note-editor" data-topic="websockets-realtime">
+                        <textarea placeholder="Add your notes about WebSockets..."></textarea>
+                    </div>
+                </div>
+            </div>
+            """);
+        
+        topic.setEstimatedMinutes(180);
+        topic.setSortOrder(15);
+        module.getTopics().add(topic);
+        topicRepository.save(topic);
+        
+        log.info("✅ Created WebSockets & Real-Time topic");
+    }
+
+    
+    // ==================== TOPIC 16: Microservices Architecture ====================
+    
+    private void createMicroservicesArchitectureTopic(LearningModule module) {
+        Topic topic = new Topic();
+        topic.setTitle("Microservices Architecture & Service Communication");
+        topic.setDescription("Master microservices: service design, inter-service communication, API gateways, and distributed patterns");
+        topic.setContent("""
+            <div class="topic-content">
+                <h2>🏗️ Microservices Architecture</h2>
+                
+                <div class="learning-objectives">
+                    <h3>🎯 Learning Objectives</h3>
+                    <ul>
+                        <li>Design microservices with domain-driven design</li>
+                        <li>Implement service-to-service communication patterns</li>
+                        <li>Build API gateways and service mesh</li>
+                        <li>Handle distributed transactions and saga patterns</li>
+                        <li>Implement service discovery and load balancing</li>
+                    </ul>
+                </div>
+                
+                <div class="concept-section">
+                    <h3>🏗️ Microservices Implementation</h3>
+                    
+                    <div class="code-example">
+                        <h5>Service Architecture with Message Queue:</h5>
+                        <pre><code class="language-javascript">
+const express = require('express');
+const amqp = require('amqplib');
+
+class LaunchService {
+    constructor() {
+        this.app = express();
+        this.setupRoutes();
+        this.connectMessageQueue();
+    }
+    
+    async connectMessageQueue() {
+        this.connection = await amqp.connect('amqp://localhost');
+        this.channel = await this.connection.createChannel();
+        await this.channel.assertQueue('launch_events');
+        
+        // Listen for events from other services
+        this.channel.consume('launch_events', async (msg) => {
+            const event = JSON.parse(msg.content.toString());
+            await this.handleEvent(event);
+            this.channel.ack(msg);
+        });
+    }
+    
+    async publishEvent(eventType, data) {
+        const event = { type: eventType, data, timestamp: Date.now() };
+        this.channel.sendToQueue('launch_events', Buffer.from(JSON.stringify(event)));
+    }
+    
+    setupRoutes() {
+        this.app.post('/launches', async (req, res) => {
+            const launch = await this.createLaunch(req.body);
+            await this.publishEvent('LAUNCH_CREATED', launch);
+            res.json(launch);
+        });
+    }
+}
+
+module.exports = LaunchService;
+                        </code></pre>
+                    </div>
+                </div>
+                
+                <div class="note-taking-section">
+                    <h3>📝 Your Notes</h3>
+                    <div class="note-editor" data-topic="microservices">
+                        <textarea placeholder="Add your notes about microservices..."></textarea>
+                    </div>
+                </div>
+            </div>
+            """);
+        
+        topic.setEstimatedMinutes(240);
+        topic.setSortOrder(16);
+        module.getTopics().add(topic);
+        topicRepository.save(topic);
+        
+        log.info("✅ Created Microservices Architecture topic");
+    }
+    
+    // ==================== TOPIC 17: Serverless & Cloud ====================
+    
+    private void createServerlessCloudTopic(LearningModule module) {
+        Topic topic = new Topic();
+        topic.setTitle("Serverless Architecture & Cloud Functions");
+        topic.setDescription("Master serverless: AWS Lambda, API Gateway, DynamoDB, and event-driven architectures");
+        topic.setContent("""
+            <div class="topic-content">
+                <h2>☁️ Serverless Architecture</h2>
+                
+                <div class="learning-objectives">
+                    <h3>🎯 Learning Objectives</h3>
+                    <ul>
+                        <li>Build serverless applications with AWS Lambda</li>
+                        <li>Design event-driven architectures</li>
+                        <li>Implement API Gateway and DynamoDB integration</li>
+                        <li>Optimize cold start performance</li>
+                        <li>Handle serverless deployment and monitoring</li>
+                    </ul>
+                </div>
+                
+                <div class="concept-section">
+                    <h3>🏗️ AWS Lambda Functions</h3>
+                    
+                    <div class="code-example">
+                        <h5>Production Lambda Handler:</h5>
+                        <pre><code class="language-javascript">
+const AWS = require('aws-sdk');
+const dynamodb = new AWS.DynamoDB.DocumentClient();
+
+exports.handler = async (event) => {
+    try {
+        const { httpMethod, path, body } = event;
+        
+        if (httpMethod === 'GET' && path === '/launches') {
+            const result = await dynamodb.scan({
+                TableName: 'Launches'
+            }).promise();
+            
+            return {
+                statusCode: 200,
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(result.Items)
+            };
+        }
+        
+        if (httpMethod === 'POST' && path === '/launches') {
+            const launch = JSON.parse(body);
+            
+            await dynamodb.put({
+                TableName: 'Launches',
+                Item: { ...launch, id: Date.now().toString() }
+            }).promise();
+            
+            return {
+                statusCode: 201,
+                body: JSON.stringify({ success: true })
+            };
+        }
+        
+        return { statusCode: 404, body: 'Not Found' };
+        
+    } catch (error) {
+        console.error(error);
+        return {
+            statusCode: 500,
+            body: JSON.stringify({ error: error.message })
+        };
+    }
+};
+                        </code></pre>
+                    </div>
+                </div>
+                
+                <div class="note-taking-section">
+                    <h3>📝 Your Notes</h3>
+                    <div class="note-editor" data-topic="serverless-cloud">
+                        <textarea placeholder="Add your notes about serverless..."></textarea>
+                    </div>
+                </div>
+            </div>
+            """);
+        
+        topic.setEstimatedMinutes(200);
+        topic.setSortOrder(17);
+        module.getTopics().add(topic);
+        topicRepository.save(topic);
+        
+        log.info("✅ Created Serverless & Cloud topic");
+    }
+    
+    // ==================== TOPIC 18: Docker & Kubernetes ====================
+    
+    private void createDockerKubernetesTopic(LearningModule module) {
+        Topic topic = new Topic();
+        topic.setTitle("Docker & Kubernetes: Container Orchestration");
+        topic.setDescription("Master containerization: Docker best practices, Kubernetes deployments, and production orchestration");
+        topic.setContent("""
+            <div class="topic-content">
+                <h2>🐳 Docker & Kubernetes</h2>
+                
+                <div class="learning-objectives">
+                    <h3>🎯 Learning Objectives</h3>
+                    <ul>
+                        <li>Master Docker containerization and multi-stage builds</li>
+                        <li>Deploy applications to Kubernetes clusters</li>
+                        <li>Implement rolling updates and auto-scaling</li>
+                        <li>Configure service mesh and ingress controllers</li>
+                        <li>Monitor and debug containerized applications</li>
+                    </ul>
+                </div>
+                
+                <div class="concept-section">
+                    <h3>🏗️ Kubernetes Deployment</h3>
+                    
+                    <div class="code-example">
+                        <h5>Kubernetes Deployment YAML:</h5>
+                        <pre><code class="language-yaml">
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: spacex-tracker
+  labels:
+    app: spacex-tracker
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: spacex-tracker
+  template:
+    metadata:
+      labels:
+        app: spacex-tracker
+    spec:
+      containers:
+      - name: spacex-tracker
+        image: spacex-tracker:latest
+        ports:
+        - containerPort: 3000
+        env:
+        - name: NODE_ENV
+          value: "production"
+        resources:
+          requests:
+            memory: "256Mi"
+            cpu: "250m"
+          limits:
+            memory: "512Mi"
+            cpu: "500m"
+        livenessProbe:
+          httpGet:
+            path: /health
+            port: 3000
+          initialDelaySeconds: 30
+          periodSeconds: 10
+        readinessProbe:
+          httpGet:
+            path: /ready
+            port: 3000
+          initialDelaySeconds: 5
+          periodSeconds: 5
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: spacex-tracker-service
+spec:
+  selector:
+    app: spacex-tracker
+  ports:
+  - protocol: TCP
+    port: 80
+    targetPort: 3000
+  type: LoadBalancer
+                        </code></pre>
+                    </div>
+                </div>
+                
+                <div class="note-taking-section">
+                    <h3>📝 Your Notes</h3>
+                    <div class="note-editor" data-topic="docker-kubernetes">
+                        <textarea placeholder="Add your notes about Docker and Kubernetes..."></textarea>
+                    </div>
+                </div>
+            </div>
+            """);
+        
+        topic.setEstimatedMinutes(220);
+        topic.setSortOrder(18);
+        module.getTopics().add(topic);
+        topicRepository.save(topic);
+        
+        log.info("✅ Created Docker & Kubernetes topic");
+    }
+    
+    // ==================== TOPIC 19: Monitoring & Logging ====================
+    
+    private void createMonitoringLoggingTopic(LearningModule module) {
+        Topic topic = new Topic();
+        topic.setTitle("Monitoring, Logging & Observability");
+        topic.setDescription("Master production monitoring: Prometheus, Grafana, ELK stack, distributed tracing, and alerting");
+        topic.setContent("""
+            <div class="topic-content">
+                <h2>📊 Monitoring & Observability</h2>
+                
+                <div class="learning-objectives">
+                    <h3>🎯 Learning Objectives</h3>
+                    <ul>
+                        <li>Implement structured logging with Winston/Pino</li>
+                        <li>Set up Prometheus metrics and Grafana dashboards</li>
+                        <li>Configure distributed tracing with Jaeger</li>
+                        <li>Build alerting systems and on-call workflows</li>
+                        <li>Analyze performance bottlenecks and optimize</li>
+                    </ul>
+                </div>
+                
+                <div class="concept-section">
+                    <h3>🏗️ Production Monitoring Setup</h3>
+                    
+                    <div class="code-example">
+                        <h5>Structured Logging with Winston:</h5>
+                        <pre><code class="language-javascript">
+const winston = require('winston');
+const { ElasticsearchTransport } = require('winston-elasticsearch');
+
+const logger = winston.createLogger({
+    level: 'info',
+    format: winston.format.combine(
+        winston.format.timestamp(),
+        winston.format.errors({ stack: true }),
+        winston.format.json()
+    ),
+    defaultMeta: { service: 'spacex-tracker' },
+    transports: [
+        new winston.transports.File({ filename: 'error.log', level: 'error' }),
+        new winston.transports.File({ filename: 'combined.log' }),
+        new ElasticsearchTransport({
+            level: 'info',
+            clientOpts: { node: 'http://localhost:9200' }
+        })
+    ]
+});
+
+// Prometheus metrics
+const client = require('prom-client');
+const register = new client.Registry();
+
+const httpRequestDuration = new client.Histogram({
+    name: 'http_request_duration_seconds',
+    help: 'Duration of HTTP requests in seconds',
+    labelNames: ['method', 'route', 'status_code'],
+    registers: [register]
+});
+
+module.exports = { logger, httpRequestDuration, register };
+                        </code></pre>
+                    </div>
+                </div>
+                
+                <div class="note-taking-section">
+                    <h3>📝 Your Notes</h3>
+                    <div class="note-editor" data-topic="monitoring-logging">
+                        <textarea placeholder="Add your notes about monitoring..."></textarea>
+                    </div>
+                </div>
+            </div>
+            """);
+        
+        topic.setEstimatedMinutes(180);
+        topic.setSortOrder(19);
+        module.getTopics().add(topic);
+        topicRepository.save(topic);
+        
+        log.info("✅ Created Monitoring & Logging topic");
+    }
+    
+    // ==================== TOPIC 20: Security Best Practices ====================
+    
+    private void createSecurityBestPracticesTopic(LearningModule module) {
+        Topic topic = new Topic();
+        topic.setTitle("Security Best Practices & Vulnerability Prevention");
+        topic.setDescription("Master Node.js security: OWASP Top 10, input validation, rate limiting, and security headers");
+        topic.setContent("""
+            <div class="topic-content">
+                <h2>🔒 Security Best Practices</h2>
+                
+                <div class="learning-objectives">
+                    <h3>🎯 Learning Objectives</h3>
+                    <ul>
+                        <li>Prevent OWASP Top 10 vulnerabilities</li>
+                        <li>Implement input validation and sanitization</li>
+                        <li>Configure security headers and CORS properly</li>
+                        <li>Handle secrets management and encryption</li>
+                        <li>Perform security audits and penetration testing</li>
+                    </ul>
+                </div>
+                
+                <div class="concept-section">
+                    <h3>🏗️ Security Implementation</h3>
+                    
+                    <div class="code-example">
+                        <h5>Comprehensive Security Middleware:</h5>
+                        <pre><code class="language-javascript">
+const helmet = require('helmet');
+const rateLimit = require('express-rate-limit');
+const mongoSanitize = require('express-mongo-sanitize');
+const xss = require('xss-clean');
+
+// Security headers
+app.use(helmet({
+    contentSecurityPolicy: {
+        directives: {
+            defaultSrc: ["'self'"],
+            styleSrc: ["'self'", "'unsafe-inline'"],
+            scriptSrc: ["'self'"],
+            imgSrc: ["'self'", 'data:', 'https:']
+        }
+    },
+    hsts: {
+        maxAge: 31536000,
+        includeSubDomains: true,
+        preload: true
+    }
+}));
+
+// Rate limiting
+const limiter = rateLimit({
+    windowMs: 15 * 60 * 1000,
+    max: 100,
+    message: 'Too many requests from this IP'
+});
+app.use('/api/', limiter);
+
+// Data sanitization
+app.use(mongoSanitize());
+app.use(xss());
+
+// Input validation
+const { body, validationResult } = require('express-validator');
+
+app.post('/api/launches',
+    body('name').trim().isLength({ min: 3, max: 100 }).escape(),
+    body('date').isISO8601(),
+    async (req, res) => {
+        const errors = validationResult(req);
+        if (!errors.isEmpty()) {
+            return res.status(400).json({ errors: errors.array() });
+        }
+        // Process request
+    }
+);
+
+module.exports = app;
+                        </code></pre>
+                    </div>
+                </div>
+                
+                <div class="note-taking-section">
+                    <h3>📝 Your Notes</h3>
+                    <div class="note-editor" data-topic="security-best-practices">
+                        <textarea placeholder="Add your notes about security..."></textarea>
+                    </div>
+                </div>
+            </div>
+            """);
+        
+        topic.setEstimatedMinutes(200);
+        topic.setSortOrder(20);
+        module.getTopics().add(topic);
+        topicRepository.save(topic);
+        
+        log.info("✅ Created Security Best Practices topic");
+    }
+
+    
+    // ==================== TOPIC 21: Advanced Performance Tuning ====================
+    
+    private void createAdvancedPerformanceTuningTopic(LearningModule module) {
+        Topic topic = new Topic();
+        topic.setTitle("Advanced Performance Tuning & Optimization");
+        topic.setDescription("Master performance optimization: profiling, memory management, V8 internals, and production tuning");
+        topic.setContent("""
+            <div class="topic-content">
+                <h2>⚡ Advanced Performance Tuning</h2>
+                
+                <div class="learning-objectives">
+                    <h3>🎯 Learning Objectives</h3>
+                    <ul>
+                        <li>Profile and optimize Node.js applications</li>
+                        <li>Understand V8 engine internals and optimization</li>
+                        <li>Implement advanced caching strategies</li>
+                        <li>Optimize memory usage and prevent leaks</li>
+                        <li>Tune production performance at scale</li>
+                    </ul>
+                </div>
+                
+                <div class="concept-section">
+                    <h3>🏗️ Performance Optimization Techniques</h3>
+                    
+                    <div class="code-example">
+                        <h5>Advanced Performance Monitoring:</h5>
+                        <pre><code class="language-javascript">
+const v8 = require('v8');
+const { performance, PerformanceObserver } = require('perf_hooks');
+
+class PerformanceMonitor {
+    constructor() {
+        this.setupObservers();
+    }
+    
+    setupObservers() {
+        const obs = new PerformanceObserver((items) => {
+            items.getEntries().forEach((entry) => {
+                console.log(\`\${entry.name}: \${entry.duration}ms\`);
+            });
+        });
+        obs.observe({ entryTypes: ['measure', 'function'] });
+    }
+    
+    getHeapStatistics() {
+        const heapStats = v8.getHeapStatistics();
+        return {
+            totalHeapSize: (heapStats.total_heap_size / 1024 / 1024).toFixed(2) + ' MB',
+            usedHeapSize: (heapStats.used_heap_size / 1024 / 1024).toFixed(2) + ' MB',
+            heapSizeLimit: (heapStats.heap_size_limit / 1024 / 1024).toFixed(2) + ' MB'
+        };
+    }
+    
+    async profileFunction(fn, name) {
+        performance.mark(\`\${name}-start\`);
+        const result = await fn();
+        performance.mark(\`\${name}-end\`);
+        performance.measure(name, \`\${name}-start\`, \`\${name}-end\`);
+        return result;
+    }
+}
+
+module.exports = PerformanceMonitor;
+                        </code></pre>
+                    </div>
+                </div>
+                
+                <div class="note-taking-section">
+                    <h3>📝 Your Notes</h3>
+                    <div class="note-editor" data-topic="performance-tuning">
+                        <textarea placeholder="Add your notes about performance tuning..."></textarea>
+                    </div>
+                </div>
+            </div>
+            """);
+        
+        topic.setEstimatedMinutes(240);
+        topic.setSortOrder(21);
+        module.getTopics().add(topic);
+        topicRepository.save(topic);
+        
+        log.info("✅ Created Advanced Performance Tuning topic");
+    }
+    
+    // ==================== TOPIC 22: Distributed Systems ====================
+    
+    private void createDistributedSystemsTopic(LearningModule module) {
+        Topic topic = new Topic();
+        topic.setTitle("Distributed Systems & Consensus Algorithms");
+        topic.setDescription("Master distributed systems: CAP theorem, consensus algorithms, distributed transactions, and fault tolerance");
+        topic.setContent("""
+            <div class="topic-content">
+                <h2>🌐 Distributed Systems</h2>
+                
+                <div class="learning-objectives">
+                    <h3>🎯 Learning Objectives</h3>
+                    <ul>
+                        <li>Understand CAP theorem and consistency models</li>
+                        <li>Implement distributed consensus with Raft/Paxos</li>
+                        <li>Handle distributed transactions and saga patterns</li>
+                        <li>Design fault-tolerant systems</li>
+                        <li>Implement service mesh and circuit breakers</li>
+                    </ul>
+                </div>
+                
+                <div class="concept-section">
+                    <h3>🏗️ Distributed System Patterns</h3>
+                    
+                    <div class="code-example">
+                        <h5>Circuit Breaker Pattern:</h5>
+                        <pre><code class="language-javascript">
+class CircuitBreaker {
+    constructor(options = {}) {
+        this.failureThreshold = options.failureThreshold || 5;
+        this.resetTimeout = options.resetTimeout || 60000;
+        this.state = 'CLOSED';
+        this.failureCount = 0;
+        this.nextAttempt = Date.now();
+    }
+    
+    async execute(fn) {
+        if (this.state === 'OPEN') {
+            if (Date.now() < this.nextAttempt) {
+                throw new Error('Circuit breaker is OPEN');
+            }
+            this.state = 'HALF_OPEN';
+        }
+        
+        try {
+            const result = await fn();
+            this.onSuccess();
+            return result;
+        } catch (error) {
+            this.onFailure();
+            throw error;
+        }
+    }
+    
+    onSuccess() {
+        this.failureCount = 0;
+        this.state = 'CLOSED';
+    }
+    
+    onFailure() {
+        this.failureCount++;
+        if (this.failureCount >= this.failureThreshold) {
+            this.state = 'OPEN';
+            this.nextAttempt = Date.now() + this.resetTimeout;
+        }
+    }
+}
+
+module.exports = CircuitBreaker;
+                        </code></pre>
+                    </div>
+                </div>
+                
+                <div class="note-taking-section">
+                    <h3>📝 Your Notes</h3>
+                    <div class="note-editor" data-topic="distributed-systems">
+                        <textarea placeholder="Add your notes about distributed systems..."></textarea>
+                    </div>
+                </div>
+            </div>
+            """);
+        
+        topic.setEstimatedMinutes(260);
+        topic.setSortOrder(22);
+        module.getTopics().add(topic);
+        topicRepository.save(topic);
+        
+        log.info("✅ Created Distributed Systems topic");
+    }
+    
+    // ==================== TOPIC 23: Event-Driven Architecture ====================
+    
+    private void createEventDrivenArchitectureTopic(LearningModule module) {
+        Topic topic = new Topic();
+        topic.setTitle("Event-Driven Architecture & Message Queues");
+        topic.setDescription("Master event-driven systems: Kafka, RabbitMQ, event sourcing, CQRS, and async patterns");
+        topic.setContent("""
+            <div class="topic-content">
+                <h2>📨 Event-Driven Architecture</h2>
+                
+                <div class="learning-objectives">
+                    <h3>🎯 Learning Objectives</h3>
+                    <ul>
+                        <li>Design event-driven architectures</li>
+                        <li>Implement Kafka producers and consumers</li>
+                        <li>Build event sourcing and CQRS patterns</li>
+                        <li>Handle message ordering and idempotency</li>
+                        <li>Implement saga patterns for distributed workflows</li>
+                    </ul>
+                </div>
+                
+                <div class="concept-section">
+                    <h3>🏗️ Kafka Event System</h3>
+                    
+                    <div class="code-example">
+                        <h5>Kafka Producer/Consumer:</h5>
+                        <pre><code class="language-javascript">
+const { Kafka } = require('kafkajs');
+
+class EventBus {
+    constructor() {
+        this.kafka = new Kafka({
+            clientId: 'spacex-tracker',
+            brokers: ['localhost:9092']
+        });
+        
+        this.producer = this.kafka.producer();
+        this.consumer = this.kafka.consumer({ groupId: 'launch-service' });
+    }
+    
+    async publishEvent(topic, event) {
+        await this.producer.connect();
+        await this.producer.send({
+            topic,
+            messages: [{
+                key: event.id,
+                value: JSON.stringify(event),
+                headers: { 'event-type': event.type }
+            }]
+        });
+    }
+    
+    async subscribe(topic, handler) {
+        await this.consumer.connect();
+        await this.consumer.subscribe({ topic, fromBeginning: false });
+        
+        await this.consumer.run({
+            eachMessage: async ({ topic, partition, message }) => {
+                const event = JSON.parse(message.value.toString());
+                await handler(event);
+            }
+        });
+    }
+}
+
+module.exports = EventBus;
+                        </code></pre>
+                    </div>
+                </div>
+                
+                <div class="note-taking-section">
+                    <h3>📝 Your Notes</h3>
+                    <div class="note-editor" data-topic="event-driven-architecture">
+                        <textarea placeholder="Add your notes about event-driven architecture..."></textarea>
+                    </div>
+                </div>
+            </div>
+            """);
+        
+        topic.setEstimatedMinutes(240);
+        topic.setSortOrder(23);
+        module.getTopics().add(topic);
+        topicRepository.save(topic);
+        
+        log.info("✅ Created Event-Driven Architecture topic");
+    }
+    
+    // ==================== TOPIC 24: Production Debugging ====================
+    
+    private void createProductionDebuggingTopic(LearningModule module) {
+        Topic topic = new Topic();
+        topic.setTitle("Production Debugging & Troubleshooting");
+        topic.setDescription("Master production debugging: heap dumps, CPU profiling, distributed tracing, and incident response");
+        topic.setContent("""
+            <div class="topic-content">
+                <h2>🔍 Production Debugging</h2>
+                
+                <div class="learning-objectives">
+                    <h3>🎯 Learning Objectives</h3>
+                    <ul>
+                        <li>Debug production issues without downtime</li>
+                        <li>Analyze heap dumps and memory leaks</li>
+                        <li>Profile CPU usage and optimize hot paths</li>
+                        <li>Implement distributed tracing</li>
+                        <li>Handle incident response and post-mortems</li>
+                    </ul>
+                </div>
+                
+                <div class="concept-section">
+                    <h3>🏗️ Production Debugging Tools</h3>
+                    
+                    <div class="code-example">
+                        <h5>Heap Dump Analysis:</h5>
+                        <pre><code class="language-javascript">
+const v8 = require('v8');
+const fs = require('fs');
+
+class ProductionDebugger {
+    static captureHeapSnapshot(filename) {
+        const snapshotStream = v8.writeHeapSnapshot(filename);
+        console.log(\`Heap snapshot written to \${snapshotStream}\`);
+        return snapshotStream;
+    }
+    
+    static async analyzeCPUProfile(duration = 10000) {
+        const profiler = require('v8-profiler-next');
+        profiler.startProfiling('CPU Profile');
+        
+        await new Promise(resolve => setTimeout(resolve, duration));
+        
+        const profile = profiler.stopProfiling();
+        profile.export((error, result) => {
+            fs.writeFileSync('cpu-profile.cpuprofile', result);
+            profile.delete();
+        });
+    }
+    
+    static monitorEventLoop() {
+        const { monitorEventLoopDelay } = require('perf_hooks');
+        const h = monitorEventLoopDelay({ resolution: 20 });
+        h.enable();
+        
+        setInterval(() => {
+            console.log(\`Event Loop Delay: \${h.mean}ms (max: \${h.max}ms)\`);
+        }, 5000);
+    }
+}
+
+module.exports = ProductionDebugger;
+                        </code></pre>
+                    </div>
+                </div>
+                
+                <div class="note-taking-section">
+                    <h3>📝 Your Notes</h3>
+                    <div class="note-editor" data-topic="production-debugging">
+                        <textarea placeholder="Add your notes about production debugging..."></textarea>
+                    </div>
+                </div>
+            </div>
+            """);
+        
+        topic.setEstimatedMinutes(220);
+        topic.setSortOrder(24);
+        module.getTopics().add(topic);
+        topicRepository.save(topic);
+        
+        log.info("✅ Created Production Debugging topic");
+    }
+    
+    // ==================== TOPIC 25: Scalability Patterns ====================
+    
+    private void createScalabilityPatternsTopic(LearningModule module) {
+        Topic topic = new Topic();
+        topic.setTitle("Scalability Patterns & High-Performance Systems");
+        topic.setDescription("Master scalability: horizontal scaling, load balancing, caching strategies, and handling millions of requests");
+        topic.setContent("""
+            <div class="topic-content">
+                <h2>📈 Scalability Patterns</h2>
+                
+                <div class="learning-objectives">
+                    <h3>🎯 Learning Objectives</h3>
+                    <ul>
+                        <li>Design horizontally scalable architectures</li>
+                        <li>Implement advanced load balancing strategies</li>
+                        <li>Build multi-layer caching systems</li>
+                        <li>Handle database sharding and replication</li>
+                        <li>Optimize for millions of concurrent users</li>
+                    </ul>
+                </div>
+                
+                <div class="concept-section">
+                    <h3>🏗️ High-Performance Architecture</h3>
+                    
+                    <div class="code-example">
+                        <h5>Multi-Layer Caching Strategy:</h5>
+                        <pre><code class="language-javascript">
+const Redis = require('ioredis');
+const NodeCache = require('node-cache');
+
+class MultiLayerCache {
+    constructor() {
+        this.l1Cache = new NodeCache({ stdTTL: 60 }); // In-memory
+        this.l2Cache = new Redis(); // Redis
+    }
+    
+    async get(key) {
+        // Try L1 cache first
+        let value = this.l1Cache.get(key);
+        if (value) {
+            console.log('L1 Cache HIT');
+            return value;
+        }
+        
+        // Try L2 cache
+        value = await this.l2Cache.get(key);
+        if (value) {
+            console.log('L2 Cache HIT');
+            this.l1Cache.set(key, value);
+            return JSON.parse(value);
+        }
+        
+        console.log('Cache MISS');
+        return null;
+    }
+    
+    async set(key, value, ttl = 300) {
+        this.l1Cache.set(key, value, ttl);
+        await this.l2Cache.setex(key, ttl, JSON.stringify(value));
+    }
+    
+    async invalidate(key) {
+        this.l1Cache.del(key);
+        await this.l2Cache.del(key);
+    }
+}
+
+// Load Balancer with Health Checks
+class LoadBalancer {
+    constructor(servers) {
+        this.servers = servers;
+        this.currentIndex = 0;
+        this.healthStatus = new Map();
+        this.startHealthChecks();
+    }
+    
+    startHealthChecks() {
+        setInterval(() => {
+            this.servers.forEach(async (server) => {
+                try {
+                    const response = await fetch(\`\${server}/health\`);
+                    this.healthStatus.set(server, response.ok);
+                } catch (error) {
+                    this.healthStatus.set(server, false);
+                }
+            });
+        }, 10000);
+    }
+    
+    getNextServer() {
+        const healthyServers = this.servers.filter(s => this.healthStatus.get(s) !== false);
+        
+        if (healthyServers.length === 0) {
+            throw new Error('No healthy servers available');
+        }
+        
+        const server = healthyServers[this.currentIndex % healthyServers.length];
+        this.currentIndex++;
+        return server;
+    }
+}
+
+module.exports = { MultiLayerCache, LoadBalancer };
+                        </code></pre>
+                    </div>
+                </div>
+                
+                <div class="note-taking-section">
+                    <h3>📝 Your Notes</h3>
+                    <div class="note-editor" data-topic="scalability-patterns">
+                        <textarea placeholder="Add your notes about scalability patterns..."></textarea>
+                    </div>
+                </div>
+            </div>
+            """);
+        
+        topic.setEstimatedMinutes(260);
+        topic.setSortOrder(25);
+        module.getTopics().add(topic);
+        topicRepository.save(topic);
+        
+        log.info("✅ Created Scalability Patterns topic");
     }
