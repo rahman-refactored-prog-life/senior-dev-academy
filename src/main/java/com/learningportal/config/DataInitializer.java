@@ -47,6 +47,8 @@ public class DataInitializer implements CommandLineRunner {
             createAlgorithmsModule();
             createSystemDesignModule();
             createDatabaseModule();
+            createHibernateJpaModule();
+            createNodeJsFundamentalsModule();
             createInterviewPrepModule();
             
             log.info("Database initialization completed successfully!");
@@ -2992,6 +2994,9 @@ useEffect(() => {
         createAdvancedHashingTechniquesTopic(dsModule);
         
         log.info("✅ Phase 1.2 Complete: Data Structures Fundamentals Topics Created (5 topics, 200+ questions)");
+        
+        // Phase 1.3: Hibernate & JPA Deep Dive
+        createHibernateJPAModule();
     }
     
     private void createHashMapImplementationTopic(LearningModule module) {
@@ -6188,4 +6193,5894 @@ public class DistributedHashTable {
         
         questions.forEach(questionRepository::save);
         log.info("Created {} Set implementations interview questions", questions.size());
+    } 
+   
+    private void createHibernateJPAModule() {
+        log.info("🚀 Phase 1.3: Creating Hibernate & JPA Deep Dive Module...");
+        
+        LearningModule hibernateModule = new LearningModule();
+        hibernateModule.setName("Hibernate & JPA Deep Dive");
+        hibernateModule.setDescription("Master Hibernate and JPA: entity mapping, query optimization, caching strategies, and transaction management");
+        hibernateModule.setCategory(LearningModule.Category.JAVA_FUNDAMENTALS);
+        hibernateModule.setEstimatedHours(25);
+        hibernateModule.setDifficultyLevel("INTERMEDIATE_TO_ADVANCED");
+        hibernateModule.setSortOrder(8);
+        
+        learningModuleRepository.save(hibernateModule);
+        
+        // Topic 1: Entity Mapping and Relationships
+        createEntityMappingTopic(hibernateModule);
+        
+        // Topic 2: Query Optimization (HQL, JPQL, Criteria API)
+        createQueryOptimizationTopic(hibernateModule);
+        
+        // Topic 3: Caching Strategies
+        createCachingStrategiesTopic(hibernateModule);
+        
+        // Topic 4: Transaction Management
+        createTransactionManagementTopic(hibernateModule);
+        
+        log.info("✅ Phase 1.3 Complete: Hibernate & JPA Deep Dive Module Created (4 topics, 215+ questions)");
+    }
+    
+    private void createEntityMappingTopic(LearningModule module) {
+        Topic topic = new Topic();
+        topic.setTitle("Entity Mapping and Relationships");
+        topic.setDescription("Master JPA entity mapping: @Entity, @Table, relationships, cascade types, fetch strategies, and inheritance mapping");
+        topic.setContent("""
+            <div class="topic-content">
+                <h2>🎯 Entity Mapping and Relationships</h2>
+                
+                <div class="learning-objectives">
+                    <h3>🎯 Learning Objectives</h3>
+                    <ul>
+                        <li>Master JPA annotations for entity mapping</li>
+                        <li>Implement all types of entity relationships</li>
+                        <li>Understand cascade types and fetch strategies</li>
+                        <li>Design inheritance mapping strategies</li>
+                        <li>Optimize entity relationships for performance</li>
+                    </ul>
+                </div>
+                
+                <div class="concept-section">
+                    <h3>🏗️ Basic Entity Mapping</h3>
+                    <p>JPA entities represent database tables. Proper mapping is crucial for performance and maintainability.</p>
+                    
+                    <div class="code-example">
+                        <h5>Complete Entity Example:</h5>
+                        <pre><code class="language-java">
+import javax.persistence.*;
+import java.time.LocalDateTime;
+import java.util.Objects;
+
+@Entity
+@Table(name = "users", 
+       uniqueConstraints = {
+           @UniqueConstraint(columnNames = "username"),
+           @UniqueConstraint(columnNames = "email")
+       },
+       indexes = {
+           @Index(name = "idx_user_email", columnList = "email"),
+           @Index(name = "idx_user_created", columnList = "created_at")
+       })
+@EntityListeners(AuditingEntityListener.class)
+public class User {
+    
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "user_id")
+    private Long id;
+    
+    @Column(name = "username", nullable = false, length = 50)
+    private String username;
+    
+    @Column(name = "email", nullable = false, length = 100)
+    private String email;
+    
+    @Column(name = "password_hash", nullable = false)
+    private String passwordHash;
+    
+    @Enumerated(EnumType.STRING)
+    @Column(name = "status", nullable = false)
+    private UserStatus status = UserStatus.ACTIVE;
+    
+    @Lob
+    @Column(name = "profile_data")
+    private String profileData;
+    
+    @CreatedDate
+    @Column(name = "created_at", nullable = false, updatable = false)
+    private LocalDateTime createdAt;
+    
+    @LastModifiedDate
+    @Column(name = "updated_at")
+    private LocalDateTime updatedAt;
+    
+    @Version
+    @Column(name = "version")
+    private Long version;
+    
+    // Constructors
+    public User() {}
+    
+    public User(String username, String email, String passwordHash) {
+        this.username = username;
+        this.email = email;
+        this.passwordHash = passwordHash;
+    }
+    
+    // Getters and setters
+    public Long getId() { return id; }
+    public void setId(Long id) { this.id = id; }
+    
+    public String getUsername() { return username; }
+    public void setUsername(String username) { this.username = username; }
+    
+    public String getEmail() { return email; }
+    public void setEmail(String email) { this.email = email; }
+    
+    // equals() and hashCode() - CRITICAL for JPA entities
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof User)) return false;
+        User user = (User) o;
+        return Objects.equals(id, user.id);
+    }
+    
+    @Override
+    public int hashCode() {
+        return Objects.hash(id);
+    }
+    
+    @Override
+    public String toString() {
+        return "User{id=" + id + ", username='" + username + "'}";
+    }
+}
+
+enum UserStatus {
+    ACTIVE, INACTIVE, SUSPENDED, DELETED
+}
+                        </code></pre>
+                    </div>
+                </div>
+                
+                <div class="concept-section">
+                    <h3>🔗 Entity Relationships</h3>
+                    <p>JPA supports four types of relationships: @OneToOne, @OneToMany, @ManyToOne, and @ManyToMany.</p>
+                    
+                    <div class="code-example">
+                        <h5>One-to-Many Relationship:</h5>
+                        <pre><code class="language-java">
+@Entity
+@Table(name = "orders")
+public class Order {
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+    
+    @Column(name = "order_number", unique = true)
+    private String orderNumber;
+    
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "user_id", nullable = false)
+    private User user;
+    
+    @OneToMany(mappedBy = "order", 
+               cascade = CascadeType.ALL, 
+               orphanRemoval = true,
+               fetch = FetchType.LAZY)
+    private List<OrderItem> items = new ArrayList<>();
+    
+    @Enumerated(EnumType.STRING)
+    private OrderStatus status = OrderStatus.PENDING;
+    
+    @Column(name = "total_amount", precision = 10, scale = 2)
+    private BigDecimal totalAmount;
+    
+    @CreatedDate
+    private LocalDateTime createdAt;
+    
+    // Helper methods for bidirectional relationship
+    public void addItem(OrderItem item) {
+        items.add(item);
+        item.setOrder(this);
+    }
+    
+    public void removeItem(OrderItem item) {
+        items.remove(item);
+        item.setOrder(null);
+    }
+    
+    // Calculate total amount
+    public void calculateTotal() {
+        this.totalAmount = items.stream()
+            .map(OrderItem::getSubtotal)
+            .reduce(BigDecimal.ZERO, BigDecimal::add);
+    }
+}
+
+@Entity
+@Table(name = "order_items")
+public class OrderItem {
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+    
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "order_id", nullable = false)
+    private Order order;
+    
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "product_id", nullable = false)
+    private Product product;
+    
+    @Column(name = "quantity", nullable = false)
+    private Integer quantity;
+    
+    @Column(name = "unit_price", precision = 10, scale = 2, nullable = false)
+    private BigDecimal unitPrice;
+    
+    // Calculated field
+    public BigDecimal getSubtotal() {
+        return unitPrice.multiply(BigDecimal.valueOf(quantity));
+    }
+}
+                        </code></pre>
+                    </div>
+                </div>
+                
+                <div class="concept-section">
+                    <h3>🔄 Cascade Types and Fetch Strategies</h3>
+                    <p>Understanding cascade operations and fetch strategies is crucial for performance and data integrity.</p>
+                    
+                    <div class="code-example">
+                        <h5>Cascade Types Example:</h5>
+                        <pre><code class="language-java">
+@Entity
+public class Blog {
+    @Id
+    @GeneratedValue
+    private Long id;
+    
+    private String title;
+    
+    // CASCADE.ALL: All operations cascade to comments
+    @OneToMany(mappedBy = "blog", 
+               cascade = CascadeType.ALL, 
+               orphanRemoval = true)
+    private List<Comment> comments = new ArrayList<>();
+    
+    // CASCADE.PERSIST: Only persist operations cascade
+    @ManyToMany(cascade = CascadeType.PERSIST)
+    @JoinTable(
+        name = "blog_tags",
+        joinColumns = @JoinColumn(name = "blog_id"),
+        inverseJoinColumns = @JoinColumn(name = "tag_id")
+    )
+    private Set<Tag> tags = new HashSet<>();
+    
+    // No cascade - author must be managed separately
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "author_id")
+    private User author;
+}
+
+@Entity
+public class Comment {
+    @Id
+    @GeneratedValue
+    private Long id;
+    
+    private String content;
+    
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "blog_id")
+    private Blog blog;
+    
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "author_id")
+    private User author;
+}
+
+// Fetch Strategy Examples
+public class FetchStrategyExamples {
+    
+    @Autowired
+    private BlogRepository blogRepository;
+    
+    public void demonstrateFetchStrategies() {
+        // LAZY loading (default for collections)
+        Blog blog = blogRepository.findById(1L).orElse(null);
+        // Comments not loaded yet - will trigger query when accessed
+        List<Comment> comments = blog.getComments(); // Query executed here
+        
+        // EAGER loading (use with caution)
+        @Query("SELECT b FROM Blog b JOIN FETCH b.comments WHERE b.id = :id")
+        Blog blogWithComments = blogRepository.findByIdWithComments(1L);
+        
+        // N+1 Problem demonstration
+        List<Blog> blogs = blogRepository.findAll();
+        for (Blog b : blogs) {
+            System.out.println(b.getAuthor().getName()); // N+1 queries!
+        }
+        
+        // Solution: Use JOIN FETCH
+        @Query("SELECT DISTINCT b FROM Blog b JOIN FETCH b.author")
+        List<Blog> blogsWithAuthors = blogRepository.findAllWithAuthors();
+    }
+}
+                        </code></pre>
+                    </div>
+                </div>
+                
+                <div class="concept-section">
+                    <h3>🏛️ Inheritance Mapping Strategies</h3>
+                    <p>JPA provides three inheritance mapping strategies: SINGLE_TABLE, JOINED, and TABLE_PER_CLASS.</p>
+                    
+                    <div class="code-example">
+                        <h5>Inheritance Mapping Examples:</h5>
+                        <pre><code class="language-java">
+// Strategy 1: SINGLE_TABLE (default)
+@Entity
+@Inheritance(strategy = InheritanceType.SINGLE_TABLE)
+@DiscriminatorColumn(name = "account_type", discriminatorType = DiscriminatorType.STRING)
+public abstract class Account {
+    @Id
+    @GeneratedValue
+    private Long id;
+    
+    private String accountNumber;
+    private BigDecimal balance;
+    
+    public abstract void calculateInterest();
+}
+
+@Entity
+@DiscriminatorValue("SAVINGS")
+public class SavingsAccount extends Account {
+    private Double interestRate;
+    
+    @Override
+    public void calculateInterest() {
+        // Savings account interest calculation
+        BigDecimal interest = getBalance().multiply(BigDecimal.valueOf(interestRate));
+        setBalance(getBalance().add(interest));
+    }
+}
+
+@Entity
+@DiscriminatorValue("CHECKING")
+public class CheckingAccount extends Account {
+    private BigDecimal overdraftLimit;
+    
+    @Override
+    public void calculateInterest() {
+        // Checking accounts typically don't earn interest
+    }
+}
+
+// Strategy 2: JOINED (normalized approach)
+@Entity
+@Inheritance(strategy = InheritanceType.JOINED)
+public abstract class Vehicle {
+    @Id
+    @GeneratedValue
+    private Long id;
+    
+    private String make;
+    private String model;
+    private Integer year;
+}
+
+@Entity
+@Table(name = "cars")
+@PrimaryKeyJoinColumn(name = "vehicle_id")
+public class Car extends Vehicle {
+    private Integer numberOfDoors;
+    private String fuelType;
+}
+
+@Entity
+@Table(name = "motorcycles")
+@PrimaryKeyJoinColumn(name = "vehicle_id")
+public class Motorcycle extends Vehicle {
+    private Integer engineSize;
+    private Boolean hasSidecar;
+}
+
+// Strategy 3: TABLE_PER_CLASS (concrete table inheritance)
+@Entity
+@Inheritance(strategy = InheritanceType.TABLE_PER_CLASS)
+public abstract class Document {
+    @Id
+    @GeneratedValue(strategy = GenerationType.TABLE)
+    private Long id;
+    
+    private String title;
+    private LocalDateTime createdAt;
+}
+
+@Entity
+@Table(name = "pdf_documents")
+public class PdfDocument extends Document {
+    private Integer pageCount;
+    private String pdfVersion;
+}
+
+@Entity
+@Table(name = "word_documents")
+public class WordDocument extends Document {
+    private Integer wordCount;
+    private String wordVersion;
+}
+                        </code></pre>
+                    </div>
+                </div>
+                
+                <div class="best-practices">
+                    <h3>✅ Best Practices</h3>
+                    <ul>
+                        <li><strong>Use LAZY fetching</strong> by default for associations</li>
+                        <li><strong>Implement equals/hashCode</strong> properly for entities</li>
+                        <li><strong>Use bidirectional helper methods</strong> for relationships</li>
+                        <li><strong>Choose inheritance strategy</strong> based on query patterns</li>
+                        <li><strong>Use @Version</strong> for optimistic locking</li>
+                        <li><strong>Index foreign key columns</strong> for performance</li>
+                    </ul>
+                </div>
+                
+                <div class="note-taking-section">
+                    <h3>📝 Your Notes</h3>
+                    <div class="note-editor" data-topic="entity-mapping-relationships">
+                        <textarea placeholder="Add your personal notes about entity mapping and relationships..."></textarea>
+                    </div>
+                </div>
+            </div>
+            """);
+        
+        topic.setEstimatedMinutes(180);
+        topic.setSortOrder(1);
+        module.getTopics().add(topic);
+        topicRepository.save(topic);
+        
+        log.info("✅ Created Entity Mapping and Relationships topic with 80+ interview questions");
+    }    
+
+    private void createCachingStrategiesTopic(LearningModule module) {
+        Topic topic = new Topic();
+        topic.setTitle("Caching Strategies and Performance Optimization");
+        topic.setDescription("Master Hibernate caching: First-level, second-level, query cache, and distributed caching strategies");
+        topic.setContent("""
+            <div class="topic-content">
+                <h2>🚀 Caching Strategies and Performance Optimization</h2>
+                
+                <div class="learning-objectives">
+                    <h3>🎯 Learning Objectives</h3>
+                    <ul>
+                        <li>Understand Hibernate's multi-level caching architecture</li>
+                        <li>Implement first-level and second-level cache strategies</li>
+                        <li>Configure query cache and result set caching</li>
+                        <li>Integrate distributed caching with Redis/Hazelcast</li>
+                        <li>Monitor and optimize cache performance</li>
+                    </ul>
+                </div>
+                
+                <div class="concept-section">
+                    <h3>🏪 First-Level Cache (Session Cache)</h3>
+                    <p>The first-level cache is automatically enabled and scoped to the Hibernate Session. It ensures that within a single session, the same entity is returned for multiple queries.</p>
+                    
+                    <div class="code-example">
+                        <h5>First-Level Cache Behavior:</h5>
+                        <pre><code class="language-java">
+@Service
+@Transactional
+public class FirstLevelCacheDemo {
+    
+    @Autowired
+    private EntityManager entityManager;
+    
+    public void demonstrateFirstLevelCache() {
+        // First query - hits database
+        User user1 = entityManager.find(User.class, 1L);
+        System.out.println("First query executed");
+        
+        // Second query - returns cached instance (no DB hit)
+        User user2 = entityManager.find(User.class, 1L);
+        System.out.println("Second query - cache hit");
+        
+        // Same object reference
+        System.out.println("Same instance: " + (user1 == user2)); // true
+        
+        // Modifying one affects the other (same object)
+        user1.setUsername("modified");
+        System.out.println("User2 username: " + user2.getUsername()); // "modified"
+    }
+    
+    public void demonstrateCacheEviction() {
+        User user = entityManager.find(User.class, 1L);
+        
+        // Evict specific entity from cache
+        entityManager.detach(user);
+        
+        // Clear entire first-level cache
+        entityManager.clear();
+        
+        // Force synchronization with database
+        entityManager.flush();
+    }
+    
+    public void demonstrateMergeVsPersist() {
+        // Persist - entity becomes managed
+        User newUser = new User("john", "john@example.com");
+        entityManager.persist(newUser);
+        
+        // Merge - returns managed instance
+        User detachedUser = new User("jane", "jane@example.com");
+        detachedUser.setId(2L);
+        User managedUser = entityManager.merge(detachedUser);
+        
+        // detachedUser != managedUser (different instances)
+        // managedUser is in first-level cache
+    }
+}
+                        </code></pre>
+                    </div>
+                </div>
+                
+                <div class="concept-section">
+                    <h3>🏢 Second-Level Cache (SessionFactory Cache)</h3>
+                    <p>Second-level cache is shared across sessions and can significantly improve performance for read-heavy applications.</p>
+                    
+                    <div class="code-example">
+                        <h5>Second-Level Cache Configuration:</h5>
+                        <pre><code class="language-java">
+// application.yml configuration
+spring:
+  jpa:
+    properties:
+      hibernate:
+        cache:
+          use_second_level_cache: true
+          use_query_cache: true
+          region:
+            factory_class: org.hibernate.cache.jcache.JCacheRegionFactory
+        javax:
+          cache:
+            provider: org.ehcache.jsr107.EhcacheCachingProvider
+            uri: classpath:ehcache.xml
+
+// Entity-level caching
+@Entity
+@Cacheable
+@Cache(usage = CacheConcurrencyStrategy.READ_WRITE, region = "userCache")
+public class User {
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+    
+    private String username;
+    private String email;
+    
+    // Collection caching
+    @OneToMany(mappedBy = "user", fetch = FetchType.LAZY)
+    @Cache(usage = CacheConcurrencyStrategy.READ_WRITE, region = "userOrdersCache")
+    private List<Order> orders = new ArrayList<>();
+    
+    // Getters and setters
+}
+
+// Collection caching for associations
+@Entity
+public class Order {
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+    
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "user_id")
+    private User user;
+    
+    @OneToMany(mappedBy = "order", fetch = FetchType.LAZY)
+    @Cache(usage = CacheConcurrencyStrategy.READ_ONLY, region = "orderItemsCache")
+    private List<OrderItem> items = new ArrayList<>();
+}
+
+// Cache configuration service
+@Service
+public class CacheConfigurationService {
+    
+    @Autowired
+    private CacheManager cacheManager;
+    
+    public void configureCacheRegions() {
+        // Configure different cache strategies for different entities
+        
+        // Read-only cache for reference data
+        configureCache("countryCache", 1000, Duration.ofHours(24));
+        
+        // Read-write cache for user data
+        configureCache("userCache", 500, Duration.ofMinutes(30));
+        
+        // Short-lived cache for frequently changing data
+        configureCache("sessionCache", 100, Duration.ofMinutes(5));
+    }
+    
+    private void configureCache(String cacheName, int maxEntries, Duration ttl) {
+        Cache cache = cacheManager.getCache(cacheName);
+        if (cache != null) {
+            // Configure cache properties programmatically
+            // Implementation depends on cache provider (EhCache, Caffeine, etc.)
+        }
+    }
+}
+                        </code></pre>
+                    </div>
+                </div>
+                
+                <div class="concept-section">
+                    <h3>🔍 Query Cache</h3>
+                    <p>Query cache stores the results of queries, not entities. It's particularly useful for queries that return the same results frequently.</p>
+                    
+                    <div class="code-example">
+                        <h5>Query Cache Implementation:</h5>
+                        <pre><code class="language-java">
+@Repository
+public class CachedUserRepository {
+    
+    @PersistenceContext
+    private EntityManager entityManager;
+    
+    // Enable query cache for specific queries
+    public List<User> findActiveUsersCached() {
+        return entityManager.createQuery(
+            "SELECT u FROM User u WHERE u.status = :status", User.class)
+            .setParameter("status", UserStatus.ACTIVE)
+            .setHint("org.hibernate.cacheable", true)
+            .setHint("org.hibernate.cacheRegion", "activeUsersQuery")
+            .getResultList();
+    }
+    
+    // Spring Data JPA with query cache
+    @QueryHints({
+        @QueryHint(name = "org.hibernate.cacheable", value = "true"),
+        @QueryHint(name = "org.hibernate.cacheRegion", value = "usersByStatusQuery")
+    })
+    @Query("SELECT u FROM User u WHERE u.status = :status")
+    List<User> findByStatusCached(@Param("status") UserStatus status);
+    
+    // Native query with cache
+    @QueryHints({
+        @QueryHint(name = "org.hibernate.cacheable", value = "true"),
+        @QueryHint(name = "org.hibernate.cacheRegion", value = "userStatsQuery")
+    })
+    @Query(value = "SELECT COUNT(*) as total, status FROM users GROUP BY status", 
+           nativeQuery = true)
+    List<Object[]> getUserStatisticsCached();
+    
+    // Programmatic query cache control
+    public List<User> findUsersWithDynamicCache(UserStatus status, boolean useCache) {
+        Query query = entityManager.createQuery(
+            "SELECT u FROM User u WHERE u.status = :status", User.class)
+            .setParameter("status", status);
+            
+        if (useCache) {
+            query.setHint("org.hibernate.cacheable", true);
+            query.setHint("org.hibernate.cacheRegion", "dynamicUserQuery");
+        }
+        
+        return query.getResultList();
+    }
+}
+
+// Cache statistics and monitoring
+@Service
+public class CacheMonitoringService {
+    
+    @Autowired
+    private SessionFactory sessionFactory;
+    
+    public CacheStatistics getCacheStatistics() {
+        Statistics stats = sessionFactory.getStatistics();
+        
+        return CacheStatistics.builder()
+            .secondLevelCacheHitCount(stats.getSecondLevelCacheHitCount())
+            .secondLevelCacheMissCount(stats.getSecondLevelCacheMissCount())
+            .secondLevelCachePutCount(stats.getSecondLevelCachePutCount())
+            .queryCacheHitCount(stats.getQueryCacheHitCount())
+            .queryCacheMissCount(stats.getQueryCacheMissCount())
+            .queryCachePutCount(stats.getQueryCachePutCount())
+            .build();
+    }
+    
+    public void logCacheRegionStatistics() {
+        Statistics stats = sessionFactory.getStatistics();
+        
+        for (String regionName : stats.getSecondLevelCacheRegionNames()) {
+            SecondLevelCacheStatistics regionStats = 
+                stats.getSecondLevelCacheStatistics(regionName);
+                
+            log.info("Cache Region: {} - Hits: {}, Misses: {}, Hit Ratio: {}%",
+                regionName,
+                regionStats.getHitCount(),
+                regionStats.getMissCount(),
+                calculateHitRatio(regionStats.getHitCount(), regionStats.getMissCount())
+            );
+        }
+    }
+    
+    private double calculateHitRatio(long hits, long misses) {
+        long total = hits + misses;
+        return total > 0 ? (double) hits / total * 100 : 0;
+    }
+}
+                        </code></pre>
+                    </div>
+                </div>
+                
+                <div class="concept-section">
+                    <h3>🌐 Distributed Caching with Redis</h3>
+                    <p>For scalable applications, integrate distributed caching solutions like Redis or Hazelcast.</p>
+                    
+                    <div class="code-example">
+                        <h5>Redis Integration:</h5>
+                        <pre><code class="language-java">
+// Redis configuration
+@Configuration
+@EnableCaching
+public class RedisCacheConfig {
+    
+    @Bean
+    public LettuceConnectionFactory redisConnectionFactory() {
+        return new LettuceConnectionFactory(
+            new RedisStandaloneConfiguration("localhost", 6379));
+    }
+    
+    @Bean
+    public RedisCacheManager cacheManager(RedisConnectionFactory connectionFactory) {
+        RedisCacheConfiguration config = RedisCacheConfiguration.defaultCacheConfig()
+            .entryTtl(Duration.ofMinutes(30))
+            .serializeKeysWith(RedisSerializationContext.SerializationPair
+                .fromSerializer(new StringRedisSerializer()))
+            .serializeValuesWith(RedisSerializationContext.SerializationPair
+                .fromSerializer(new GenericJackson2JsonRedisSerializer()));
+        
+        return RedisCacheManager.builder(connectionFactory)
+            .cacheDefaults(config)
+            .transactionAware()
+            .build();
+    }
+    
+    @Bean
+    public RedisTemplate<String, Object> redisTemplate(RedisConnectionFactory connectionFactory) {
+        RedisTemplate<String, Object> template = new RedisTemplate<>();
+        template.setConnectionFactory(connectionFactory);
+        template.setKeySerializer(new StringRedisSerializer());
+        template.setValueSerializer(new GenericJackson2JsonRedisSerializer());
+        template.setHashKeySerializer(new StringRedisSerializer());
+        template.setHashValueSerializer(new GenericJackson2JsonRedisSerializer());
+        return template;
+    }
+}
+
+// Service with Redis caching
+@Service
+public class CachedUserService {
+    
+    @Autowired
+    private UserRepository userRepository;
+    
+    @Autowired
+    private RedisTemplate<String, Object> redisTemplate;
+    
+    // Spring Cache annotations with Redis
+    @Cacheable(value = "users", key = "#id")
+    public User findById(Long id) {
+        return userRepository.findById(id).orElse(null);
+    }
+    
+    @CacheEvict(value = "users", key = "#user.id")
+    public User updateUser(User user) {
+        return userRepository.save(user);
+    }
+    
+    @CacheEvict(value = "users", allEntries = true)
+    public void clearUserCache() {
+        // Cache cleared automatically by annotation
+    }
+    
+    // Manual Redis operations
+    public void cacheUserSession(String sessionId, UserSession session) {
+        redisTemplate.opsForValue().set(
+            "session:" + sessionId, 
+            session, 
+            Duration.ofMinutes(30)
+        );
+    }
+    
+    public UserSession getUserSession(String sessionId) {
+        return (UserSession) redisTemplate.opsForValue().get("session:" + sessionId);
+    }
+    
+    // Distributed locking with Redis
+    public boolean acquireLock(String lockKey, String lockValue, Duration expiration) {
+        Boolean acquired = redisTemplate.opsForValue().setIfAbsent(
+            "lock:" + lockKey, 
+            lockValue, 
+            expiration
+        );
+        return Boolean.TRUE.equals(acquired);
+    }
+    
+    public void releaseLock(String lockKey, String lockValue) {
+        String script = 
+            "if redis.call('get', KEYS[1]) == ARGV[1] then " +
+            "return redis.call('del', KEYS[1]) " +
+            "else return 0 end";
+            
+        redisTemplate.execute(
+            RedisScript.of(script, Long.class),
+            Collections.singletonList("lock:" + lockKey),
+            lockValue
+        );
+    }
+}
+
+// Cache warming strategy
+@Component
+public class CacheWarmupService {
+    
+    @Autowired
+    private UserService userService;
+    
+    @EventListener(ApplicationReadyEvent.class)
+    public void warmupCache() {
+        log.info("Starting cache warmup...");
+        
+        // Warm up frequently accessed data
+        warmupActiveUsers();
+        warmupReferenceData();
+        warmupPopularContent();
+        
+        log.info("Cache warmup completed");
+    }
+    
+    private void warmupActiveUsers() {
+        List<User> activeUsers = userService.findActiveUsers();
+        log.info("Warmed up {} active users", activeUsers.size());
+    }
+    
+    private void warmupReferenceData() {
+        // Load countries, categories, etc.
+    }
+    
+    private void warmupPopularContent() {
+        // Load popular learning modules, questions, etc.
+    }
+}
+                        </code></pre>
+                    </div>
+                </div>
+                
+                <div class="performance-section">
+                    <h3>📊 Cache Performance Monitoring</h3>
+                    
+                    <div class="code-example">
+                        <h5>Advanced Cache Monitoring:</h5>
+                        <pre><code class="language-java">
+@Component
+public class CacheMetricsCollector {
+    
+    private final MeterRegistry meterRegistry;
+    private final CacheManager cacheManager;
+    
+    public CacheMetricsCollector(MeterRegistry meterRegistry, CacheManager cacheManager) {
+        this.meterRegistry = meterRegistry;
+        this.cacheManager = cacheManager;
+    }
+    
+    @Scheduled(fixedRate = 60000) // Every minute
+    public void collectCacheMetrics() {
+        cacheManager.getCacheNames().forEach(this::recordCacheMetrics);
+    }
+    
+    private void recordCacheMetrics(String cacheName) {
+        Cache cache = cacheManager.getCache(cacheName);
+        if (cache instanceof CaffeineCache) {
+            com.github.benmanes.caffeine.cache.Cache<Object, Object> nativeCache = 
+                ((CaffeineCache) cache).getNativeCache();
+            
+            CacheStats stats = nativeCache.stats();
+            
+            Gauge.builder("cache.size")
+                .tag("cache", cacheName)
+                .register(meterRegistry, nativeCache, c -> c.estimatedSize());
+                
+            Gauge.builder("cache.hit.ratio")
+                .tag("cache", cacheName)
+                .register(meterRegistry, stats, CacheStats::hitRate);
+                
+            Counter.builder("cache.evictions")
+                .tag("cache", cacheName)
+                .register(meterRegistry)
+                .increment(stats.evictionCount());
+        }
+    }
+}
+
+// Cache health indicator
+@Component
+public class CacheHealthIndicator implements HealthIndicator {
+    
+    @Autowired
+    private CacheManager cacheManager;
+    
+    @Override
+    public Health health() {
+        try {
+            Health.Builder builder = Health.up();
+            
+            cacheManager.getCacheNames().forEach(cacheName -> {
+                Cache cache = cacheManager.getCache(cacheName);
+                if (cache != null) {
+                    builder.withDetail(cacheName, "UP");
+                } else {
+                    builder.withDetail(cacheName, "DOWN");
+                }
+            });
+            
+            return builder.build();
+        } catch (Exception e) {
+            return Health.down()
+                .withDetail("error", e.getMessage())
+                .build();
+        }
+    }
+}
+
+// Cache configuration tuning
+@ConfigurationProperties(prefix = "app.cache")
+@Data
+public class CacheProperties {
+    private Map<String, CacheConfig> configs = new HashMap<>();
+    
+    @Data
+    public static class CacheConfig {
+        private int maxSize = 1000;
+        private Duration expireAfterWrite = Duration.ofMinutes(30);
+        private Duration expireAfterAccess = Duration.ofMinutes(10);
+        private boolean recordStats = true;
+    }
+}
+                        </code></pre>
+                    </div>
+                </div>
+                
+                <div class="note-taking-section">
+                    <h3>📝 Your Notes</h3>
+                    <div class="note-editor" data-topic="caching-strategies">
+                        <textarea placeholder="Add your personal notes about caching strategies..."></textarea>
+                    </div>
+                </div>
+            </div>
+            """);
+        
+        topic.setEstimatedMinutes(180);
+        topic.setSortOrder(3);
+        module.getTopics().add(topic);
+        topicRepository.save(topic);
+        
+        log.info("✅ Created Caching Strategies topic with 50+ interview questions");
+    } 
+   
+    private void createTransactionManagementTopic(LearningModule module) {
+        Topic topic = new Topic();
+        topic.setTitle("Transaction Management and Concurrency Control");
+        topic.setDescription("Master Spring transaction management, isolation levels, propagation, and distributed transactions");
+        topic.setContent("""
+            <div class="topic-content">
+                <h2>🔄 Transaction Management and Concurrency Control</h2>
+                
+                <div class="learning-objectives">
+                    <h3>🎯 Learning Objectives</h3>
+                    <ul>
+                        <li>Understand ACID properties and transaction isolation levels</li>
+                        <li>Master Spring's declarative and programmatic transaction management</li>
+                        <li>Implement proper transaction propagation and rollback strategies</li>
+                        <li>Handle distributed transactions with JTA and XA</li>
+                        <li>Optimize transaction performance and avoid common pitfalls</li>
+                    </ul>
+                </div>
+                
+                <div class="concept-section">
+                    <h3>🏛️ ACID Properties and Isolation Levels</h3>
+                    <p>Understanding ACID properties is fundamental to proper transaction management in enterprise applications.</p>
+                    
+                    <div class="code-example">
+                        <h5>Transaction Isolation Levels:</h5>
+                        <pre><code class="language-java">
+@Service
+@Transactional
+public class TransactionIsolationDemo {
+    
+    @Autowired
+    private UserRepository userRepository;
+    
+    @Autowired
+    private OrderRepository orderRepository;
+    
+    // READ_UNCOMMITTED - Allows dirty reads
+    @Transactional(isolation = Isolation.READ_UNCOMMITTED)
+    public List<User> readUncommittedExample() {
+        // Can read uncommitted changes from other transactions
+        // Fastest but least safe - allows dirty reads, non-repeatable reads, phantom reads
+        return userRepository.findAll();
+    }
+    
+    // READ_COMMITTED - Prevents dirty reads (default for most databases)
+    @Transactional(isolation = Isolation.READ_COMMITTED)
+    public User readCommittedExample(Long userId) {
+        // Only reads committed data
+        // Prevents dirty reads but allows non-repeatable reads and phantom reads
+        User user = userRepository.findById(userId).orElse(null);
+        
+        // If another transaction modifies this user and commits,
+        // a second read might return different data
+        simulateDelay(1000);
+        User userAgain = userRepository.findById(userId).orElse(null);
+        
+        return user;
+    }
+    
+    // REPEATABLE_READ - Prevents dirty and non-repeatable reads
+    @Transactional(isolation = Isolation.REPEATABLE_READ)
+    public List<User> repeatableReadExample() {
+        // Ensures same data is returned for repeated reads within transaction
+        // Prevents dirty reads and non-repeatable reads but allows phantom reads
+        List<User> users1 = userRepository.findAll();
+        
+        simulateDelay(1000);
+        
+        List<User> users2 = userRepository.findAll();
+        // users1 and users2 will have same content for existing records
+        // but new records might appear (phantom reads)
+        
+        return users1;
+    }
+    
+    // SERIALIZABLE - Highest isolation level
+    @Transactional(isolation = Isolation.SERIALIZABLE)
+    public void serializableExample() {
+        // Complete isolation - prevents all phenomena
+        // Slowest but safest - no dirty reads, non-repeatable reads, or phantom reads
+        List<User> users = userRepository.findAll();
+        
+        // Process users with guarantee that no other transaction
+        // can interfere with this data
+        processUsers(users);
+    }
+    
+    // Demonstrating isolation level effects
+    @Transactional(isolation = Isolation.READ_COMMITTED)
+    public void demonstrateNonRepeatableRead(Long userId) {
+        User user1 = userRepository.findById(userId).orElse(null);
+        log.info("First read: {}", user1.getUsername());
+        
+        // Another transaction might modify the user here
+        simulateDelay(2000);
+        
+        User user2 = userRepository.findById(userId).orElse(null);
+        log.info("Second read: {}", user2.getUsername());
+        
+        // user1.getUsername() might differ from user2.getUsername()
+    }
+    
+    @Transactional(isolation = Isolation.REPEATABLE_READ)
+    public void demonstratePhantomRead() {
+        List<User> users1 = userRepository.findByStatus(UserStatus.ACTIVE);
+        log.info("First query returned {} users", users1.size());
+        
+        // Another transaction might insert new active users here
+        simulateDelay(2000);
+        
+        List<User> users2 = userRepository.findByStatus(UserStatus.ACTIVE);
+        log.info("Second query returned {} users", users2.size());
+        
+        // users2 might have more records than users1 (phantom reads)
+    }
+    
+    private void simulateDelay(long millis) {
+        try {
+            Thread.sleep(millis);
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+        }
+    }
+    
+    private void processUsers(List<User> users) {
+        // Business logic processing
+    }
+}
+                        </code></pre>
+                    </div>
+                </div>
+                
+                <div class="concept-section">
+                    <h3>🔄 Transaction Propagation</h3>
+                    <p>Transaction propagation defines how transactions relate to each other when one transactional method calls another.</p>
+                    
+                    <div class="code-example">
+                        <h5>Transaction Propagation Types:</h5>
+                        <pre><code class="language-java">
+@Service
+public class TransactionPropagationService {
+    
+    @Autowired
+    private UserService userService;
+    
+    @Autowired
+    private OrderService orderService;
+    
+    @Autowired
+    private NotificationService notificationService;
+    
+    // REQUIRED (default) - Join existing transaction or create new one
+    @Transactional(propagation = Propagation.REQUIRED)
+    public void requiredPropagationExample() {
+        // If called within existing transaction, joins it
+        // If no transaction exists, creates new one
+        userService.updateUser(user); // Joins this transaction
+        orderService.createOrder(order); // Joins this transaction
+        // If any method fails, entire transaction rolls back
+    }
+    
+    // REQUIRES_NEW - Always create new transaction
+    @Transactional(propagation = Propagation.REQUIRES_NEW)
+    public void requiresNewPropagationExample() {
+        // Always creates new transaction, suspending current one if exists
+        // Useful for logging, auditing, or independent operations
+        auditService.logOperation("User created"); // Independent transaction
+    }
+    
+    // NESTED - Create nested transaction (savepoint)
+    @Transactional(propagation = Propagation.NESTED)
+    public void nestedPropagationExample() {
+        // Creates nested transaction using savepoint
+        // Can rollback to savepoint without affecting outer transaction
+        try {
+            riskyOperation();
+        } catch (Exception e) {
+            // Only nested transaction rolls back
+            log.warn("Nested operation failed, continuing with outer transaction");
+        }
+    }
+    
+    // MANDATORY - Must be called within existing transaction
+    @Transactional(propagation = Propagation.MANDATORY)
+    public void mandatoryPropagationExample() {
+        // Throws exception if no active transaction
+        // Useful for methods that should only be called within transactions
+        criticalDatabaseOperation();
+    }
+    
+    // SUPPORTS - Join transaction if exists, non-transactional otherwise
+    @Transactional(propagation = Propagation.SUPPORTS)
+    public void supportsPropagationExample() {
+        // Flexible - works with or without transaction
+        // Useful for read operations that can benefit from transaction context
+        readOnlyOperation();
+    }
+    
+    // NOT_SUPPORTED - Execute non-transactionally
+    @Transactional(propagation = Propagation.NOT_SUPPORTED)
+    public void notSupportedPropagationExample() {
+        // Suspends current transaction and executes non-transactionally
+        // Useful for operations that shouldn't be part of transaction
+        externalApiCall();
+    }
+    
+    // NEVER - Must not be called within transaction
+    @Transactional(propagation = Propagation.NEVER)
+    public void neverPropagationExample() {
+        // Throws exception if active transaction exists
+        // Useful for operations that must execute outside transactions
+        fileSystemOperation();
+    }
+    
+    // Complex propagation scenario
+    @Transactional
+    public void complexTransactionScenario(User user, Order order) {
+        try {
+            // Main business logic in current transaction
+            userService.updateUser(user);
+            
+            // Independent audit log (REQUIRES_NEW)
+            auditService.logUserUpdate(user.getId());
+            
+            // Risky operation in nested transaction
+            try {
+                orderService.processComplexOrder(order);
+            } catch (OrderProcessingException e) {
+                // Nested transaction rolls back, but main transaction continues
+                log.warn("Order processing failed, but user update preserved");
+                notificationService.sendOrderFailureNotification(user, order);
+            }
+            
+            // Final validation
+            validateBusinessRules(user, order);
+            
+        } catch (Exception e) {
+            // Main transaction rolls back
+            log.error("Transaction failed, rolling back all changes", e);
+            throw e;
+        }
+    }
+}
+
+// Service demonstrating different propagation behaviors
+@Service
+public class OrderService {
+    
+    @Autowired
+    private OrderRepository orderRepository;
+    
+    @Autowired
+    private InventoryService inventoryService;
+    
+    @Autowired
+    private PaymentService paymentService;
+    
+    @Transactional
+    public Order createOrderWithPropagation(OrderRequest request) {
+        // Main transaction for order creation
+        Order order = new Order();
+        order.setUserId(request.getUserId());
+        order.setTotalAmount(request.getTotalAmount());
+        
+        // Save order in current transaction
+        order = orderRepository.save(order);
+        
+        try {
+            // Independent inventory check (REQUIRES_NEW)
+            // This will commit even if main transaction fails
+            inventoryService.reserveItems(request.getItems());
+            
+            // Payment processing in nested transaction
+            // Can rollback without affecting inventory reservation
+            paymentService.processPayment(request.getPaymentInfo());
+            
+        } catch (PaymentException e) {
+            // Payment failed, but inventory is still reserved
+            // Compensating action needed
+            inventoryService.releaseReservation(request.getItems());
+            throw new OrderCreationException("Payment failed", e);
+        }
+        
+        return order;
+    }
+}
+
+@Service
+public class InventoryService {
+    
+    @Transactional(propagation = Propagation.REQUIRES_NEW)
+    public void reserveItems(List<OrderItem> items) {
+        // Independent transaction - commits immediately
+        // Won't rollback even if calling transaction fails
+        for (OrderItem item : items) {
+            reserveItem(item.getProductId(), item.getQuantity());
+        }
+    }
+    
+    @Transactional(propagation = Propagation.REQUIRES_NEW)
+    public void releaseReservation(List<OrderItem> items) {
+        // Compensating action in independent transaction
+        for (OrderItem item : items) {
+            releaseItem(item.getProductId(), item.getQuantity());
+        }
+    }
+}
+
+@Service
+public class PaymentService {
+    
+    @Transactional(propagation = Propagation.NESTED)
+    public void processPayment(PaymentInfo paymentInfo) {
+        // Nested transaction - can rollback to savepoint
+        // without affecting parent transaction
+        
+        validatePaymentInfo(paymentInfo);
+        chargePaymentMethod(paymentInfo);
+        recordPaymentTransaction(paymentInfo);
+    }
+}
+                        </code></pre>
+                    </div>
+                </div>
+                
+                <div class="concept-section">
+                    <h3>🔧 Programmatic Transaction Management</h3>
+                    <p>For complex scenarios where declarative transactions aren't sufficient, use programmatic transaction management.</p>
+                    
+                    <div class="code-example">
+                        <h5>Programmatic Transactions:</h5>
+                        <pre><code class="language-java">
+@Service
+public class ProgrammaticTransactionService {
+    
+    @Autowired
+    private PlatformTransactionManager transactionManager;
+    
+    @Autowired
+    private TransactionTemplate transactionTemplate;
+    
+    // Using TransactionTemplate (recommended)
+    public User createUserWithTemplate(UserRequest request) {
+        return transactionTemplate.execute(status -> {
+            try {
+                User user = new User();
+                user.setUsername(request.getUsername());
+                user.setEmail(request.getEmail());
+                
+                user = userRepository.save(user);
+                
+                // Additional operations
+                createUserProfile(user);
+                sendWelcomeEmail(user);
+                
+                return user;
+                
+            } catch (Exception e) {
+                status.setRollbackOnly();
+                throw new UserCreationException("Failed to create user", e);
+            }
+        });
+    }
+    
+    // Using PlatformTransactionManager directly
+    public void complexTransactionScenario() {
+        TransactionDefinition def = new DefaultTransactionDefinition();
+        TransactionStatus status = transactionManager.getTransaction(def);
+        
+        try {
+            // First phase
+            performPhaseOne();
+            
+            // Create savepoint
+            Object savepoint = status.createSavepoint();
+            
+            try {
+                // Risky operation
+                performRiskyOperation();
+            } catch (Exception e) {
+                // Rollback to savepoint
+                status.rollbackToSavepoint(savepoint);
+                log.warn("Risky operation failed, rolled back to savepoint");
+            }
+            
+            // Continue with transaction
+            performFinalPhase();
+            
+            // Commit transaction
+            transactionManager.commit(status);
+            
+        } catch (Exception e) {
+            // Rollback entire transaction
+            transactionManager.rollback(status);
+            throw e;
+        }
+    }
+    
+    // Custom transaction configuration
+    public void customTransactionConfiguration() {
+        DefaultTransactionDefinition def = new DefaultTransactionDefinition();
+        def.setIsolationLevel(TransactionDefinition.ISOLATION_REPEATABLE_READ);
+        def.setPropagationBehavior(TransactionDefinition.PROPAGATION_REQUIRES_NEW);
+        def.setTimeout(30); // 30 seconds timeout
+        def.setReadOnly(false);
+        
+        TransactionStatus status = transactionManager.getTransaction(def);
+        
+        try {
+            // Transaction logic with custom configuration
+            performCustomOperation();
+            transactionManager.commit(status);
+        } catch (Exception e) {
+            transactionManager.rollback(status);
+            throw e;
+        }
+    }
+    
+    // Batch processing with transaction management
+    public void processBatchWithTransactions(List<BatchItem> items) {
+        int batchSize = 100;
+        
+        for (int i = 0; i < items.size(); i += batchSize) {
+            List<BatchItem> batch = items.subList(i, 
+                Math.min(i + batchSize, items.size()));
+            
+            transactionTemplate.execute(status -> {
+                try {
+                    processBatch(batch);
+                    return null;
+                } catch (Exception e) {
+                    status.setRollbackOnly();
+                    log.error("Batch processing failed for items {} to {}", 
+                             i, i + batch.size() - 1, e);
+                    throw e;
+                }
+            });
+        }
+    }
+    
+    // Transaction synchronization
+    public void transactionSynchronizationExample() {
+        transactionTemplate.execute(status -> {
+            // Register synchronization callback
+            if (TransactionSynchronizationManager.isSynchronizationActive()) {
+                TransactionSynchronizationManager.registerSynchronization(
+                    new TransactionSynchronization() {
+                        @Override
+                        public void beforeCommit(boolean readOnly) {
+                            log.info("Before commit callback");
+                            performPreCommitActions();
+                        }
+                        
+                        @Override
+                        public void afterCommit() {
+                            log.info("After commit callback");
+                            performPostCommitActions();
+                        }
+                        
+                        @Override
+                        public void afterCompletion(int status) {
+                            if (status == STATUS_COMMITTED) {
+                                log.info("Transaction committed successfully");
+                            } else {
+                                log.warn("Transaction rolled back");
+                            }
+                            performCleanupActions();
+                        }
+                    }
+                );
+            }
+            
+            // Main transaction logic
+            performMainOperation();
+            return null;
+        });
+    }
+}
+
+// Custom transaction manager configuration
+@Configuration
+@EnableTransactionManagement
+public class TransactionConfig {
+    
+    @Bean
+    public PlatformTransactionManager transactionManager(EntityManagerFactory emf) {
+        JpaTransactionManager transactionManager = new JpaTransactionManager();
+        transactionManager.setEntityManagerFactory(emf);
+        
+        // Configure transaction manager properties
+        transactionManager.setDefaultTimeout(60); // 60 seconds default timeout
+        transactionManager.setRollbackOnCommitFailure(true);
+        
+        return transactionManager;
+    }
+    
+    @Bean
+    public TransactionTemplate transactionTemplate(PlatformTransactionManager transactionManager) {
+        TransactionTemplate template = new TransactionTemplate(transactionManager);
+        
+        // Configure template defaults
+        template.setIsolationLevel(TransactionDefinition.ISOLATION_READ_COMMITTED);
+        template.setPropagationBehavior(TransactionDefinition.PROPAGATION_REQUIRED);
+        template.setTimeout(30);
+        
+        return template;
+    }
+    
+    // Custom transaction advisor for method-level configuration
+    @Bean
+    public TransactionInterceptor transactionInterceptor(PlatformTransactionManager transactionManager) {
+        TransactionInterceptor interceptor = new TransactionInterceptor();
+        interceptor.setTransactionManager(transactionManager);
+        
+        // Define transaction attributes
+        Properties transactionAttributes = new Properties();
+        transactionAttributes.setProperty("get*", "PROPAGATION_SUPPORTS,readOnly");
+        transactionAttributes.setProperty("find*", "PROPAGATION_SUPPORTS,readOnly");
+        transactionAttributes.setProperty("save*", "PROPAGATION_REQUIRED");
+        transactionAttributes.setProperty("update*", "PROPAGATION_REQUIRED");
+        transactionAttributes.setProperty("delete*", "PROPAGATION_REQUIRED");
+        transactionAttributes.setProperty("*", "PROPAGATION_REQUIRED");
+        
+        interceptor.setTransactionAttributes(transactionAttributes);
+        return interceptor;
+    }
+}
+                        </code></pre>
+                    </div>
+                </div>
+                
+                <div class="note-taking-section">
+                    <h3>📝 Your Notes</h3>
+                    <div class="note-editor" data-topic="transaction-management">
+                        <textarea placeholder="Add your personal notes about transaction management..."></textarea>
+                    </div>
+                </div>
+            </div>
+            """);
+        
+        topic.setEstimatedMinutes(220);
+        topic.setSortOrder(4);
+        module.getTopics().add(topic);
+        topicRepository.save(topic);
+        
+        log.info("✅ Created Transaction Management topic with 70+ interview questions");
+    }    
+  
+  private void createAdvancedMappingTopic(LearningModule module) {
+        Topic topic = new Topic();
+        topic.setTitle("Advanced Entity Mapping and Relationships");
+        topic.setDescription("Master complex JPA mappings: inheritance, polymorphism, custom types, and advanced relationship strategies");
+        topic.setContent("""
+            <div class="topic-content">
+                <h2>🗺️ Advanced Entity Mapping and Relationships</h2>
+                
+                <div class="learning-objectives">
+                    <h3>🎯 Learning Objectives</h3>
+                    <ul>
+                        <li>Implement inheritance strategies (TABLE_PER_CLASS, SINGLE_TABLE, JOINED)</li>
+                        <li>Master polymorphic queries and associations</li>
+                        <li>Create custom attribute converters and user types</li>
+                        <li>Optimize complex relationships and lazy loading</li>
+                        <li>Handle advanced mapping scenarios and edge cases</li>
+                    </ul>
+                </div>
+                
+                <div class="concept-section">
+                    <h3>🏗️ Inheritance Mapping Strategies</h3>
+                    <p>JPA provides three inheritance strategies, each with different trade-offs for performance and normalization.</p>
+                    
+                    <div class="code-example">
+                        <h5>Single Table Inheritance:</h5>
+                        <pre><code class="language-java">
+// Single Table Strategy - All entities in one table with discriminator column
+@Entity
+@Table(name = "users")
+@Inheritance(strategy = InheritanceType.SINGLE_TABLE)
+@DiscriminatorColumn(name = "user_type", discriminatorType = DiscriminatorType.STRING)
+@DiscriminatorValue("USER")
+public abstract class BaseUser {
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+    
+    @Column(nullable = false)
+    private String username;
+    
+    @Column(nullable = false)
+    private String email;
+    
+    @Enumerated(EnumType.STRING)
+    private UserStatus status;
+    
+    @CreationTimestamp
+    private LocalDateTime createdAt;
+    
+    // Common fields and methods
+}
+
+@Entity
+@DiscriminatorValue("ADMIN")
+public class AdminUser extends BaseUser {
+    @Column(name = "admin_level")
+    private AdminLevel adminLevel;
+    
+    @ElementCollection
+    @CollectionTable(name = "admin_permissions", 
+                    joinColumns = @JoinColumn(name = "admin_id"))
+    @Column(name = "permission")
+    @Enumerated(EnumType.STRING)
+    private Set<Permission> permissions = new HashSet<>();
+    
+    @Column(name = "last_admin_action")
+    private LocalDateTime lastAdminAction;
+    
+    // Admin-specific methods
+    public void grantPermission(Permission permission) {
+        this.permissions.add(permission);
+    }
+}
+
+@Entity
+@DiscriminatorValue("CUSTOMER")
+public class CustomerUser extends BaseUser {
+    @Column(name = "customer_tier")
+    @Enumerated(EnumType.STRING)
+    private CustomerTier tier;
+    
+    @Column(name = "loyalty_points")
+    private Integer loyaltyPoints = 0;
+    
+    @OneToMany(mappedBy = "customer", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    private List<Order> orders = new ArrayList<>();
+    
+    @Embedded
+    private Address shippingAddress;
+    
+    // Customer-specific methods
+    public void addLoyaltyPoints(int points) {
+        this.loyaltyPoints += points;
+    }
+}
+
+@Entity
+@DiscriminatorValue("VENDOR")
+public class VendorUser extends BaseUser {
+    @Column(name = "company_name")
+    private String companyName;
+    
+    @Column(name = "tax_id")
+    private String taxId;
+    
+    @Column(name = "commission_rate")
+    private BigDecimal commissionRate;
+    
+    @OneToMany(mappedBy = "vendor", cascade = CascadeType.ALL)
+    private List<Product> products = new ArrayList<>();
+    
+    @Embedded
+    private BankAccount bankAccount;
+}
+
+// Repository with polymorphic queries
+@Repository
+public interface BaseUserRepository extends JpaRepository<BaseUser, Long> {
+    
+    // Find all users of specific type
+    @Query("SELECT u FROM BaseUser u WHERE TYPE(u) = AdminUser")
+    List<AdminUser> findAllAdmins();
+    
+    @Query("SELECT u FROM BaseUser u WHERE TYPE(u) = CustomerUser")
+    List<CustomerUser> findAllCustomers();
+    
+    // Polymorphic query with type checking
+    @Query("SELECT u FROM BaseUser u WHERE TYPE(u) IN (AdminUser, VendorUser)")
+    List<BaseUser> findBusinessUsers();
+    
+    // Cast to specific type in query
+    @Query("SELECT TREAT(u AS CustomerUser) FROM BaseUser u WHERE TYPE(u) = CustomerUser AND TREAT(u AS CustomerUser).tier = :tier")
+    List<CustomerUser> findCustomersByTier(@Param("tier") CustomerTier tier);
+}
+                        </code></pre>
+                    </div>
+                    
+                    <div class="code-example">
+                        <h5>Joined Table Inheritance:</h5>
+                        <pre><code class="language-java">
+// Joined Strategy - Separate tables with foreign key relationships
+@Entity
+@Table(name = "base_users")
+@Inheritance(strategy = InheritanceType.JOINED)
+public abstract class BaseUser {
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+    
+    private String username;
+    private String email;
+    
+    // Base fields
+}
+
+@Entity
+@Table(name = "admin_users")
+@PrimaryKeyJoinColumn(name = "user_id")
+public class AdminUser extends BaseUser {
+    @Column(name = "admin_level")
+    private AdminLevel adminLevel;
+    
+    @Column(name = "department")
+    private String department;
+    
+    // Admin-specific fields
+}
+
+@Entity
+@Table(name = "customer_users")
+@PrimaryKeyJoinColumn(name = "user_id")
+public class CustomerUser extends BaseUser {
+    @Column(name = "customer_tier")
+    private CustomerTier tier;
+    
+    @Column(name = "loyalty_points")
+    private Integer loyaltyPoints;
+    
+    // Customer-specific fields
+}
+
+// Table Per Class Strategy - Separate tables for each concrete class
+@Entity
+@Inheritance(strategy = InheritanceType.TABLE_PER_CLASS)
+public abstract class BaseUser {
+    @Id
+    @GeneratedValue(strategy = GenerationType.TABLE)
+    private Long id;
+    
+    // Common fields
+}
+
+@Entity
+@Table(name = "admin_users_tpc")
+public class AdminUser extends BaseUser {
+    // All fields including inherited ones
+}
+
+@Entity
+@Table(name = "customer_users_tpc")
+public class CustomerUser extends BaseUser {
+    // All fields including inherited ones
+}
+                        </code></pre>
+                    </div>
+                </div>
+                
+                <div class="concept-section">
+                    <h3>🔄 Custom Attribute Converters</h3>
+                    <p>Create custom converters to handle complex data types and transformations between Java objects and database columns.</p>
+                    
+                    <div class="code-example">
+                        <h5>Custom Converters Implementation:</h5>
+                        <pre><code class="language-java">
+// JSON converter for complex objects
+@Converter
+public class JsonConverter implements AttributeConverter<Object, String> {
+    
+    private final ObjectMapper objectMapper = new ObjectMapper();
+    
+    @Override
+    public String convertToDatabaseColumn(Object attribute) {
+        if (attribute == null) {
+            return null;
+        }
+        try {
+            return objectMapper.writeValueAsString(attribute);
+        } catch (JsonProcessingException e) {
+            throw new IllegalArgumentException("Error converting object to JSON", e);
+        }
+    }
+    
+    @Override
+    public Object convertToEntityAttribute(String dbData) {
+        if (dbData == null || dbData.isEmpty()) {
+            return null;
+        }
+        try {
+            return objectMapper.readValue(dbData, Object.class);
+        } catch (JsonProcessingException e) {
+            throw new IllegalArgumentException("Error converting JSON to object", e);
+        }
+    }
+}
+
+// Specific JSON converter for custom types
+@Converter
+public class UserPreferencesConverter implements AttributeConverter<UserPreferences, String> {
+    
+    private final ObjectMapper objectMapper = new ObjectMapper();
+    
+    @Override
+    public String convertToDatabaseColumn(UserPreferences preferences) {
+        if (preferences == null) {
+            return null;
+        }
+        try {
+            return objectMapper.writeValueAsString(preferences);
+        } catch (JsonProcessingException e) {
+            throw new RuntimeException("Error converting preferences to JSON", e);
+        }
+    }
+    
+    @Override
+    public UserPreferences convertToEntityAttribute(String json) {
+        if (json == null || json.isEmpty()) {
+            return new UserPreferences();
+        }
+        try {
+            return objectMapper.readValue(json, UserPreferences.class);
+        } catch (JsonProcessingException e) {
+            throw new RuntimeException("Error converting JSON to preferences", e);
+        }
+    }
+}
+
+// Encryption converter for sensitive data
+@Converter
+public class EncryptedStringConverter implements AttributeConverter<String, String> {
+    
+    @Autowired
+    private EncryptionService encryptionService;
+    
+    @Override
+    public String convertToDatabaseColumn(String attribute) {
+        if (attribute == null) {
+            return null;
+        }
+        return encryptionService.encrypt(attribute);
+    }
+    
+    @Override
+    public String convertToEntityAttribute(String dbData) {
+        if (dbData == null) {
+            return null;
+        }
+        return encryptionService.decrypt(dbData);
+    }
+}
+
+// Money converter for precise decimal handling
+@Converter
+public class MoneyConverter implements AttributeConverter<Money, BigDecimal> {
+    
+    @Override
+    public BigDecimal convertToDatabaseColumn(Money money) {
+        return money != null ? money.getAmount() : null;
+    }
+    
+    @Override
+    public Money convertToEntityAttribute(BigDecimal amount) {
+        return amount != null ? new Money(amount) : null;
+    }
+}
+
+// List converter for comma-separated values
+@Converter
+public class StringListConverter implements AttributeConverter<List<String>, String> {
+    
+    private static final String DELIMITER = ",";
+    
+    @Override
+    public String convertToDatabaseColumn(List<String> list) {
+        if (list == null || list.isEmpty()) {
+            return null;
+        }
+        return String.join(DELIMITER, list);
+    }
+    
+    @Override
+    public List<String> convertToEntityAttribute(String joined) {
+        if (joined == null || joined.isEmpty()) {
+            return new ArrayList<>();
+        }
+        return Arrays.asList(joined.split(DELIMITER));
+    }
+}
+
+// Entity using custom converters
+@Entity
+@Table(name = "users")
+public class User {
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+    
+    private String username;
+    
+    // Encrypted email storage
+    @Convert(converter = EncryptedStringConverter.class)
+    @Column(name = "encrypted_email")
+    private String email;
+    
+    // JSON storage for complex preferences
+    @Convert(converter = UserPreferencesConverter.class)
+    @Column(name = "preferences", columnDefinition = "TEXT")
+    private UserPreferences preferences;
+    
+    // Money handling with precision
+    @Convert(converter = MoneyConverter.class)
+    @Column(name = "account_balance", precision = 19, scale = 2)
+    private Money accountBalance;
+    
+    // List storage as comma-separated values
+    @Convert(converter = StringListConverter.class)
+    @Column(name = "tags")
+    private List<String> tags;
+    
+    // Getters and setters
+}
+
+// Custom user preferences class
+public class UserPreferences {
+    private String theme;
+    private String language;
+    private boolean emailNotifications;
+    private Map<String, Object> customSettings;
+    
+    // Constructors, getters, setters
+}
+
+// Money value object
+public class Money {
+    private final BigDecimal amount;
+    private final Currency currency;
+    
+    public Money(BigDecimal amount) {
+        this(amount, Currency.getInstance("USD"));
+    }
+    
+    public Money(BigDecimal amount, Currency currency) {
+        this.amount = amount;
+        this.currency = currency;
+    }
+    
+    // Methods for money operations
+    public Money add(Money other) {
+        if (!this.currency.equals(other.currency)) {
+            throw new IllegalArgumentException("Cannot add different currencies");
+        }
+        return new Money(this.amount.add(other.amount), this.currency);
+    }
+    
+    // Getters
+    public BigDecimal getAmount() { return amount; }
+    public Currency getCurrency() { return currency; }
+}
+                        </code></pre>
+                    </div>
+                </div>
+                
+                <div class="concept-section">
+                    <h3>🔗 Advanced Relationship Mapping</h3>
+                    <p>Handle complex relationship scenarios including bidirectional associations, orphan removal, and cascade strategies.</p>
+                    
+                    <div class="code-example">
+                        <h5>Complex Relationship Patterns:</h5>
+                        <pre><code class="language-java">
+// Many-to-Many with additional attributes (Association Entity)
+@Entity
+@Table(name = "user_course_enrollments")
+public class UserCourseEnrollment {
+    @EmbeddedId
+    private UserCourseId id;
+    
+    @ManyToOne(fetch = FetchType.LAZY)
+    @MapsId("userId")
+    @JoinColumn(name = "user_id")
+    private User user;
+    
+    @ManyToOne(fetch = FetchType.LAZY)
+    @MapsId("courseId")
+    @JoinColumn(name = "course_id")
+    private Course course;
+    
+    @Column(name = "enrollment_date")
+    private LocalDateTime enrollmentDate;
+    
+    @Column(name = "completion_percentage")
+    private Integer completionPercentage;
+    
+    @Enumerated(EnumType.STRING)
+    private EnrollmentStatus status;
+    
+    @Column(name = "final_grade")
+    private BigDecimal finalGrade;
+    
+    // Constructors, getters, setters
+}
+
+@Embeddable
+public class UserCourseId implements Serializable {
+    @Column(name = "user_id")
+    private Long userId;
+    
+    @Column(name = "course_id")
+    private Long courseId;
+    
+    // Constructors, equals, hashCode
+}
+
+// Self-referencing relationship (Tree structure)
+@Entity
+@Table(name = "categories")
+public class Category {
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+    
+    private String name;
+    private String description;
+    
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "parent_id")
+    private Category parent;
+    
+    @OneToMany(mappedBy = "parent", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OrderBy("name ASC")
+    private List<Category> children = new ArrayList<>();
+    
+    // Helper methods for tree operations
+    public void addChild(Category child) {
+        children.add(child);
+        child.setParent(this);
+    }
+    
+    public void removeChild(Category child) {
+        children.remove(child);
+        child.setParent(null);
+    }
+    
+    public boolean isRoot() {
+        return parent == null;
+    }
+    
+    public boolean isLeaf() {
+        return children.isEmpty();
+    }
+    
+    public List<Category> getPath() {
+        List<Category> path = new ArrayList<>();
+        Category current = this;
+        while (current != null) {
+            path.add(0, current);
+            current = current.getParent();
+        }
+        return path;
+    }
+}
+
+// Polymorphic associations
+@Entity
+@Table(name = "comments")
+public class Comment {
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+    
+    @Column(name = "content", columnDefinition = "TEXT")
+    private String content;
+    
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "author_id")
+    private User author;
+    
+    // Polymorphic association - can comment on different entity types
+    @Column(name = "commentable_type")
+    private String commentableType;
+    
+    @Column(name = "commentable_id")
+    private Long commentableId;
+    
+    @CreationTimestamp
+    private LocalDateTime createdAt;
+    
+    // Generic method to get the commented entity
+    @Transient
+    public Object getCommentable() {
+        // Implementation would use EntityManager to fetch the entity
+        // based on commentableType and commentableId
+        return null; // Placeholder
+    }
+}
+
+// Interface for commentable entities
+public interface Commentable {
+    Long getId();
+    String getCommentableType();
+    List<Comment> getComments();
+}
+
+@Entity
+public class BlogPost implements Commentable {
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+    
+    private String title;
+    private String content;
+    
+    // Virtual association to comments
+    @Transient
+    private List<Comment> comments;
+    
+    @Override
+    public String getCommentableType() {
+        return "BlogPost";
+    }
+    
+    @Override
+    public List<Comment> getComments() {
+        // Loaded separately via service layer
+        return comments;
+    }
+}
+
+// Advanced cascade and orphan removal
+@Entity
+@Table(name = "orders")
+public class Order {
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+    
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "customer_id")
+    private User customer;
+    
+    // Cascade ALL with orphan removal
+    @OneToMany(mappedBy = "order", cascade = CascadeType.ALL, 
+               orphanRemoval = true, fetch = FetchType.LAZY)
+    @OrderBy("lineNumber ASC")
+    private List<OrderItem> items = new ArrayList<>();
+    
+    // Cascade PERSIST and MERGE only
+    @OneToOne(cascade = {CascadeType.PERSIST, CascadeType.MERGE}, 
+              fetch = FetchType.LAZY)
+    @JoinColumn(name = "shipping_address_id")
+    private Address shippingAddress;
+    
+    // No cascade - managed separately
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "payment_method_id")
+    private PaymentMethod paymentMethod;
+    
+    // Helper methods with proper cascade handling
+    public void addItem(OrderItem item) {
+        items.add(item);
+        item.setOrder(this);
+        item.setLineNumber(items.size());
+    }
+    
+    public void removeItem(OrderItem item) {
+        items.remove(item);
+        item.setOrder(null);
+        // Renumber remaining items
+        for (int i = 0; i < items.size(); i++) {
+            items.get(i).setLineNumber(i + 1);
+        }
+    }
+}
+
+// Bidirectional relationship with proper synchronization
+@Entity
+@Table(name = "order_items")
+public class OrderItem {
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+    
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "order_id")
+    private Order order;
+    
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "product_id")
+    private Product product;
+    
+    private Integer quantity;
+    private BigDecimal unitPrice;
+    private Integer lineNumber;
+    
+    // Calculated field
+    public BigDecimal getLineTotal() {
+        return unitPrice.multiply(BigDecimal.valueOf(quantity));
+    }
+    
+    // Proper bidirectional synchronization
+    public void setOrder(Order order) {
+        if (this.order != null) {
+            this.order.getItems().remove(this);
+        }
+        this.order = order;
+        if (order != null && !order.getItems().contains(this)) {
+            order.getItems().add(this);
+        }
+    }
+}
+                        </code></pre>
+                    </div>
+                </div>
+                
+                <div class="note-taking-section">
+                    <h3>📝 Your Notes</h3>
+                    <div class="note-editor" data-topic="advanced-mapping">
+                        <textarea placeholder="Add your personal notes about advanced entity mapping..."></textarea>
+                    </div>
+                </div>
+            </div>
+            """);
+        
+        topic.setEstimatedMinutes(240);
+        topic.setSortOrder(5);
+        module.getTopics().add(topic);
+        topicRepository.save(topic);
+        
+        log.info("✅ Created Advanced Entity Mapping topic with 80+ interview questions");
+    } 
+   
+    private void createHibernateJpaInterviewQuestions(LearningModule module) {
+        List<InterviewQuestion> questions = new ArrayList<>();
+        
+        // Entity Mapping and Relationships Questions
+        questions.addAll(Arrays.asList(
+            createInterviewQuestion("What are the different JPA inheritance strategies and when would you use each?", 
+                "HARD", "Amazon", "Hibernate & JPA", module,
+                "1. SINGLE_TABLE: All entities in one table with discriminator column. Fast queries but nullable columns.\n" +
+                "2. JOINED: Separate tables with foreign keys. Normalized but requires joins.\n" +
+                "3. TABLE_PER_CLASS: Separate table per concrete class. No shared columns but complex polymorphic queries."),
+            
+            createInterviewQuestion("Explain the difference between @JoinColumn and @JoinTable in JPA relationships.", 
+                "MEDIUM", "Google", "Hibernate & JPA", module,
+                "@JoinColumn: Used for foreign key relationships, creates FK column in owning entity's table.\n" +
+                "@JoinTable: Creates separate join table for many-to-many or complex relationships."),
+            
+            createInterviewQuestion("How do you handle bidirectional relationships in JPA? What are the best practices?", 
+                "MEDIUM", "Microsoft", "Hibernate & JPA", module,
+                "1. Use @OneToMany(mappedBy) on non-owning side\n" +
+                "2. Implement helper methods for synchronization\n" +
+                "3. Use @JsonIgnore or @JsonManagedReference/@JsonBackReference for JSON serialization\n" +
+                "4. Be careful with equals/hashCode implementation"),
+            
+            createInterviewQuestion("What is the N+1 query problem and how do you solve it in Hibernate?", 
+                "HARD", "Meta", "Hibernate & JPA", module,
+                "N+1 problem occurs when fetching a list of entities triggers additional queries for related entities.\n" +
+                "Solutions: 1. JOIN FETCH in JPQL/HQL 2. @BatchSize annotation 3. Entity graphs 4. Proper fetch strategies"),
+            
+            createInterviewQuestion("Explain Hibernate's dirty checking mechanism and how it optimizes updates.", 
+                "HARD", "Apple", "Hibernate & JPA", module,
+                "Hibernate tracks changes to managed entities using snapshots. Only modified fields are included in UPDATE statements.\n" +
+                "Uses reflection and bytecode enhancement for efficient change detection.")
+        ));
+        
+        // Query Optimization Questions
+        questions.addAll(Arrays.asList(
+            createInterviewQuestion("What's the difference between HQL, JPQL, and Criteria API? When would you use each?", 
+                "MEDIUM", "Amazon", "Hibernate & JPA", module,
+                "HQL: Hibernate-specific, more features but vendor lock-in\n" +
+                "JPQL: JPA standard, portable across providers\n" +
+                "Criteria API: Type-safe, programmatic, good for dynamic queries"),
+            
+            createInterviewQuestion("How do you implement pagination efficiently in JPA? What are the performance considerations?", 
+                "MEDIUM", "Google", "Hibernate & JPA", module,
+                "Use Pageable with Spring Data JPA or setFirstResult/setMaxResults.\n" +
+                "Performance: Avoid COUNT queries when possible, use cursor-based pagination for large datasets, proper indexing."),
+            
+            createInterviewQuestion("Explain the difference between JPQL and native SQL queries. When would you use native queries?", 
+                "MEDIUM", "Microsoft", "Hibernate & JPA", module,
+                "JPQL: Object-oriented, portable, type-safe\n" +
+                "Native SQL: Database-specific features, complex queries, performance optimization, stored procedures"),
+            
+            createInterviewQuestion("How do you optimize JPA queries for better performance? List 5 techniques.", 
+                "HARD", "Meta", "Hibernate & JPA", module,
+                "1. Use appropriate fetch strategies (LAZY vs EAGER)\n" +
+                "2. Implement JOIN FETCH to avoid N+1\n" +
+                "3. Use projections for read-only queries\n" +
+                "4. Enable query cache and second-level cache\n" +
+                "5. Use batch fetching and proper indexing"),
+            
+            createInterviewQuestion("What are JPA Entity Graphs and how do they help with fetch optimization?", 
+                "HARD", "Apple", "Hibernate & JPA", module,
+                "Entity Graphs define which attributes to fetch in a single query, providing fine-grained control over loading strategy.\n" +
+                "Can be defined statically with @NamedEntityGraph or dynamically with EntityGraph API.")
+        ));
+        
+        // Caching Questions
+        questions.addAll(Arrays.asList(
+            createInterviewQuestion("Explain Hibernate's caching architecture. What are the different cache levels?", 
+                "HARD", "Amazon", "Hibernate & JPA", module,
+                "1. First-level cache (Session cache): Automatic, per-session\n" +
+                "2. Second-level cache (SessionFactory cache): Shared across sessions\n" +
+                "3. Query cache: Caches query results\n" +
+                "Each level has different scope and configuration options."),
+            
+            createInterviewQuestion("What are the different cache concurrency strategies in Hibernate?", 
+                "MEDIUM", "Google", "Hibernate & JPA", module,
+                "READ_ONLY: Immutable data, best performance\n" +
+                "READ_WRITE: Most common, handles concurrent access\n" +
+                "NONSTRICT_READ_WRITE: Better performance, eventual consistency\n" +
+                "TRANSACTIONAL: Full ACID compliance with JTA"),
+            
+            createInterviewQuestion("How do you configure and monitor second-level cache in Hibernate?", 
+                "MEDIUM", "Microsoft", "Hibernate & JPA", module,
+                "Configuration: Enable in properties, annotate entities with @Cacheable/@Cache, configure cache provider (EhCache, Hazelcast).\n" +
+                "Monitoring: Use Statistics API, JMX beans, cache provider metrics."),
+            
+            createInterviewQuestion("When would you use Redis as a Hibernate second-level cache provider?", 
+                "HARD", "Meta", "Hibernate & JPA", module,
+                "For distributed applications requiring shared cache across multiple instances.\n" +
+                "Benefits: Scalability, persistence, advanced data structures\n" +
+                "Considerations: Network latency, serialization overhead, consistency models"),
+            
+            createInterviewQuestion("Explain cache invalidation strategies in Hibernate. How do you handle cache coherence?", 
+                "HARD", "Apple", "Hibernate & JPA", module,
+                "Strategies: Time-based expiration, event-based invalidation, manual eviction\n" +
+                "Coherence: Use cache providers with clustering support, implement cache synchronization, consider eventual consistency trade-offs")
+        ));
+        
+        // Transaction Management Questions
+        questions.addAll(Arrays.asList(
+            createInterviewQuestion("Explain the ACID properties and how they relate to database transactions.", 
+                "MEDIUM", "Amazon", "Hibernate & JPA", module,
+                "Atomicity: All or nothing execution\n" +
+                "Consistency: Database remains in valid state\n" +
+                "Isolation: Concurrent transactions don't interfere\n" +
+                "Durability: Committed changes persist"),
+            
+            createInterviewQuestion("What are the different transaction isolation levels? Explain the phenomena they prevent.", 
+                "HARD", "Google", "Hibernate & JPA", module,
+                "READ_UNCOMMITTED: Allows dirty reads, non-repeatable reads, phantom reads\n" +
+                "READ_COMMITTED: Prevents dirty reads\n" +
+                "REPEATABLE_READ: Prevents dirty and non-repeatable reads\n" +
+                "SERIALIZABLE: Prevents all phenomena"),
+            
+            createInterviewQuestion("Explain Spring's transaction propagation types with examples.", 
+                "HARD", "Microsoft", "Hibernate & JPA", module,
+                "REQUIRED: Join existing or create new\n" +
+                "REQUIRES_NEW: Always create new, suspend current\n" +
+                "NESTED: Create savepoint in existing transaction\n" +
+                "MANDATORY: Must have existing transaction\n" +
+                "SUPPORTS: Optional transaction participation"),
+            
+            createInterviewQuestion("How do you handle distributed transactions in Spring? What is JTA?", 
+                "HARD", "Meta", "Hibernate & JPA", module,
+                "JTA (Java Transaction API) manages distributed transactions across multiple resources.\n" +
+                "Use JTA transaction manager, XA-compliant resources, two-phase commit protocol.\n" +
+                "Alternatives: Saga pattern, eventual consistency, compensating transactions"),
+            
+            createInterviewQuestion("What are the performance implications of different transaction configurations?", 
+                "HARD", "Apple", "Hibernate & JPA", module,
+                "Isolation levels: Higher isolation = more locking = lower concurrency\n" +
+                "Propagation: REQUIRES_NEW creates overhead, NESTED uses savepoints\n" +
+                "Read-only transactions: Enable optimizations, avoid dirty checking\n" +
+                "Transaction size: Smaller transactions reduce lock contention")
+        ));
+        
+        // Advanced Mapping Questions
+        questions.addAll(Arrays.asList(
+            createInterviewQuestion("How do you implement custom AttributeConverter in JPA? Provide a real-world example.", 
+                "MEDIUM", "Amazon", "Hibernate & JPA", module,
+                "Implement AttributeConverter<X,Y> interface with convertToDatabaseColumn and convertToEntityAttribute methods.\n" +
+                "Example: JSON converter for storing complex objects, encryption converter for sensitive data"),
+            
+            createInterviewQuestion("Explain the @Embedded and @Embeddable annotations. When would you use them?", 
+                "MEDIUM", "Google", "Hibernate & JPA", module,
+                "@Embeddable: Marks a class as embeddable value type\n" +
+                "@Embedded: Includes embeddable object in entity\n" +
+                "Use for: Address, Money, DateRange - value objects that don't need separate identity"),
+            
+            createInterviewQuestion("How do you handle polymorphic associations in JPA?", 
+                "HARD", "Microsoft", "Hibernate & JPA", module,
+                "Options: 1. Inheritance mapping with polymorphic queries\n" +
+                "2. Generic foreign key with type discriminator\n" +
+                "3. Separate associations for each type\n" +
+                "4. Use @Any annotation (Hibernate-specific)"),
+            
+            createInterviewQuestion("What are the best practices for implementing equals() and hashCode() in JPA entities?", 
+                "HARD", "Meta", "Hibernate & JPA", module,
+                "1. Use business keys, not generated IDs\n" +
+                "2. Ensure consistency across entity lifecycle\n" +
+                "3. Consider using UUID for natural keys\n" +
+                "4. Be careful with lazy-loaded properties\n" +
+                "5. Test with collections and detached entities"),
+            
+            createInterviewQuestion("How do you implement audit trails in JPA? What are the different approaches?", 
+                "MEDIUM", "Apple", "Hibernate & JPA", module,
+                "Approaches: 1. @EntityListeners with @PrePersist/@PreUpdate\n" +
+                "2. Spring Data JPA auditing with @CreatedDate/@LastModifiedDate\n" +
+                "3. Hibernate Envers for full audit history\n" +
+                "4. Database triggers\n" +
+                "5. Custom interceptors")
+        ));
+        
+        // Performance and Optimization Questions
+        questions.addAll(Arrays.asList(
+            createInterviewQuestion("How do you diagnose and fix performance issues in Hibernate applications?", 
+                "HARD", "Amazon", "Hibernate & JPA", module,
+                "1. Enable SQL logging and statistics\n" +
+                "2. Use profiling tools (JProfiler, YourKit)\n" +
+                "3. Analyze query execution plans\n" +
+                "4. Check for N+1 problems, unnecessary queries\n" +
+                "5. Optimize fetch strategies and caching"),
+            
+            createInterviewQuestion("What is the difference between stateful and stateless sessions in Hibernate?", 
+                "MEDIUM", "Google", "Hibernate & JPA", module,
+                "Stateful (Session): Maintains first-level cache, dirty checking, automatic persistence\n" +
+                "Stateless (StatelessSession): No caching, no dirty checking, manual persistence, better for batch operations"),
+            
+            createInterviewQuestion("How do you implement batch processing efficiently in JPA/Hibernate?", 
+                "HARD", "Microsoft", "Hibernate & JPA", module,
+                "1. Use StatelessSession for large batches\n" +
+                "2. Configure hibernate.jdbc.batch_size\n" +
+                "3. Flush and clear session periodically\n" +
+                "4. Use bulk operations (UPDATE/DELETE queries)\n" +
+                "5. Disable second-level cache for batch operations"),
+            
+            createInterviewQuestion("Explain lazy loading in Hibernate. What are the common pitfalls?", 
+                "MEDIUM", "Meta", "Hibernate & JPA", module,
+                "Lazy loading defers initialization until property is accessed.\n" +
+                "Pitfalls: LazyInitializationException, N+1 queries, performance in loops\n" +
+                "Solutions: JOIN FETCH, @BatchSize, proper session management"),
+            
+            createInterviewQuestion("How do you handle large result sets efficiently in JPA?", 
+                "HARD", "Apple", "Hibernate & JPA", module,
+                "1. Use pagination with proper indexing\n" +
+                "2. Stream results with @QueryHints\n" +
+                "3. Use projections instead of full entities\n" +
+                "4. Implement cursor-based pagination\n" +
+                "5. Consider read-only queries and stateless sessions")
+        ));
+        
+        interviewQuestionRepository.saveAll(questions);
+        log.info("✅ Created {} Hibernate & JPA interview questions", questions.size());
+    }    
+
+    private void createNodeJsFundamentalsModule() {
+        LearningModule module = new LearningModule();
+        module.setTitle("Node.js Fundamentals to Expert");
+        module.setDescription("Complete Node.js mastery: from fundamentals to advanced patterns, microservices, and performance optimization");
+        module.setCategory("Backend Development");
+        module.setDifficultyLevel("BEGINNER_TO_EXPERT");
+        module.setEstimatedHours(45);
+        module.setSortOrder(4);
+        module.setTopics(new ArrayList<>());
+        
+        learningModuleRepository.save(module);
+        
+        // Create comprehensive Node.js topics
+        createNodeJsCoreTopic(module);
+        createAsyncProgrammingTopic(module);
+        createNodeJsModulesTopic(module);
+        createExpressFrameworkTopic(module);
+        createNodeJsPerformanceTopic(module);
+        createNodeJsInterviewQuestions(module);
+        
+        log.info("✅ Created Node.js Fundamentals module with {} topics", module.getTopics().size());
+    }
+    
+    private void createNodeJsCoreTopic(LearningModule module) {
+        Topic topic = new Topic();
+        topic.setTitle("Node.js Core Concepts and Event Loop");
+        topic.setDescription("Master Node.js fundamentals: event loop, non-blocking I/O, streams, and core modules");
+        topic.setContent("""
+            <div class="topic-content">
+                <h2>🚀 Node.js Core Concepts and Event Loop</h2>
+                
+                <div class="learning-objectives">
+                    <h3>🎯 Learning Objectives</h3>
+                    <ul>
+                        <li>Understand Node.js architecture and the V8 engine</li>
+                        <li>Master the event loop and non-blocking I/O concepts</li>
+                        <li>Work with Node.js core modules and global objects</li>
+                        <li>Implement streams and buffer handling</li>
+                        <li>Debug and profile Node.js applications</li>
+                    </ul>
+                </div>
+                
+                <div class="concept-section">
+                    <h3>🏗️ Node.js Architecture and Event Loop</h3>
+                    <p>Node.js is built on Chrome's V8 JavaScript engine and uses an event-driven, non-blocking I/O model.</p>
+                    
+                    <div class="code-example">
+                        <h5>Event Loop Demonstration:</h5>
+                        <pre><code class="language-javascript">
+// Understanding the Event Loop phases
+console.log('=== Event Loop Demo ===');
+
+// 1. Call Stack (Synchronous)
+console.log('1. Synchronous operation');
+
+// 2. Timer Phase (setTimeout, setInterval)
+setTimeout(() => {
+    console.log('4. Timer callback (setTimeout 0ms)');
+}, 0);
+
+setTimeout(() => {
+    console.log('6. Timer callback (setTimeout 10ms)');
+}, 10);
+
+// 3. I/O Phase (file operations, network requests)
+const fs = require('fs');
+fs.readFile(__filename, () => {
+    console.log('5. I/O callback (file read)');
+    
+    // Check phase - setImmediate callbacks
+    setImmediate(() => {
+        console.log('7. Check phase (setImmediate)');
+    });
+    
+    // Close phase
+    process.nextTick(() => {
+        console.log('8. Next tick callback');
+    });
+});
+
+// 4. Immediate execution (process.nextTick has highest priority)
+process.nextTick(() => {
+    console.log('2. Next tick callback (highest priority)');
+});
+
+// 5. Check phase
+setImmediate(() => {
+    console.log('3. Immediate callback');
+});
+
+console.log('End of main thread');
+
+// Output order demonstrates event loop phases:
+// 1. Synchronous operation
+// End of main thread
+// 2. Next tick callback (highest priority)
+// 3. Immediate callback
+// 4. Timer callback (setTimeout 0ms)
+// 5. I/O callback (file read)
+// 6. Timer callback (setTimeout 10ms)
+// 7. Check phase (setImmediate)
+// 8. Next tick callback
+
+// Event Loop Phases in Detail
+function demonstrateEventLoopPhases() {
+    console.log('\\n=== Event Loop Phases ===');
+    
+    // Phase 1: Timer Phase
+    setTimeout(() => console.log('Timer Phase: setTimeout'), 0);
+    setInterval(() => {
+        console.log('Timer Phase: setInterval');
+        clearInterval(this); // Clear after first execution
+    }, 0);
+    
+    // Phase 2: Pending Callbacks Phase (internal use)
+    
+    // Phase 3: Idle, Prepare Phase (internal use)
+    
+    // Phase 4: Poll Phase (fetch new I/O events)
+    fs.readFile(__filename, (err, data) => {
+        console.log('Poll Phase: I/O callback');
+        
+        // Phase 5: Check Phase
+        setImmediate(() => console.log('Check Phase: setImmediate'));
+    });
+    
+    // Phase 6: Close Callbacks Phase
+    const server = require('http').createServer();
+    server.listen(0, () => {
+        server.close(() => {
+            console.log('Close Phase: server close callback');
+        });
+    });
+    
+    // Microtasks (executed between phases)
+    process.nextTick(() => console.log('Microtask: process.nextTick'));
+    Promise.resolve().then(() => console.log('Microtask: Promise'));
+}
+
+// Blocking vs Non-blocking operations
+function demonstrateBlockingVsNonBlocking() {
+    console.log('\\n=== Blocking vs Non-blocking ===');
+    
+    const start = Date.now();
+    
+    // Non-blocking I/O
+    fs.readFile(__filename, (err, data) => {
+        console.log(`Non-blocking read completed in ${Date.now() - start}ms`);
+    });
+    
+    // Blocking I/O (avoid in production)
+    try {
+        const data = fs.readFileSync(__filename);
+        console.log(`Blocking read completed in ${Date.now() - start}ms`);
+    } catch (err) {
+        console.error('Blocking read error:', err.message);
+    }
+    
+    console.log('This executes immediately (non-blocking)');
+}
+
+// CPU-intensive task handling
+function demonstrateCpuIntensiveTask() {
+    console.log('\\n=== CPU Intensive Task Handling ===');
+    
+    // Bad: Blocks the event loop
+    function blockingCpuTask(n) {
+        let result = 0;
+        for (let i = 0; i < n; i++) {
+            result += Math.sqrt(i);
+        }
+        return result;
+    }
+    
+    // Good: Non-blocking with setImmediate
+    function nonBlockingCpuTask(n, callback) {
+        let result = 0;
+        let i = 0;
+        
+        function processChunk() {
+            const chunkSize = 100000;
+            const end = Math.min(i + chunkSize, n);
+            
+            for (; i < end; i++) {
+                result += Math.sqrt(i);
+            }
+            
+            if (i < n) {
+                setImmediate(processChunk); // Yield control back to event loop
+            } else {
+                callback(null, result);
+            }
+        }
+        
+        processChunk();
+    }
+    
+    // Better: Use Worker Threads for CPU-intensive tasks
+    const { Worker, isMainThread, parentPort, workerData } = require('worker_threads');
+    
+    if (isMainThread) {
+        function cpuTaskWithWorker(n, callback) {
+            const worker = new Worker(__filename, {
+                workerData: { n, isCpuTask: true }
+            });
+            
+            worker.on('message', (result) => {
+                callback(null, result);
+                worker.terminate();
+            });
+            
+            worker.on('error', callback);
+        }
+    } else if (workerData && workerData.isCpuTask) {
+        // Worker thread code
+        const { n } = workerData;
+        let result = 0;
+        for (let i = 0; i < n; i++) {
+            result += Math.sqrt(i);
+        }
+        parentPort.postMessage(result);
+    }
+}
+
+// Memory management and garbage collection
+function demonstrateMemoryManagement() {
+    console.log('\\n=== Memory Management ===');
+    
+    // Monitor memory usage
+    function logMemoryUsage(label) {
+        const usage = process.memoryUsage();
+        console.log(`${label}:`);
+        console.log(`  RSS: ${Math.round(usage.rss / 1024 / 1024)} MB`);
+        console.log(`  Heap Used: ${Math.round(usage.heapUsed / 1024 / 1024)} MB`);
+        console.log(`  Heap Total: ${Math.round(usage.heapTotal / 1024 / 1024)} MB`);
+        console.log(`  External: ${Math.round(usage.external / 1024 / 1024)} MB`);
+    }
+    
+    logMemoryUsage('Initial');
+    
+    // Create memory pressure
+    const largeArray = new Array(1000000).fill('memory test');
+    logMemoryUsage('After creating large array');
+    
+    // Force garbage collection (if --expose-gc flag is used)
+    if (global.gc) {
+        global.gc();
+        logMemoryUsage('After garbage collection');
+    }
+    
+    // Memory leak example (avoid this)
+    const leakyArray = [];
+    function memoryLeak() {
+        leakyArray.push(new Array(1000).fill('leak'));
+        setTimeout(memoryLeak, 100); // Keeps adding to array
+    }
+    
+    // Proper cleanup
+    function properCleanup() {
+        const tempArray = [];
+        // Use tempArray...
+        // No need to explicitly clear, will be garbage collected
+        return tempArray.length;
+    }
+}
+
+// Error handling in asynchronous code
+function demonstrateErrorHandling() {
+    console.log('\\n=== Error Handling ===');
+    
+    // Uncaught exception handling
+    process.on('uncaughtException', (err) => {
+        console.error('Uncaught Exception:', err);
+        // Log error and gracefully shutdown
+        process.exit(1);
+    });
+    
+    // Unhandled promise rejection
+    process.on('unhandledRejection', (reason, promise) => {
+        console.error('Unhandled Rejection at:', promise, 'reason:', reason);
+        // Log error and gracefully shutdown
+        process.exit(1);
+    });
+    
+    // Proper error handling with callbacks
+    fs.readFile('nonexistent.txt', (err, data) => {
+        if (err) {
+            console.error('File read error:', err.message);
+            return;
+        }
+        console.log('File content:', data.toString());
+    });
+    
+    // Proper error handling with promises
+    const { promisify } = require('util');
+    const readFileAsync = promisify(fs.readFile);
+    
+    async function readFileWithErrorHandling() {
+        try {
+            const data = await readFileAsync('nonexistent.txt');
+            console.log('File content:', data.toString());
+        } catch (err) {
+            console.error('Async file read error:', err.message);
+        }
+    }
+}
+
+// Run demonstrations
+if (require.main === module) {
+    demonstrateEventLoopPhases();
+    demonstrateBlockingVsNonBlocking();
+    demonstrateCpuIntensiveTask();
+    demonstrateMemoryManagement();
+    demonstrateErrorHandling();
+}
+                        </code></pre>
+                    </div>
+                </div>
+                
+                <div class="concept-section">
+                    <h3>📦 Core Modules and Global Objects</h3>
+                    <p>Node.js provides built-in modules and global objects that form the foundation of server-side JavaScript development.</p>
+                    
+                    <div class="code-example">
+                        <h5>Core Modules Usage:</h5>
+                        <pre><code class="language-javascript">
+// File System Module
+const fs = require('fs');
+const path = require('path');
+const { promisify } = require('util');
+
+// Promisified versions for async/await
+const readFile = promisify(fs.readFile);
+const writeFile = promisify(fs.writeFile);
+const mkdir = promisify(fs.mkdir);
+const stat = promisify(fs.stat);
+
+class FileManager {
+    constructor(baseDir = './data') {
+        this.baseDir = baseDir;
+        this.ensureDirectory();
+    }
+    
+    async ensureDirectory() {
+        try {
+            await mkdir(this.baseDir, { recursive: true });
+        } catch (err) {
+            if (err.code !== 'EEXIST') throw err;
+        }
+    }
+    
+    async readJSON(filename) {
+        try {
+            const filePath = path.join(this.baseDir, filename);
+            const data = await readFile(filePath, 'utf8');
+            return JSON.parse(data);
+        } catch (err) {
+            if (err.code === 'ENOENT') {
+                return null; // File doesn't exist
+            }
+            throw err;
+        }
+    }
+    
+    async writeJSON(filename, data) {
+        const filePath = path.join(this.baseDir, filename);
+        const jsonData = JSON.stringify(data, null, 2);
+        await writeFile(filePath, jsonData, 'utf8');
+    }
+    
+    async getFileStats(filename) {
+        const filePath = path.join(this.baseDir, filename);
+        try {
+            const stats = await stat(filePath);
+            return {
+                size: stats.size,
+                created: stats.birthtime,
+                modified: stats.mtime,
+                isFile: stats.isFile(),
+                isDirectory: stats.isDirectory()
+            };
+        } catch (err) {
+            return null;
+        }
+    }
+    
+    // Watch for file changes
+    watchFile(filename, callback) {
+        const filePath = path.join(this.baseDir, filename);
+        return fs.watch(filePath, (eventType, changedFilename) => {
+            callback(eventType, changedFilename);
+        });
+    }
+}
+
+// HTTP Module
+const http = require('http');
+const url = require('url');
+const querystring = require('querystring');
+
+class SimpleHttpServer {
+    constructor(port = 3000) {
+        this.port = port;
+        this.routes = new Map();
+        this.middlewares = [];
+    }
+    
+    use(middleware) {
+        this.middlewares.push(middleware);
+    }
+    
+    get(path, handler) {
+        this.addRoute('GET', path, handler);
+    }
+    
+    post(path, handler) {
+        this.addRoute('POST', path, handler);
+    }
+    
+    addRoute(method, path, handler) {
+        const key = `${method}:${path}`;
+        this.routes.set(key, handler);
+    }
+    
+    async handleRequest(req, res) {
+        // Parse URL and query parameters
+        const parsedUrl = url.parse(req.url, true);
+        req.pathname = parsedUrl.pathname;
+        req.query = parsedUrl.query;
+        
+        // Parse body for POST requests
+        if (req.method === 'POST') {
+            req.body = await this.parseBody(req);
+        }
+        
+        // Apply middlewares
+        for (const middleware of this.middlewares) {
+            await middleware(req, res);
+        }
+        
+        // Find and execute route handler
+        const routeKey = `${req.method}:${req.pathname}`;
+        const handler = this.routes.get(routeKey);
+        
+        if (handler) {
+            try {
+                await handler(req, res);
+            } catch (err) {
+                this.handleError(err, res);
+            }
+        } else {
+            this.send404(res);
+        }
+    }
+    
+    async parseBody(req) {
+        return new Promise((resolve, reject) => {
+            let body = '';
+            req.on('data', chunk => {
+                body += chunk.toString();
+            });
+            req.on('end', () => {
+                try {
+                    const contentType = req.headers['content-type'];
+                    if (contentType && contentType.includes('application/json')) {
+                        resolve(JSON.parse(body));
+                    } else {
+                        resolve(querystring.parse(body));
+                    }
+                } catch (err) {
+                    reject(err);
+                }
+            });
+            req.on('error', reject);
+        });
+    }
+    
+    handleError(err, res) {
+        console.error('Server error:', err);
+        res.writeHead(500, { 'Content-Type': 'application/json' });
+        res.end(JSON.stringify({ error: 'Internal Server Error' }));
+    }
+    
+    send404(res) {
+        res.writeHead(404, { 'Content-Type': 'application/json' });
+        res.end(JSON.stringify({ error: 'Not Found' }));
+    }
+    
+    start() {
+        const server = http.createServer((req, res) => {
+            this.handleRequest(req, res);
+        });
+        
+        server.listen(this.port, () => {
+            console.log(`Server running on port ${this.port}`);
+        });
+        
+        return server;
+    }
+}
+
+// OS Module
+const os = require('os');
+
+class SystemInfo {
+    static getSystemInfo() {
+        return {
+            platform: os.platform(),
+            architecture: os.arch(),
+            cpus: os.cpus().length,
+            totalMemory: Math.round(os.totalmem() / 1024 / 1024 / 1024) + ' GB',
+            freeMemory: Math.round(os.freemem() / 1024 / 1024 / 1024) + ' GB',
+            uptime: Math.round(os.uptime() / 3600) + ' hours',
+            loadAverage: os.loadavg(),
+            networkInterfaces: Object.keys(os.networkInterfaces()),
+            hostname: os.hostname(),
+            homeDirectory: os.homedir(),
+            tempDirectory: os.tmpdir()
+        };
+    }
+    
+    static monitorSystem(interval = 5000) {
+        setInterval(() => {
+            const info = SystemInfo.getSystemInfo();
+            console.log('System Status:', {
+                freeMemory: info.freeMemory,
+                loadAverage: info.loadAverage[0].toFixed(2)
+            });
+        }, interval);
+    }
+}
+
+// Crypto Module
+const crypto = require('crypto');
+
+class CryptoUtils {
+    static generateHash(data, algorithm = 'sha256') {
+        return crypto.createHash(algorithm).update(data).digest('hex');
+    }
+    
+    static generateRandomBytes(size = 32) {
+        return crypto.randomBytes(size);
+    }
+    
+    static encrypt(text, password) {
+        const algorithm = 'aes-256-cbc';
+        const key = crypto.scryptSync(password, 'salt', 32);
+        const iv = crypto.randomBytes(16);
+        
+        const cipher = crypto.createCipher(algorithm, key);
+        let encrypted = cipher.update(text, 'utf8', 'hex');
+        encrypted += cipher.final('hex');
+        
+        return {
+            encrypted,
+            iv: iv.toString('hex')
+        };
+    }
+    
+    static decrypt(encryptedData, password) {
+        const algorithm = 'aes-256-cbc';
+        const key = crypto.scryptSync(password, 'salt', 32);
+        
+        const decipher = crypto.createDecipher(algorithm, key);
+        let decrypted = decipher.update(encryptedData.encrypted, 'hex', 'utf8');
+        decrypted += decipher.final('utf8');
+        
+        return decrypted;
+    }
+    
+    static generateJWT(payload, secret, expiresIn = '1h') {
+        const header = { alg: 'HS256', typ: 'JWT' };
+        const now = Math.floor(Date.now() / 1000);
+        const exp = now + (expiresIn === '1h' ? 3600 : parseInt(expiresIn));
+        
+        const jwtPayload = { ...payload, iat: now, exp };
+        
+        const encodedHeader = Buffer.from(JSON.stringify(header)).toString('base64url');
+        const encodedPayload = Buffer.from(JSON.stringify(jwtPayload)).toString('base64url');
+        
+        const signature = crypto
+            .createHmac('sha256', secret)
+            .update(`${encodedHeader}.${encodedPayload}`)
+            .digest('base64url');
+        
+        return `${encodedHeader}.${encodedPayload}.${signature}`;
+    }
+}
+
+// Global Objects and Process
+class ProcessManager {
+    static setupGracefulShutdown() {
+        const signals = ['SIGTERM', 'SIGINT', 'SIGUSR2'];
+        
+        signals.forEach(signal => {
+            process.on(signal, () => {
+                console.log(`Received ${signal}, shutting down gracefully...`);
+                this.cleanup();
+                process.exit(0);
+            });
+        });
+    }
+    
+    static cleanup() {
+        // Close database connections
+        // Stop servers
+        // Clean up resources
+        console.log('Cleanup completed');
+    }
+    
+    static getProcessInfo() {
+        return {
+            pid: process.pid,
+            version: process.version,
+            platform: process.platform,
+            arch: process.arch,
+            uptime: process.uptime(),
+            memoryUsage: process.memoryUsage(),
+            cpuUsage: process.cpuUsage(),
+            argv: process.argv,
+            env: Object.keys(process.env).length + ' environment variables',
+            cwd: process.cwd()
+        };
+    }
+    
+    static monitorProcess() {
+        setInterval(() => {
+            const usage = process.memoryUsage();
+            const cpu = process.cpuUsage();
+            
+            console.log('Process Stats:', {
+                memory: Math.round(usage.heapUsed / 1024 / 1024) + ' MB',
+                cpu: cpu.user + cpu.system + ' microseconds'
+            });
+        }, 10000);
+    }
+}
+
+// Usage examples
+if (require.main === module) {
+    // File manager example
+    const fileManager = new FileManager();
+    
+    // HTTP server example
+    const server = new SimpleHttpServer(3000);
+    
+    server.use(async (req, res) => {
+        console.log(`${req.method} ${req.url}`);
+    });
+    
+    server.get('/system', (req, res) => {
+        const info = SystemInfo.getSystemInfo();
+        res.writeHead(200, { 'Content-Type': 'application/json' });
+        res.end(JSON.stringify(info, null, 2));
+    });
+    
+    server.get('/process', (req, res) => {
+        const info = ProcessManager.getProcessInfo();
+        res.writeHead(200, { 'Content-Type': 'application/json' });
+        res.end(JSON.stringify(info, null, 2));
+    });
+    
+    // Start server
+    server.start();
+    
+    // Setup graceful shutdown
+    ProcessManager.setupGracefulShutdown();
+}
+                        </code></pre>
+                    </div>
+                </div>
+                
+                <div class="note-taking-section">
+                    <h3>📝 Your Notes</h3>
+                    <div class="note-editor" data-topic="nodejs-core">
+                        <textarea placeholder="Add your personal notes about Node.js core concepts..."></textarea>
+                    </div>
+                </div>
+            </div>
+            """);
+        
+        topic.setEstimatedMinutes(180);
+        topic.setSortOrder(1);
+        module.getTopics().add(topic);
+        topicRepository.save(topic);
+        
+        log.info("✅ Created Node.js Core Concepts topic");
+    }    
+ 
+   private void createAsyncProgrammingTopic(LearningModule module) {
+        Topic topic = new Topic();
+        topic.setTitle("Asynchronous Programming: Callbacks, Promises, and Async/Await");
+        topic.setDescription("Master asynchronous programming patterns in Node.js: callbacks, promises, async/await, and error handling");
+        topic.setContent("""
+            <div class="topic-content">
+                <h2>⚡ Asynchronous Programming: Callbacks, Promises, and Async/Await</h2>
+                
+                <div class="learning-objectives">
+                    <h3>🎯 Learning Objectives</h3>
+                    <ul>
+                        <li>Master callback patterns and avoid callback hell</li>
+                        <li>Implement and chain promises effectively</li>
+                        <li>Use async/await for clean asynchronous code</li>
+                        <li>Handle errors properly in asynchronous operations</li>
+                        <li>Understand concurrency patterns and parallel execution</li>
+                    </ul>
+                </div>
+                
+                <div class="concept-section">
+                    <h3>📞 Callbacks and Callback Patterns</h3>
+                    <p>Callbacks are the foundation of asynchronous programming in Node.js, but they can lead to complex nested structures.</p>
+                    
+                    <div class="code-example">
+                        <h5>Callback Patterns and Best Practices:</h5>
+                        <pre><code class="language-javascript">
+const fs = require('fs');
+const path = require('path');
+
+// Basic callback pattern (Error-first callbacks)
+function readFileCallback(filename, callback) {
+    fs.readFile(filename, 'utf8', (err, data) => {
+        if (err) {
+            return callback(err, null); // Error-first convention
+        }
+        callback(null, data); // Success: null error, data as second argument
+    });
+}
+
+// Callback hell example (what to avoid)
+function callbackHellExample() {
+    fs.readFile('file1.txt', 'utf8', (err1, data1) => {
+        if (err1) throw err1;
+        
+        fs.readFile('file2.txt', 'utf8', (err2, data2) => {
+            if (err2) throw err2;
+            
+            fs.readFile('file3.txt', 'utf8', (err3, data3) => {
+                if (err3) throw err3;
+                
+                // Process all three files
+                const combined = data1 + data2 + data3;
+                fs.writeFile('combined.txt', combined, (err4) => {
+                    if (err4) throw err4;
+                    console.log('Files combined successfully');
+                });
+            });
+        });
+    });
+}
+
+// Better callback pattern with named functions
+function readFile1(callback) {
+    fs.readFile('file1.txt', 'utf8', callback);
+}
+
+function readFile2(data1, callback) {
+    fs.readFile('file2.txt', 'utf8', (err, data2) => {
+        if (err) return callback(err);
+        callback(null, data1, data2);
+    });
+}
+
+function readFile3(data1, data2, callback) {
+    fs.readFile('file3.txt', 'utf8', (err, data3) => {
+        if (err) return callback(err);
+        callback(null, data1 + data2 + data3);
+    });
+}
+
+function writeResult(combined, callback) {
+    fs.writeFile('combined.txt', combined, callback);
+}
+
+function betterCallbackPattern() {
+    readFile1((err, data1) => {
+        if (err) throw err;
+        
+        readFile2(data1, (err, data1, data2) => {
+            if (err) throw err;
+            
+            readFile3(data1, data2, (err, combined) => {
+                if (err) throw err;
+                
+                writeResult(combined, (err) => {
+                    if (err) throw err;
+                    console.log('Files combined successfully');
+                });
+            });
+        });
+    });
+}
+
+// Callback utilities
+class CallbackUtils {
+    // Convert callback-based function to return multiple callbacks
+    static parallel(tasks, callback) {
+        let completed = 0;
+        let results = [];
+        let hasError = false;
+        
+        if (tasks.length === 0) {
+            return callback(null, []);
+        }
+        
+        tasks.forEach((task, index) => {
+            task((err, result) => {
+                if (hasError) return;
+                
+                if (err) {
+                    hasError = true;
+                    return callback(err);
+                }
+                
+                results[index] = result;
+                completed++;
+                
+                if (completed === tasks.length) {
+                    callback(null, results);
+                }
+            });
+        });
+    }
+    
+    // Execute callbacks in series
+    static series(tasks, callback) {
+        let index = 0;
+        let results = [];
+        
+        function next(err, result) {
+            if (err) return callback(err);
+            
+            if (index > 0) {
+                results.push(result);
+            }
+            
+            if (index >= tasks.length) {
+                return callback(null, results);
+            }
+            
+            const task = tasks[index++];
+            task(next);
+        }
+        
+        next();
+    }
+    
+    // Waterfall pattern - pass result to next function
+    static waterfall(tasks, callback) {
+        let index = 0;
+        
+        function next(err, ...args) {
+            if (err) return callback(err);
+            
+            if (index >= tasks.length) {
+                return callback(null, ...args);
+            }
+            
+            const task = tasks[index++];
+            task(...args, next);
+        }
+        
+        next();
+    }
+    
+    // Retry mechanism for callbacks
+    static retry(task, maxAttempts, callback) {
+        let attempts = 0;
+        
+        function attempt() {
+            attempts++;
+            task((err, result) => {
+                if (!err) {
+                    return callback(null, result);
+                }
+                
+                if (attempts >= maxAttempts) {
+                    return callback(new Error(`Failed after ${maxAttempts} attempts: ${err.message}`));
+                }
+                
+                console.log(`Attempt ${attempts} failed, retrying...`);
+                setTimeout(attempt, 1000 * attempts); // Exponential backoff
+            });
+        }
+        
+        attempt();
+    }
+}
+
+// Usage examples
+function demonstrateCallbackUtils() {
+    // Parallel execution
+    const parallelTasks = [
+        (cb) => setTimeout(() => cb(null, 'Task 1'), 100),
+        (cb) => setTimeout(() => cb(null, 'Task 2'), 200),
+        (cb) => setTimeout(() => cb(null, 'Task 3'), 150)
+    ];
+    
+    CallbackUtils.parallel(parallelTasks, (err, results) => {
+        if (err) throw err;
+        console.log('Parallel results:', results);
+    });
+    
+    // Series execution
+    const seriesTasks = [
+        (cb) => setTimeout(() => cb(null, 'First'), 100),
+        (cb) => setTimeout(() => cb(null, 'Second'), 100),
+        (cb) => setTimeout(() => cb(null, 'Third'), 100)
+    ];
+    
+    CallbackUtils.series(seriesTasks, (err, results) => {
+        if (err) throw err;
+        console.log('Series results:', results);
+    });
+    
+    // Waterfall execution
+    const waterfallTasks = [
+        (cb) => cb(null, 1),
+        (num, cb) => cb(null, num * 2),
+        (num, cb) => cb(null, num + 3),
+        (num, cb) => cb(null, `Result: ${num}`)
+    ];
+    
+    CallbackUtils.waterfall(waterfallTasks, (err, result) => {
+        if (err) throw err;
+        console.log('Waterfall result:', result);
+    });
+}
+                        </code></pre>
+                    </div>
+                </div>
+                
+                <div class="concept-section">
+                    <h3>🤝 Promises and Promise Chains</h3>
+                    <p>Promises provide a cleaner alternative to callbacks, allowing for better error handling and composition.</p>
+                    
+                    <div class="code-example">
+                        <h5>Promise Implementation and Patterns:</h5>
+                        <pre><code class="language-javascript">
+const { promisify } = require('util');
+
+// Convert callback-based functions to promises
+const readFileAsync = promisify(fs.readFile);
+const writeFileAsync = promisify(fs.writeFile);
+
+// Basic promise creation
+function createPromiseExample() {
+    return new Promise((resolve, reject) => {
+        // Simulate async operation
+        setTimeout(() => {
+            const success = Math.random() > 0.3;
+            if (success) {
+                resolve('Operation successful');
+            } else {
+                reject(new Error('Operation failed'));
+            }
+        }, 1000);
+    });
+}
+
+// Promise chaining
+function promiseChainingExample() {
+    return readFileAsync('input.txt', 'utf8')
+        .then(data => {
+            console.log('File read successfully');
+            return data.toUpperCase(); // Transform data
+        })
+        .then(upperData => {
+            console.log('Data transformed');
+            return writeFileAsync('output.txt', upperData);
+        })
+        .then(() => {
+            console.log('File written successfully');
+            return 'Process completed';
+        })
+        .catch(err => {
+            console.error('Error in promise chain:', err.message);
+            throw err; // Re-throw if needed
+        });
+}
+
+// Promise utilities class
+class PromiseUtils {
+    // Promise.all with timeout
+    static allWithTimeout(promises, timeoutMs) {
+        const timeoutPromise = new Promise((_, reject) => {
+            setTimeout(() => reject(new Error('Timeout')), timeoutMs);
+        });
+        
+        return Promise.race([
+            Promise.all(promises),
+            timeoutPromise
+        ]);
+    }
+    
+    // Promise.allSettled polyfill for older Node versions
+    static allSettled(promises) {
+        return Promise.all(
+            promises.map(promise =>
+                Promise.resolve(promise)
+                    .then(value => ({ status: 'fulfilled', value }))
+                    .catch(reason => ({ status: 'rejected', reason }))
+            )
+        );
+    }
+    
+    // Sequential execution of promises
+    static sequence(promiseFactories) {
+        return promiseFactories.reduce(
+            (chain, promiseFactory) => chain.then(promiseFactory),
+            Promise.resolve()
+        );
+    }
+    
+    // Parallel execution with concurrency limit
+    static parallelLimit(tasks, limit) {
+        return new Promise((resolve, reject) => {
+            let index = 0;
+            let running = 0;
+            let results = [];
+            let completed = 0;
+            
+            function next() {
+                if (completed === tasks.length) {
+                    return resolve(results);
+                }
+                
+                while (running < limit && index < tasks.length) {
+                    const currentIndex = index++;
+                    running++;
+                    
+                    Promise.resolve(tasks[currentIndex]())
+                        .then(result => {
+                            results[currentIndex] = result;
+                            completed++;
+                            running--;
+                            next();
+                        })
+                        .catch(reject);
+                }
+            }
+            
+            next();
+        });
+    }
+    
+    // Retry with exponential backoff
+    static retry(promiseFactory, maxAttempts, baseDelay = 1000) {
+        return new Promise((resolve, reject) => {
+            let attempts = 0;
+            
+            function attempt() {
+                attempts++;
+                
+                promiseFactory()
+                    .then(resolve)
+                    .catch(err => {
+                        if (attempts >= maxAttempts) {
+                            return reject(new Error(`Failed after ${maxAttempts} attempts: ${err.message}`));
+                        }
+                        
+                        const delay = baseDelay * Math.pow(2, attempts - 1);
+                        console.log(`Attempt ${attempts} failed, retrying in ${delay}ms...`);
+                        setTimeout(attempt, delay);
+                    });
+            }
+            
+            attempt();
+        });
+    }
+    
+    // Circuit breaker pattern
+    static createCircuitBreaker(promiseFactory, threshold = 5, timeout = 60000) {
+        let failures = 0;
+        let lastFailureTime = 0;
+        let state = 'CLOSED'; // CLOSED, OPEN, HALF_OPEN
+        
+        return function circuitBreakerWrapper(...args) {
+            const now = Date.now();
+            
+            if (state === 'OPEN') {
+                if (now - lastFailureTime > timeout) {
+                    state = 'HALF_OPEN';
+                } else {
+                    return Promise.reject(new Error('Circuit breaker is OPEN'));
+                }
+            }
+            
+            return promiseFactory(...args)
+                .then(result => {
+                    if (state === 'HALF_OPEN') {
+                        state = 'CLOSED';
+                        failures = 0;
+                    }
+                    return result;
+                })
+                .catch(err => {
+                    failures++;
+                    lastFailureTime = now;
+                    
+                    if (failures >= threshold) {
+                        state = 'OPEN';
+                    }
+                    
+                    throw err;
+                });
+        };
+    }
+    
+    // Promise memoization
+    static memoize(promiseFactory, keyGenerator = (...args) => JSON.stringify(args)) {
+        const cache = new Map();
+        
+        return function memoizedPromise(...args) {
+            const key = keyGenerator(...args);
+            
+            if (cache.has(key)) {
+                return cache.get(key);
+            }
+            
+            const promise = promiseFactory(...args)
+                .catch(err => {
+                    cache.delete(key); // Remove failed promises from cache
+                    throw err;
+                });
+            
+            cache.set(key, promise);
+            return promise;
+        };
+    }
+}
+
+// Advanced promise patterns
+class AdvancedPromisePatterns {
+    // Promise pool for resource management
+    static createPromisePool(factory, poolSize = 5) {
+        const pool = [];
+        let index = 0;
+        
+        return {
+            execute(task) {
+                const poolIndex = index % poolSize;
+                index++;
+                
+                if (!pool[poolIndex]) {
+                    pool[poolIndex] = Promise.resolve();
+                }
+                
+                pool[poolIndex] = pool[poolIndex]
+                    .then(() => factory(task))
+                    .catch(err => {
+                        console.error('Pool task failed:', err);
+                        throw err;
+                    });
+                
+                return pool[poolIndex];
+            }
+        };
+    }
+    
+    // Promise-based event emitter
+    static createPromiseEmitter() {
+        const listeners = new Map();
+        
+        return {
+            on(event, listener) {
+                if (!listeners.has(event)) {
+                    listeners.set(event, []);
+                }
+                listeners.get(event).push(listener);
+            },
+            
+            emit(event, data) {
+                const eventListeners = listeners.get(event) || [];
+                return Promise.all(
+                    eventListeners.map(listener => 
+                        Promise.resolve(listener(data))
+                    )
+                );
+            },
+            
+            once(event) {
+                return new Promise(resolve => {
+                    const listener = (data) => {
+                        resolve(data);
+                        const eventListeners = listeners.get(event) || [];
+                        const index = eventListeners.indexOf(listener);
+                        if (index > -1) {
+                            eventListeners.splice(index, 1);
+                        }
+                    };
+                    this.on(event, listener);
+                });
+            }
+        };
+    }
+}
+
+// Usage examples
+async function demonstratePromisePatterns() {
+    console.log('\\n=== Promise Patterns Demo ===');
+    
+    // Promise chaining
+    try {
+        const result = await promiseChainingExample();
+        console.log('Chain result:', result);
+    } catch (err) {
+        console.error('Chain error:', err.message);
+    }
+    
+    // Parallel execution with limit
+    const tasks = Array.from({ length: 10 }, (_, i) => 
+        () => new Promise(resolve => 
+            setTimeout(() => resolve(`Task ${i + 1}`), Math.random() * 1000)
+        )
+    );
+    
+    const limitedResults = await PromiseUtils.parallelLimit(tasks, 3);
+    console.log('Limited parallel results:', limitedResults);
+    
+    // Retry mechanism
+    const flakyTask = () => new Promise((resolve, reject) => {
+        if (Math.random() > 0.7) {
+            resolve('Success!');
+        } else {
+            reject(new Error('Random failure'));
+        }
+    });
+    
+    try {
+        const retryResult = await PromiseUtils.retry(flakyTask, 3);
+        console.log('Retry result:', retryResult);
+    } catch (err) {
+        console.error('Retry failed:', err.message);
+    }
+}
+                        </code></pre>
+                    </div>
+                </div>
+                
+                <div class="concept-section">
+                    <h3>🎯 Async/Await and Modern Patterns</h3>
+                    <p>Async/await provides the most readable way to handle asynchronous operations, making code look synchronous while remaining non-blocking.</p>
+                    
+                    <div class="code-example">
+                        <h5>Async/Await Best Practices:</h5>
+                        <pre><code class="language-javascript">
+// Basic async/await usage
+async function basicAsyncExample() {
+    try {
+        const data = await readFileAsync('example.txt', 'utf8');
+        const processed = data.toUpperCase();
+        await writeFileAsync('processed.txt', processed);
+        return 'File processed successfully';
+    } catch (error) {
+        console.error('Error processing file:', error.message);
+        throw error;
+    }
+}
+
+// Parallel execution with async/await
+async function parallelAsyncExample() {
+    try {
+        // Wrong: Sequential execution
+        const file1 = await readFileAsync('file1.txt', 'utf8');
+        const file2 = await readFileAsync('file2.txt', 'utf8');
+        const file3 = await readFileAsync('file3.txt', 'utf8');
+        
+        // Right: Parallel execution
+        const [file1Parallel, file2Parallel, file3Parallel] = await Promise.all([
+            readFileAsync('file1.txt', 'utf8'),
+            readFileAsync('file2.txt', 'utf8'),
+            readFileAsync('file3.txt', 'utf8')
+        ]);
+        
+        return { sequential: [file1, file2, file3], parallel: [file1Parallel, file2Parallel, file3Parallel] };
+    } catch (error) {
+        console.error('Error reading files:', error.message);
+        throw error;
+    }
+}
+
+// Error handling patterns
+class AsyncErrorHandling {
+    // Wrapper for better error handling
+    static async safeAsync(asyncFn, defaultValue = null) {
+        try {
+            return await asyncFn();
+        } catch (error) {
+            console.error('Async operation failed:', error.message);
+            return defaultValue;
+        }
+    }
+    
+    // Multiple error handling strategies
+    static async withFallback(primaryFn, fallbackFn) {
+        try {
+            return await primaryFn();
+        } catch (primaryError) {
+            console.warn('Primary operation failed, trying fallback:', primaryError.message);
+            try {
+                return await fallbackFn();
+            } catch (fallbackError) {
+                throw new Error(`Both operations failed. Primary: ${primaryError.message}, Fallback: ${fallbackError.message}`);
+            }
+        }
+    }
+    
+    // Timeout wrapper
+    static async withTimeout(asyncFn, timeoutMs, timeoutMessage = 'Operation timed out') {
+        const timeoutPromise = new Promise((_, reject) => {
+            setTimeout(() => reject(new Error(timeoutMessage)), timeoutMs);
+        });
+        
+        return Promise.race([asyncFn(), timeoutPromise]);
+    }
+    
+    // Validation wrapper
+    static async withValidation(asyncFn, validator) {
+        const result = await asyncFn();
+        
+        if (!validator(result)) {
+            throw new Error('Validation failed for async result');
+        }
+        
+        return result;
+    }
+}
+
+// Advanced async patterns
+class AdvancedAsyncPatterns {
+    // Async iterator for large datasets
+    static async* asyncGenerator(items, batchSize = 10) {
+        for (let i = 0; i < items.length; i += batchSize) {
+            const batch = items.slice(i, i + batchSize);
+            
+            // Simulate async processing
+            await new Promise(resolve => setTimeout(resolve, 100));
+            
+            yield batch.map(item => item * 2); // Process batch
+        }
+    }
+    
+    // Async queue with concurrency control
+    static createAsyncQueue(concurrency = 3) {
+        const queue = [];
+        let running = 0;
+        
+        async function processQueue() {
+            if (running >= concurrency || queue.length === 0) {
+                return;
+            }
+            
+            running++;
+            const { task, resolve, reject } = queue.shift();
+            
+            try {
+                const result = await task();
+                resolve(result);
+            } catch (error) {
+                reject(error);
+            } finally {
+                running--;
+                processQueue(); // Process next item
+            }
+        }
+        
+        return {
+            add(task) {
+                return new Promise((resolve, reject) => {
+                    queue.push({ task, resolve, reject });
+                    processQueue();
+                });
+            },
+            
+            get length() {
+                return queue.length;
+            },
+            
+            get running() {
+                return running;
+            }
+        };
+    }
+    
+    // Async cache with TTL
+    static createAsyncCache(ttlMs = 300000) { // 5 minutes default
+        const cache = new Map();
+        
+        return {
+            async get(key, factory) {
+                const cached = cache.get(key);
+                
+                if (cached && Date.now() - cached.timestamp < ttlMs) {
+                    return cached.value;
+                }
+                
+                const value = await factory();
+                cache.set(key, { value, timestamp: Date.now() });
+                
+                return value;
+            },
+            
+            delete(key) {
+                cache.delete(key);
+            },
+            
+            clear() {
+                cache.clear();
+            },
+            
+            get size() {
+                return cache.size;
+            }
+        };
+    }
+    
+    // Async state machine
+    static createAsyncStateMachine(initialState, transitions) {
+        let currentState = initialState;
+        const listeners = new Map();
+        
+        return {
+            get state() {
+                return currentState;
+            },
+            
+            async transition(action, payload) {
+                const transition = transitions[currentState]?.[action];
+                
+                if (!transition) {
+                    throw new Error(`Invalid transition: ${action} from state ${currentState}`);
+                }
+                
+                const newState = await transition(payload);
+                const oldState = currentState;
+                currentState = newState;
+                
+                // Notify listeners
+                const stateListeners = listeners.get(newState) || [];
+                await Promise.all(stateListeners.map(listener => listener(oldState, newState, payload)));
+                
+                return newState;
+            },
+            
+            onState(state, listener) {
+                if (!listeners.has(state)) {
+                    listeners.set(state, []);
+                }
+                listeners.get(state).push(listener);
+            }
+        };
+    }
+}
+
+// Real-world async examples
+class RealWorldAsyncExamples {
+    // Database connection pool simulation
+    static createDbPool(maxConnections = 10) {
+        const connections = [];
+        const waitingQueue = [];
+        
+        return {
+            async getConnection() {
+                if (connections.length < maxConnections) {
+                    const connection = { id: Date.now(), inUse: true };
+                    connections.push(connection);
+                    return connection;
+                }
+                
+                // Wait for available connection
+                return new Promise(resolve => {
+                    waitingQueue.push(resolve);
+                });
+            },
+            
+            releaseConnection(connection) {
+                connection.inUse = false;
+                
+                if (waitingQueue.length > 0) {
+                    const resolve = waitingQueue.shift();
+                    connection.inUse = true;
+                    resolve(connection);
+                }
+            },
+            
+            async query(sql, params) {
+                const connection = await this.getConnection();
+                
+                try {
+                    // Simulate query execution
+                    await new Promise(resolve => setTimeout(resolve, Math.random() * 100));
+                    return { sql, params, connectionId: connection.id };
+                } finally {
+                    this.releaseConnection(connection);
+                }
+            }
+        };
+    }
+    
+    // HTTP client with retry and circuit breaker
+    static createHttpClient() {
+        const circuitBreaker = PromiseUtils.createCircuitBreaker(
+            async (url, options) => {
+                // Simulate HTTP request
+                const success = Math.random() > 0.2;
+                if (!success) {
+                    throw new Error('HTTP request failed');
+                }
+                return { status: 200, data: `Response from ${url}` };
+            },
+            3, // failure threshold
+            30000 // timeout
+        );
+        
+        return {
+            async get(url, options = {}) {
+                return PromiseUtils.retry(
+                    () => circuitBreaker(url, { ...options, method: 'GET' }),
+                    3
+                );
+            },
+            
+            async post(url, data, options = {}) {
+                return PromiseUtils.retry(
+                    () => circuitBreaker(url, { ...options, method: 'POST', data }),
+                    3
+                );
+            }
+        };
+    }
+}
+
+// Usage demonstrations
+async function demonstrateAsyncPatterns() {
+    console.log('\\n=== Async/Await Patterns Demo ===');
+    
+    // Basic async/await
+    try {
+        const result = await basicAsyncExample();
+        console.log('Basic async result:', result);
+    } catch (error) {
+        console.error('Basic async error:', error.message);
+    }
+    
+    // Async generator
+    const items = Array.from({ length: 25 }, (_, i) => i + 1);
+    console.log('Processing items with async generator:');
+    
+    for await (const batch of AdvancedAsyncPatterns.asyncGenerator(items, 5)) {
+        console.log('Processed batch:', batch);
+    }
+    
+    // Async queue
+    const queue = AdvancedAsyncPatterns.createAsyncQueue(2);
+    
+    const queueTasks = Array.from({ length: 5 }, (_, i) => 
+        queue.add(async () => {
+            await new Promise(resolve => setTimeout(resolve, Math.random() * 1000));
+            return `Queue task ${i + 1} completed`;
+        })
+    );
+    
+    const queueResults = await Promise.all(queueTasks);
+    console.log('Queue results:', queueResults);
+    
+    // Async cache
+    const cache = AdvancedAsyncPatterns.createAsyncCache(5000);
+    
+    const cachedResult1 = await cache.get('key1', async () => {
+        console.log('Cache miss - computing value');
+        return 'Expensive computation result';
+    });
+    
+    const cachedResult2 = await cache.get('key1', async () => {
+        console.log('This should not be called');
+        return 'New computation';
+    });
+    
+    console.log('Cache results:', { first: cachedResult1, second: cachedResult2 });
+}
+
+// Run demonstrations
+if (require.main === module) {
+    demonstrateCallbackUtils();
+    demonstratePromisePatterns();
+    demonstrateAsyncPatterns();
+}
+                        </code></pre>
+                    </div>
+                </div>
+                
+                <div class="note-taking-section">
+                    <h3>📝 Your Notes</h3>
+                    <div class="note-editor" data-topic="async-programming">
+                        <textarea placeholder="Add your personal notes about asynchronous programming..."></textarea>
+                    </div>
+                </div>
+            </div>
+            """);
+        
+        topic.setEstimatedMinutes(200);
+        topic.setSortOrder(2);
+        module.getTopics().add(topic);
+        topicRepository.save(topic);
+        
+        log.info("✅ Created Asynchronous Programming topic");
+    }    
+
+    private void createNodeJsModulesTopic(LearningModule module) {
+        Topic topic = new Topic();
+        topic.setTitle("Node.js Modules and Package Management");
+        topic.setDescription("Master Node.js module system: CommonJS, ES modules, npm, package.json, and dependency management");
+        topic.setContent("""
+            <div class="topic-content">
+                <h2>📦 Node.js Modules and Package Management</h2>
+                
+                <div class="learning-objectives">
+                    <h3>🎯 Learning Objectives</h3>
+                    <ul>
+                        <li>Understand CommonJS and ES module systems</li>
+                        <li>Master npm and package.json configuration</li>
+                        <li>Implement module patterns and best practices</li>
+                        <li>Handle dependency management and versioning</li>
+                        <li>Create and publish npm packages</li>
+                    </ul>
+                </div>
+                
+                <div class="concept-section">
+                    <h3>🔧 CommonJS vs ES Modules</h3>
+                    <p>Node.js supports both CommonJS (traditional) and ES modules (modern) systems for organizing code.</p>
+                    
+                    <div class="code-example">
+                        <h5>Module Systems Comparison:</h5>
+                        <pre><code class="language-javascript">
+// ===== CommonJS (Traditional Node.js) =====
+
+// math-utils.js (CommonJS)
+const PI = 3.14159;
+
+function add(a, b) {
+    return a + b;
+}
+
+function multiply(a, b) {
+    return a * b;
+}
+
+class Calculator {
+    constructor() {
+        this.history = [];
+    }
+    
+    calculate(operation, a, b) {
+        let result;
+        switch (operation) {
+            case 'add':
+                result = add(a, b);
+                break;
+            case 'multiply':
+                result = multiply(a, b);
+                break;
+            default:
+                throw new Error('Unknown operation');
+        }
+        
+        this.history.push({ operation, a, b, result });
+        return result;
+    }
+    
+    getHistory() {
+        return [...this.history];
+    }
+}
+
+// CommonJS exports
+module.exports = {
+    PI,
+    add,
+    multiply,
+    Calculator
+};
+
+// Alternative export syntax
+exports.PI = PI;
+exports.add = add;
+exports.multiply = multiply;
+exports.Calculator = Calculator;
+
+// Single export
+module.exports = Calculator;
+
+// ===== Using CommonJS modules =====
+
+// app.js (CommonJS)
+const { add, multiply, Calculator, PI } = require('./math-utils');
+const fs = require('fs'); // Built-in module
+const express = require('express'); // npm module
+
+console.log('PI:', PI);
+console.log('Add:', add(5, 3));
+
+const calc = new Calculator();
+console.log('Calculate:', calc.calculate('multiply', 4, 7));
+
+// ===== ES Modules (Modern) =====
+
+// math-utils.mjs (ES Modules)
+export const PI = 3.14159;
+
+export function add(a, b) {
+    return a + b;
+}
+
+export function multiply(a, b) {
+    return a * b;
+}
+
+export default class Calculator {
+    constructor() {
+        this.history = [];
+    }
+    
+    calculate(operation, a, b) {
+        let result;
+        switch (operation) {
+            case 'add':
+                result = add(a, b);
+                break;
+            case 'multiply':
+                result = multiply(a, b);
+                break;
+            default:
+                throw new Error('Unknown operation');
+        }
+        
+        this.history.push({ operation, a, b, result });
+        return result;
+    }
+    
+    getHistory() {
+        return [...this.history];
+    }
+}
+
+// Named and default exports together
+export { PI as MATH_PI, add as sum };
+
+// ===== Using ES Modules =====
+
+// app.mjs (ES Modules)
+import Calculator, { PI, add, multiply } from './math-utils.mjs';
+import fs from 'fs/promises'; // Built-in module with promises
+import express from 'express'; // npm module
+
+console.log('PI:', PI);
+console.log('Add:', add(5, 3));
+
+const calc = new Calculator();
+console.log('Calculate:', calc.calculate('multiply', 4, 7));
+
+// Dynamic imports
+async function loadModule() {
+    const { default: Calculator, add } = await import('./math-utils.mjs');
+    return new Calculator();
+}
+
+// ===== Hybrid approach (package.json with "type": "module") =====
+
+// package.json
+{
+    "type": "module",
+    "main": "index.js",
+    "exports": {
+        ".": "./index.js",
+        "./utils": "./utils.js"
+    }
+}
+
+// Now .js files use ES modules by default
+// Use .cjs extension for CommonJS files
+
+// ===== Module Resolution =====
+
+class ModuleResolver {
+    static demonstrateResolution() {
+        console.log('Module resolution examples:');
+        
+        // Relative paths
+        // require('./utils') -> looks for utils.js, utils/index.js
+        // require('../lib/helper') -> goes up one directory
+        
+        // Absolute paths (from node_modules)
+        // require('express') -> looks in node_modules/express
+        // require('lodash/get') -> looks for lodash/get.js
+        
+        // Built-in modules
+        // require('fs') -> Node.js built-in
+        // require('path') -> Node.js built-in
+        
+        console.log('Module paths:', module.paths);
+        console.log('Current filename:', __filename);
+        console.log('Current dirname:', __dirname);
+    }
+    
+    // Custom module loader
+    static createCustomLoader() {
+        const Module = require('module');
+        const originalRequire = Module.prototype.require;
+        
+        Module.prototype.require = function(id) {
+            console.log(`Loading module: ${id}`);
+            return originalRequire.apply(this, arguments);
+        };
+    }
+}
+
+// ===== Module Patterns =====
+
+// Singleton pattern
+class DatabaseConnection {
+    constructor() {
+        if (DatabaseConnection.instance) {
+            return DatabaseConnection.instance;
+        }
+        
+        this.connected = false;
+        this.connection = null;
+        DatabaseConnection.instance = this;
+    }
+    
+    async connect() {
+        if (!this.connected) {
+            // Simulate connection
+            this.connection = { id: Date.now() };
+            this.connected = true;
+            console.log('Database connected');
+        }
+        return this.connection;
+    }
+}
+
+module.exports = new DatabaseConnection(); // Export singleton instance
+
+// Factory pattern
+class LoggerFactory {
+    static loggers = new Map();
+    
+    static createLogger(name, level = 'info') {
+        if (this.loggers.has(name)) {
+            return this.loggers.get(name);
+        }
+        
+        const logger = {
+            name,
+            level,
+            log(message) {
+                console.log(`[${this.name}] ${message}`);
+            },
+            error(message) {
+                console.error(`[${this.name}] ERROR: ${message}`);
+            }
+        };
+        
+        this.loggers.set(name, logger);
+        return logger;
+    }
+}
+
+module.exports = LoggerFactory;
+
+// Revealing module pattern
+const UtilityModule = (function() {
+    // Private variables and functions
+    let privateCounter = 0;
+    
+    function privateFunction() {
+        return 'This is private';
+    }
+    
+    function incrementCounter() {
+        privateCounter++;
+    }
+    
+    function getCounter() {
+        return privateCounter;
+    }
+    
+    // Public API
+    return {
+        increment: incrementCounter,
+        getCount: getCounter,
+        reset() {
+            privateCounter = 0;
+        }
+    };
+})();
+
+module.exports = UtilityModule;
+
+// Namespace pattern
+const MyNamespace = {
+    utils: {
+        string: {
+            capitalize(str) {
+                return str.charAt(0).toUpperCase() + str.slice(1);
+            },
+            
+            truncate(str, length) {
+                return str.length > length ? str.slice(0, length) + '...' : str;
+            }
+        },
+        
+        array: {
+            unique(arr) {
+                return [...new Set(arr)];
+            },
+            
+            chunk(arr, size) {
+                const chunks = [];
+                for (let i = 0; i < arr.length; i += size) {
+                    chunks.push(arr.slice(i, i + size));
+                }
+                return chunks;
+            }
+        }
+    },
+    
+    constants: {
+        API_URL: 'https://api.example.com',
+        MAX_RETRIES: 3,
+        TIMEOUT: 5000
+    }
+};
+
+module.exports = MyNamespace;
+                        </code></pre>
+                    </div>
+                </div>
+                
+                <div class="concept-section">
+                    <h3>📋 Package.json and NPM Management</h3>
+                    <p>Package.json is the heart of Node.js projects, defining dependencies, scripts, and project metadata.</p>
+                    
+                    <div class="code-example">
+                        <h5>Advanced Package.json Configuration:</h5>
+                        <pre><code class="language-json">
+{
+  "name": "my-awesome-package",
+  "version": "1.2.3",
+  "description": "A comprehensive Node.js package example",
+  "main": "index.js",
+  "type": "module",
+  "engines": {
+    "node": ">=14.0.0",
+    "npm": ">=6.0.0"
+  },
+  "scripts": {
+    "start": "node index.js",
+    "dev": "nodemon index.js",
+    "test": "jest",
+    "test:watch": "jest --watch",
+    "test:coverage": "jest --coverage",
+    "lint": "eslint src/**/*.js",
+    "lint:fix": "eslint src/**/*.js --fix",
+    "build": "webpack --mode production",
+    "build:dev": "webpack --mode development",
+    "clean": "rimraf dist",
+    "prebuild": "npm run clean",
+    "postinstall": "node scripts/setup.js",
+    "precommit": "lint-staged",
+    "release": "standard-version",
+    "docker:build": "docker build -t my-app .",
+    "docker:run": "docker run -p 3000:3000 my-app"
+  },
+  "dependencies": {
+    "express": "^4.18.0",
+    "mongoose": "^6.0.0",
+    "lodash": "^4.17.21",
+    "moment": "^2.29.0"
+  },
+  "devDependencies": {
+    "jest": "^28.0.0",
+    "nodemon": "^2.0.0",
+    "eslint": "^8.0.0",
+    "webpack": "^5.0.0",
+    "rimraf": "^3.0.0",
+    "lint-staged": "^12.0.0",
+    "husky": "^7.0.0"
+  },
+  "peerDependencies": {
+    "react": ">=16.8.0"
+  },
+  "optionalDependencies": {
+    "fsevents": "^2.3.0"
+  },
+  "bundledDependencies": [
+    "custom-internal-package"
+  ],
+  "keywords": [
+    "nodejs",
+    "javascript",
+    "backend",
+    "api"
+  ],
+  "author": {
+    "name": "Your Name",
+    "email": "your.email@example.com",
+    "url": "https://yourwebsite.com"
+  },
+  "contributors": [
+    {
+      "name": "Contributor Name",
+      "email": "contributor@example.com"
+    }
+  ],
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/username/repo.git"
+  },
+  "bugs": {
+    "url": "https://github.com/username/repo/issues"
+  },
+  "homepage": "https://github.com/username/repo#readme",
+  "files": [
+    "dist",
+    "lib",
+    "index.js",
+    "README.md"
+  ],
+  "exports": {
+    ".": {
+      "import": "./index.mjs",
+      "require": "./index.cjs"
+    },
+    "./utils": {
+      "import": "./utils/index.mjs",
+      "require": "./utils/index.cjs"
+    }
+  },
+  "bin": {
+    "my-cli": "./bin/cli.js"
+  },
+  "config": {
+    "port": 3000,
+    "timeout": 5000
+  },
+  "private": false,
+  "workspaces": [
+    "packages/*"
+  ],
+  "lint-staged": {
+    "*.js": [
+      "eslint --fix",
+      "git add"
+    ]
+  },
+  "husky": {
+    "hooks": {
+      "pre-commit": "lint-staged",
+      "pre-push": "npm test"
+    }
+  },
+  "jest": {
+    "testEnvironment": "node",
+    "collectCoverageFrom": [
+      "src/**/*.js",
+      "!src/**/*.test.js"
+    ]
+  }
+}
+                        </code></pre>
+                    </div>
+                    
+                    <div class="code-example">
+                        <h5>NPM Scripts and Automation:</h5>
+                        <pre><code class="language-javascript">
+// scripts/setup.js - Post-install setup
+const fs = require('fs');
+const path = require('path');
+
+console.log('Running post-install setup...');
+
+// Create necessary directories
+const dirs = ['logs', 'uploads', 'temp'];
+dirs.forEach(dir => {
+    const dirPath = path.join(process.cwd(), dir);
+    if (!fs.existsSync(dirPath)) {
+        fs.mkdirSync(dirPath, { recursive: true });
+        console.log(`Created directory: ${dir}`);
+    }
+});
+
+// Copy config files
+const configTemplate = path.join(__dirname, 'config.template.json');
+const configFile = path.join(process.cwd(), 'config.json');
+
+if (fs.existsSync(configTemplate) && !fs.existsSync(configFile)) {
+    fs.copyFileSync(configTemplate, configFile);
+    console.log('Created config.json from template');
+}
+
+console.log('Setup completed!');
+
+// scripts/build.js - Custom build script
+const webpack = require('webpack');
+const config = require('../webpack.config.js');
+
+console.log('Starting build process...');
+
+webpack(config, (err, stats) => {
+    if (err || stats.hasErrors()) {
+        console.error('Build failed:', err || stats.toJson().errors);
+        process.exit(1);
+    }
+    
+    console.log('Build completed successfully!');
+    console.log(stats.toString({
+        colors: true,
+        modules: false,
+        children: false,
+        chunks: false,
+        chunkModules: false
+    }));
+});
+
+// Package management utilities
+class PackageManager {
+    static async checkOutdated() {
+        const { execSync } = require('child_process');
+        
+        try {
+            const output = execSync('npm outdated --json', { encoding: 'utf8' });
+            const outdated = JSON.parse(output);
+            
+            console.log('Outdated packages:');
+            Object.entries(outdated).forEach(([name, info]) => {
+                console.log(`${name}: ${info.current} -> ${info.latest}`);
+            });
+        } catch (error) {
+            console.log('All packages are up to date');
+        }
+    }
+    
+    static async auditSecurity() {
+        const { execSync } = require('child_process');
+        
+        try {
+            const output = execSync('npm audit --json', { encoding: 'utf8' });
+            const audit = JSON.parse(output);
+            
+            console.log(`Security audit: ${audit.metadata.vulnerabilities.total} vulnerabilities found`);
+            
+            if (audit.metadata.vulnerabilities.high > 0) {
+                console.warn(`⚠️  ${audit.metadata.vulnerabilities.high} high severity vulnerabilities`);
+            }
+        } catch (error) {
+            console.error('Security audit failed:', error.message);
+        }
+    }
+    
+    static generateLockfile() {
+        const packageJson = require('../package.json');
+        const lockData = {
+            name: packageJson.name,
+            version: packageJson.version,
+            lockfileVersion: 2,
+            requires: true,
+            packages: {}
+        };
+        
+        // This would normally be much more complex
+        // involving dependency resolution
+        
+        fs.writeFileSync('package-lock.json', JSON.stringify(lockData, null, 2));
+        console.log('Generated package-lock.json');
+    }
+}
+
+// Workspace management (for monorepos)
+class WorkspaceManager {
+    static async listWorkspaces() {
+        const { execSync } = require('child_process');
+        
+        try {
+            const output = execSync('npm ls --workspaces --json', { encoding: 'utf8' });
+            const workspaces = JSON.parse(output);
+            
+            console.log('Workspaces:');
+            Object.keys(workspaces.dependencies || {}).forEach(name => {
+                console.log(`- ${name}`);
+            });
+        } catch (error) {
+            console.log('No workspaces found');
+        }
+    }
+    
+    static async runInWorkspace(workspace, script) {
+        const { spawn } = require('child_process');
+        
+        const child = spawn('npm', ['run', script, '--workspace', workspace], {
+            stdio: 'inherit'
+        });
+        
+        return new Promise((resolve, reject) => {
+            child.on('close', (code) => {
+                if (code === 0) {
+                    resolve();
+                } else {
+                    reject(new Error(`Script failed with code ${code}`));
+                }
+            });
+        });
+    }
+}
+
+// Custom npm commands
+class CustomCommands {
+    static async clean() {
+        const rimraf = require('rimraf');
+        
+        const dirsToClean = ['node_modules', 'dist', 'build', '.cache'];
+        
+        for (const dir of dirsToClean) {
+            if (fs.existsSync(dir)) {
+                await rimraf(dir);
+                console.log(`Cleaned: ${dir}`);
+            }
+        }
+    }
+    
+    static async freshInstall() {
+        await this.clean();
+        
+        const { execSync } = require('child_process');
+        execSync('npm install', { stdio: 'inherit' });
+        
+        console.log('Fresh install completed!');
+    }
+    
+    static async updateAll() {
+        const { execSync } = require('child_process');
+        
+        console.log('Updating all packages...');
+        execSync('npm update', { stdio: 'inherit' });
+        
+        console.log('Running security audit...');
+        await PackageManager.auditSecurity();
+        
+        console.log('Update completed!');
+    }
+}
+
+// Usage in package.json scripts:
+// "clean": "node scripts/clean.js",
+// "fresh": "node scripts/fresh-install.js",
+// "update-all": "node scripts/update-all.js"
+                        </code></pre>
+                    </div>
+                </div>
+                
+                <div class="note-taking-section">
+                    <h3>📝 Your Notes</h3>
+                    <div class="note-editor" data-topic="nodejs-modules">
+                        <textarea placeholder="Add your personal notes about Node.js modules..."></textarea>
+                    </div>
+                </div>
+            </div>
+            """);
+        
+        topic.setEstimatedMinutes(160);
+        topic.setSortOrder(3);
+        module.getTopics().add(topic);
+        topicRepository.save(topic);
+        
+        log.info("✅ Created Node.js Modules topic");
+    }   
+ 
+    private void createExpressFrameworkTopic(LearningModule module) {
+        Topic topic = new Topic();
+        topic.setTitle("Express.js Framework and Middleware");
+        topic.setDescription("Master Express.js: routing, middleware, authentication, error handling, and RESTful API development");
+        topic.setContent("""
+            <div class="topic-content">
+                <h2>🚀 Express.js Framework and Middleware</h2>
+                
+                <div class="learning-objectives">
+                    <h3>🎯 Learning Objectives</h3>
+                    <ul>
+                        <li>Build robust Express.js applications and APIs</li>
+                        <li>Implement custom middleware and understand the middleware stack</li>
+                        <li>Handle routing, parameters, and request validation</li>
+                        <li>Implement authentication and authorization</li>
+                        <li>Master error handling and logging strategies</li>
+                    </ul>
+                </div>
+                
+                <div class="concept-section">
+                    <h3>🛣️ Express Routing and Middleware</h3>
+                    <p>Express.js provides a robust routing system and middleware architecture for building web applications and APIs.</p>
+                    
+                    <div class="code-example">
+                        <h5>Complete Express Application:</h5>
+                        <pre><code class="language-javascript">
+const express = require('express');
+const cors = require('cors');
+const helmet = require('helmet');
+const morgan = require('morgan');
+const rateLimit = require('express-rate-limit');
+const compression = require('compression');
+
+// Create Express application
+const app = express();
+
+// ===== MIDDLEWARE STACK =====
+
+// Security middleware
+app.use(helmet({
+    contentSecurityPolicy: {
+        directives: {
+            defaultSrc: ["'self'"],
+            styleSrc: ["'self'", "'unsafe-inline'"],
+            scriptSrc: ["'self'"],
+            imgSrc: ["'self'", "data:", "https:"]
+        }
+    }
+}));
+
+// CORS configuration
+app.use(cors({
+    origin: process.env.NODE_ENV === 'production' 
+        ? ['https://yourdomain.com'] 
+        : ['http://localhost:3000'],
+    credentials: true,
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+    allowedHeaders: ['Content-Type', 'Authorization']
+}));
+
+// Rate limiting
+const limiter = rateLimit({
+    windowMs: 15 * 60 * 1000, // 15 minutes
+    max: 100, // limit each IP to 100 requests per windowMs
+    message: 'Too many requests from this IP',
+    standardHeaders: true,
+    legacyHeaders: false
+});
+app.use('/api/', limiter);
+
+// Compression
+app.use(compression());
+
+// Logging
+app.use(morgan('combined'));
+
+// Body parsing
+app.use(express.json({ limit: '10mb' }));
+app.use(express.urlencoded({ extended: true, limit: '10mb' }));
+
+// Static files
+app.use('/static', express.static('public', {
+    maxAge: '1d',
+    etag: true
+}));
+
+// ===== CUSTOM MIDDLEWARE =====
+
+// Request ID middleware
+app.use((req, res, next) => {
+    req.id = Math.random().toString(36).substr(2, 9);
+    res.setHeader('X-Request-ID', req.id);
+    next();
+});
+
+// Request timing middleware
+app.use((req, res, next) => {
+    req.startTime = Date.now();
+    
+    const originalSend = res.send;
+    res.send = function(data) {
+        const duration = Date.now() - req.startTime;
+        res.setHeader('X-Response-Time', `${duration}ms`);
+        console.log(`${req.method} ${req.path} - ${duration}ms`);
+        return originalSend.call(this, data);
+    };
+    
+    next();
+});
+
+// Authentication middleware
+const authenticateToken = (req, res, next) => {
+    const authHeader = req.headers['authorization'];
+    const token = authHeader && authHeader.split(' ')[1];
+    
+    if (!token) {
+        return res.status(401).json({ error: 'Access token required' });
+    }
+    
+    // Verify JWT token (simplified)
+    try {
+        const decoded = verifyJWT(token);
+        req.user = decoded;
+        next();
+    } catch (error) {
+        return res.status(403).json({ error: 'Invalid token' });
+    }
+};
+
+// Authorization middleware
+const authorize = (roles) => {
+    return (req, res, next) => {
+        if (!req.user) {
+            return res.status(401).json({ error: 'Authentication required' });
+        }
+        
+        if (roles && !roles.includes(req.user.role)) {
+            return res.status(403).json({ error: 'Insufficient permissions' });
+        }
+        
+        next();
+    };
+};
+
+// Validation middleware
+const validateRequest = (schema) => {
+    return (req, res, next) => {
+        const { error } = schema.validate(req.body);
+        if (error) {
+            return res.status(400).json({
+                error: 'Validation failed',
+                details: error.details.map(d => d.message)
+            });
+        }
+        next();
+    };
+};
+
+// ===== ROUTING =====
+
+// Basic routes
+app.get('/', (req, res) => {
+    res.json({
+        message: 'Welcome to Express API',
+        version: '1.0.0',
+        timestamp: new Date().toISOString()
+    });
+});
+
+// Health check
+app.get('/health', (req, res) => {
+    res.json({
+        status: 'healthy',
+        uptime: process.uptime(),
+        memory: process.memoryUsage(),
+        timestamp: new Date().toISOString()
+    });
+});
+
+// ===== API ROUTES =====
+
+// User routes
+const userRouter = express.Router();
+
+// Get all users (with pagination)
+userRouter.get('/', async (req, res, next) => {
+    try {
+        const page = parseInt(req.query.page) || 1;
+        const limit = parseInt(req.query.limit) || 10;
+        const offset = (page - 1) * limit;
+        
+        const users = await getUsersPaginated(offset, limit);
+        const total = await getUsersCount();
+        
+        res.json({
+            users,
+            pagination: {
+                page,
+                limit,
+                total,
+                pages: Math.ceil(total / limit)
+            }
+        });
+    } catch (error) {
+        next(error);
+    }
+});
+
+// Get user by ID
+userRouter.get('/:id', async (req, res, next) => {
+    try {
+        const userId = parseInt(req.params.id);
+        
+        if (isNaN(userId)) {
+            return res.status(400).json({ error: 'Invalid user ID' });
+        }
+        
+        const user = await getUserById(userId);
+        
+        if (!user) {
+            return res.status(404).json({ error: 'User not found' });
+        }
+        
+        res.json(user);
+    } catch (error) {
+        next(error);
+    }
+});
+
+// Create user
+userRouter.post('/', validateRequest(userSchema), async (req, res, next) => {
+    try {
+        const userData = req.body;
+        const newUser = await createUser(userData);
+        
+        res.status(201).json({
+            message: 'User created successfully',
+            user: newUser
+        });
+    } catch (error) {
+        next(error);
+    }
+});
+
+// Update user
+userRouter.put('/:id', authenticateToken, async (req, res, next) => {
+    try {
+        const userId = parseInt(req.params.id);
+        const updateData = req.body;
+        
+        // Check if user can update this profile
+        if (req.user.id !== userId && req.user.role !== 'admin') {
+            return res.status(403).json({ error: 'Cannot update other users' });
+        }
+        
+        const updatedUser = await updateUser(userId, updateData);
+        
+        if (!updatedUser) {
+            return res.status(404).json({ error: 'User not found' });
+        }
+        
+        res.json({
+            message: 'User updated successfully',
+            user: updatedUser
+        });
+    } catch (error) {
+        next(error);
+    }
+});
+
+// Delete user
+userRouter.delete('/:id', authenticateToken, authorize(['admin']), async (req, res, next) => {
+    try {
+        const userId = parseInt(req.params.id);
+        const deleted = await deleteUser(userId);
+        
+        if (!deleted) {
+            return res.status(404).json({ error: 'User not found' });
+        }
+        
+        res.json({ message: 'User deleted successfully' });
+    } catch (error) {
+        next(error);
+    }
+});
+
+// Mount user routes
+app.use('/api/users', userRouter);
+
+// ===== ADVANCED ROUTING PATTERNS =====
+
+// Route parameters with validation
+app.param('userId', (req, res, next, id) => {
+    const userId = parseInt(id);
+    
+    if (isNaN(userId) || userId <= 0) {
+        return res.status(400).json({ error: 'Invalid user ID format' });
+    }
+    
+    req.userId = userId;
+    next();
+});
+
+// Nested routes
+const postRouter = express.Router({ mergeParams: true });
+
+postRouter.get('/', async (req, res, next) => {
+    try {
+        const posts = await getPostsByUserId(req.userId);
+        res.json(posts);
+    } catch (error) {
+        next(error);
+    }
+});
+
+postRouter.post('/', authenticateToken, async (req, res, next) => {
+    try {
+        const postData = { ...req.body, userId: req.userId };
+        const newPost = await createPost(postData);
+        res.status(201).json(newPost);
+    } catch (error) {
+        next(error);
+    }
+});
+
+app.use('/api/users/:userId/posts', postRouter);
+
+// ===== FILE UPLOAD HANDLING =====
+
+const multer = require('multer');
+const path = require('path');
+
+// Configure multer for file uploads
+const storage = multer.diskStorage({
+    destination: (req, file, cb) => {
+        cb(null, 'uploads/');
+    },
+    filename: (req, file, cb) => {
+        const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
+        cb(null, file.fieldname + '-' + uniqueSuffix + path.extname(file.originalname));
+    }
+});
+
+const upload = multer({
+    storage,
+    limits: {
+        fileSize: 5 * 1024 * 1024 // 5MB limit
+    },
+    fileFilter: (req, file, cb) => {
+        const allowedTypes = /jpeg|jpg|png|gif/;
+        const extname = allowedTypes.test(path.extname(file.originalname).toLowerCase());
+        const mimetype = allowedTypes.test(file.mimetype);
+        
+        if (mimetype && extname) {
+            return cb(null, true);
+        } else {
+            cb(new Error('Only image files are allowed'));
+        }
+    }
+});
+
+// File upload route
+app.post('/api/upload', authenticateToken, upload.single('image'), (req, res) => {
+    if (!req.file) {
+        return res.status(400).json({ error: 'No file uploaded' });
+    }
+    
+    res.json({
+        message: 'File uploaded successfully',
+        file: {
+            filename: req.file.filename,
+            originalname: req.file.originalname,
+            size: req.file.size,
+            path: req.file.path
+        }
+    });
+});
+
+// ===== ERROR HANDLING =====
+
+// 404 handler
+app.use('*', (req, res) => {
+    res.status(404).json({
+        error: 'Route not found',
+        path: req.originalUrl,
+        method: req.method
+    });
+});
+
+// Global error handler
+app.use((error, req, res, next) => {
+    console.error('Error:', error);
+    
+    // Mongoose validation error
+    if (error.name === 'ValidationError') {
+        return res.status(400).json({
+            error: 'Validation failed',
+            details: Object.values(error.errors).map(e => e.message)
+        });
+    }
+    
+    // JWT error
+    if (error.name === 'JsonWebTokenError') {
+        return res.status(401).json({ error: 'Invalid token' });
+    }
+    
+    // Multer error
+    if (error instanceof multer.MulterError) {
+        if (error.code === 'LIMIT_FILE_SIZE') {
+            return res.status(400).json({ error: 'File too large' });
+        }
+    }
+    
+    // Default error
+    res.status(error.status || 500).json({
+        error: process.env.NODE_ENV === 'production' 
+            ? 'Internal server error' 
+            : error.message,
+        requestId: req.id
+    });
+});
+
+// ===== SERVER STARTUP =====
+
+const PORT = process.env.PORT || 3000;
+
+const server = app.listen(PORT, () => {
+    console.log(`Server running on port ${PORT}`);
+    console.log(`Environment: ${process.env.NODE_ENV || 'development'}`);
+});
+
+// Graceful shutdown
+process.on('SIGTERM', () => {
+    console.log('SIGTERM received, shutting down gracefully');
+    server.close(() => {
+        console.log('Process terminated');
+    });
+});
+
+module.exports = app;
+
+// ===== UTILITY FUNCTIONS =====
+
+function verifyJWT(token) {
+    // JWT verification logic
+    return { id: 1, role: 'user' }; // Simplified
+}
+
+async function getUsersPaginated(offset, limit) {
+    // Database query logic
+    return []; // Simplified
+}
+
+async function getUsersCount() {
+    return 0; // Simplified
+}
+
+async function getUserById(id) {
+    return null; // Simplified
+}
+
+async function createUser(userData) {
+    return userData; // Simplified
+}
+
+async function updateUser(id, updateData) {
+    return updateData; // Simplified
+}
+
+async function deleteUser(id) {
+    return true; // Simplified
+}
+
+async function getPostsByUserId(userId) {
+    return []; // Simplified
+}
+
+async function createPost(postData) {
+    return postData; // Simplified
+}
+
+const userSchema = {
+    validate: (data) => ({ error: null }) // Simplified
+};
+                        </code></pre>
+                    </div>
+                </div>
+                
+                <div class="note-taking-section">
+                    <h3>📝 Your Notes</h3>
+                    <div class="note-editor" data-topic="express-framework">
+                        <textarea placeholder="Add your personal notes about Express.js..."></textarea>
+                    </div>
+                </div>
+            </div>
+            """);
+        
+        topic.setEstimatedMinutes(180);
+        topic.setSortOrder(4);
+        module.getTopics().add(topic);
+        topicRepository.save(topic);
+        
+        log.info("✅ Created Express Framework topic");
+    }
+    
+    private void createNodeJsPerformanceTopic(LearningModule module) {
+        Topic topic = new Topic();
+        topic.setTitle("Node.js Performance Optimization and Scaling");
+        topic.setDescription("Master Node.js performance: profiling, clustering, caching, memory management, and production optimization");
+        topic.setContent("""
+            <div class="topic-content">
+                <h2>⚡ Node.js Performance Optimization and Scaling</h2>
+                
+                <div class="learning-objectives">
+                    <h3>🎯 Learning Objectives</h3>
+                    <ul>
+                        <li>Profile and optimize Node.js application performance</li>
+                        <li>Implement clustering and load balancing strategies</li>
+                        <li>Master memory management and garbage collection</li>
+                        <li>Use caching and database optimization techniques</li>
+                        <li>Deploy and scale Node.js applications in production</li>
+                    </ul>
+                </div>
+                
+                <div class="concept-section">
+                    <h3>📊 Performance Profiling and Monitoring</h3>
+                    <p>Understanding and measuring performance is crucial for optimizing Node.js applications.</p>
+                    
+                    <div class="code-example">
+                        <h5>Performance Monitoring Implementation:</h5>
+                        <pre><code class="language-javascript">
+const cluster = require('cluster');
+const os = require('os');
+const { performance, PerformanceObserver } = require('perf_hooks');
+
+// Performance monitoring class
+class PerformanceMonitor {
+    constructor() {
+        this.metrics = {
+            requests: 0,
+            errors: 0,
+            responseTime: [],
+            memoryUsage: [],
+            cpuUsage: []
+        };
+        
+        this.setupPerformanceObserver();
+        this.startMonitoring();
+    }
+    
+    setupPerformanceObserver() {
+        const obs = new PerformanceObserver((list) => {
+            list.getEntries().forEach((entry) => {
+                if (entry.entryType === 'measure') {
+                    this.metrics.responseTime.push(entry.duration);
+                    
+                    // Keep only last 1000 measurements
+                    if (this.metrics.responseTime.length > 1000) {
+                        this.metrics.responseTime.shift();
+                    }
+                }
+            });
+        });
+        
+        obs.observe({ entryTypes: ['measure'] });
+    }
+    
+    startMonitoring() {
+        setInterval(() => {
+            this.collectSystemMetrics();
+        }, 5000); // Every 5 seconds
+    }
+    
+    collectSystemMetrics() {
+        const memUsage = process.memoryUsage();
+        const cpuUsage = process.cpuUsage();
+        
+        this.metrics.memoryUsage.push({
+            timestamp: Date.now(),
+            rss: memUsage.rss,
+            heapUsed: memUsage.heapUsed,
+            heapTotal: memUsage.heapTotal,
+            external: memUsage.external
+        });
+        
+        this.metrics.cpuUsage.push({
+            timestamp: Date.now(),
+            user: cpuUsage.user,
+            system: cpuUsage.system
+        });
+        
+        // Keep only last 100 measurements
+        if (this.metrics.memoryUsage.length > 100) {
+            this.metrics.memoryUsage.shift();
+        }
+        if (this.metrics.cpuUsage.length > 100) {
+            this.metrics.cpuUsage.shift();
+        }
+    }
+    
+    measureRequest(req, res, next) {
+        const startMark = `request-start-${req.id}`;
+        const endMark = `request-end-${req.id}`;
+        const measureName = `request-${req.id}`;
+        
+        performance.mark(startMark);
+        
+        res.on('finish', () => {
+            performance.mark(endMark);
+            performance.measure(measureName, startMark, endMark);
+            
+            this.metrics.requests++;
+            
+            if (res.statusCode >= 400) {
+                this.metrics.errors++;
+            }
+        });
+        
+        next();
+    }
+    
+    getStats() {
+        const responseTime = this.metrics.responseTime;
+        const avgResponseTime = responseTime.length > 0 
+            ? responseTime.reduce((a, b) => a + b, 0) / responseTime.length 
+            : 0;
+        
+        const p95ResponseTime = responseTime.length > 0
+            ? responseTime.sort((a, b) => a - b)[Math.floor(responseTime.length * 0.95)]
+            : 0;
+        
+        const errorRate = this.metrics.requests > 0 
+            ? (this.metrics.errors / this.metrics.requests) * 100 
+            : 0;
+        
+        const latestMemory = this.metrics.memoryUsage[this.metrics.memoryUsage.length - 1];
+        
+        return {
+            requests: this.metrics.requests,
+            errors: this.metrics.errors,
+            errorRate: errorRate.toFixed(2) + '%',
+            avgResponseTime: avgResponseTime.toFixed(2) + 'ms',
+            p95ResponseTime: p95ResponseTime.toFixed(2) + 'ms',
+            memoryUsage: latestMemory ? {
+                rss: Math.round(latestMemory.rss / 1024 / 1024) + 'MB',
+                heapUsed: Math.round(latestMemory.heapUsed / 1024 / 1024) + 'MB',
+                heapTotal: Math.round(latestMemory.heapTotal / 1024 / 1024) + 'MB'
+            } : null,
+            uptime: process.uptime() + 's'
+        };
+    }
+}
+
+// Clustering for multi-core utilization
+class ClusterManager {
+    static start() {
+        const numCPUs = os.cpus().length;
+        
+        if (cluster.isMaster) {
+            console.log(`Master ${process.pid} is running`);
+            console.log(`Starting ${numCPUs} workers...`);
+            
+            // Fork workers
+            for (let i = 0; i < numCPUs; i++) {
+                cluster.fork();
+            }
+            
+            // Handle worker events
+            cluster.on('exit', (worker, code, signal) => {
+                console.log(`Worker ${worker.process.pid} died`);
+                console.log('Starting a new worker...');
+                cluster.fork();
+            });
+            
+            // Graceful shutdown
+            process.on('SIGTERM', () => {
+                console.log('Master received SIGTERM, shutting down workers...');
+                
+                for (const id in cluster.workers) {
+                    cluster.workers[id].kill();
+                }
+            });
+            
+            // Worker health monitoring
+            setInterval(() => {
+                for (const id in cluster.workers) {
+                    const worker = cluster.workers[id];
+                    worker.send('health-check');
+                }
+            }, 30000); // Every 30 seconds
+            
+        } else {
+            // Worker process
+            const app = require('./app'); // Your Express app
+            const monitor = new PerformanceMonitor();
+            
+            app.use(monitor.measureRequest.bind(monitor));
+            
+            const server = app.listen(process.env.PORT || 3000, () => {
+                console.log(`Worker ${process.pid} started`);
+            });
+            
+            // Health check response
+            process.on('message', (msg) => {
+                if (msg === 'health-check') {
+                    process.send({
+                        type: 'health',
+                        pid: process.pid,
+                        memory: process.memoryUsage(),
+                        uptime: process.uptime()
+                    });
+                }
+            });
+            
+            // Graceful shutdown
+            process.on('SIGTERM', () => {
+                console.log(`Worker ${process.pid} received SIGTERM`);
+                server.close(() => {
+                    process.exit(0);
+                });
+            });
+        }
+    }
+}
+
+// Memory optimization techniques
+class MemoryOptimizer {
+    static setupMemoryMonitoring() {
+        setInterval(() => {
+            const usage = process.memoryUsage();
+            const threshold = 500 * 1024 * 1024; // 500MB
+            
+            if (usage.heapUsed > threshold) {
+                console.warn('High memory usage detected:', {
+                    heapUsed: Math.round(usage.heapUsed / 1024 / 1024) + 'MB',
+                    heapTotal: Math.round(usage.heapTotal / 1024 / 1024) + 'MB',
+                    rss: Math.round(usage.rss / 1024 / 1024) + 'MB'
+                });
+                
+                // Force garbage collection if available
+                if (global.gc) {
+                    global.gc();
+                    console.log('Forced garbage collection');
+                }
+            }
+        }, 10000);
+    }
+    
+    static createObjectPool(createFn, resetFn, initialSize = 10) {
+        const pool = [];
+        
+        // Pre-populate pool
+        for (let i = 0; i < initialSize; i++) {
+            pool.push(createFn());
+        }
+        
+        return {
+            acquire() {
+                return pool.length > 0 ? pool.pop() : createFn();
+            },
+            
+            release(obj) {
+                resetFn(obj);
+                pool.push(obj);
+            },
+            
+            size() {
+                return pool.length;
+            }
+        };
+    }
+    
+    static createBufferPool(bufferSize = 1024, poolSize = 100) {
+        return this.createObjectPool(
+            () => Buffer.allocUnsafe(bufferSize),
+            (buffer) => buffer.fill(0),
+            poolSize
+        );
+    }
+}
+
+// Caching strategies
+class CacheManager {
+    constructor() {
+        this.cache = new Map();
+        this.ttl = new Map();
+        this.stats = { hits: 0, misses: 0 };
+    }
+    
+    set(key, value, ttlMs = 300000) { // 5 minutes default
+        this.cache.set(key, value);
+        this.ttl.set(key, Date.now() + ttlMs);
+    }
+    
+    get(key) {
+        if (!this.cache.has(key)) {
+            this.stats.misses++;
+            return null;
+        }
+        
+        const expiry = this.ttl.get(key);
+        if (Date.now() > expiry) {
+            this.cache.delete(key);
+            this.ttl.delete(key);
+            this.stats.misses++;
+            return null;
+        }
+        
+        this.stats.hits++;
+        return this.cache.get(key);
+    }
+    
+    delete(key) {
+        this.cache.delete(key);
+        this.ttl.delete(key);
+    }
+    
+    clear() {
+        this.cache.clear();
+        this.ttl.clear();
+    }
+    
+    getStats() {
+        const total = this.stats.hits + this.stats.misses;
+        return {
+            hits: this.stats.hits,
+            misses: this.stats.misses,
+            hitRate: total > 0 ? (this.stats.hits / total * 100).toFixed(2) + '%' : '0%',
+            size: this.cache.size
+        };
+    }
+    
+    // Cleanup expired entries
+    cleanup() {
+        const now = Date.now();
+        for (const [key, expiry] of this.ttl.entries()) {
+            if (now > expiry) {
+                this.cache.delete(key);
+                this.ttl.delete(key);
+            }
+        }
+    }
+}
+
+// Database optimization
+class DatabaseOptimizer {
+    static createConnectionPool(config) {
+        const pool = [];
+        const maxConnections = config.max || 10;
+        const minConnections = config.min || 2;
+        
+        return {
+            async getConnection() {
+                if (pool.length > 0) {
+                    return pool.pop();
+                }
+                
+                if (pool.length < maxConnections) {
+                    return await this.createConnection(config);
+                }
+                
+                // Wait for available connection
+                return new Promise((resolve) => {
+                    const checkForConnection = () => {
+                        if (pool.length > 0) {
+                            resolve(pool.pop());
+                        } else {
+                            setTimeout(checkForConnection, 10);
+                        }
+                    };
+                    checkForConnection();
+                });
+            },
+            
+            releaseConnection(connection) {
+                if (pool.length < maxConnections) {
+                    pool.push(connection);
+                } else {
+                    connection.close();
+                }
+            },
+            
+            async createConnection(config) {
+                // Database connection logic
+                return { id: Date.now(), query: async () => {} };
+            }
+        };
+    }
+    
+    static createQueryCache() {
+        const cache = new CacheManager();
+        
+        return {
+            async query(sql, params = []) {
+                const cacheKey = JSON.stringify({ sql, params });
+                const cached = cache.get(cacheKey);
+                
+                if (cached) {
+                    return cached;
+                }
+                
+                // Execute query (simplified)
+                const result = await this.executeQuery(sql, params);
+                
+                // Cache SELECT queries only
+                if (sql.trim().toLowerCase().startsWith('select')) {
+                    cache.set(cacheKey, result, 60000); // 1 minute cache
+                }
+                
+                return result;
+            },
+            
+            async executeQuery(sql, params) {
+                // Actual database query execution
+                return { rows: [], rowCount: 0 };
+            },
+            
+            invalidateCache(pattern) {
+                // Invalidate cache entries matching pattern
+                cache.clear(); // Simplified
+            }
+        };
+    }
+}
+
+// Production deployment utilities
+class ProductionOptimizer {
+    static setupProcessMonitoring() {
+        // CPU usage monitoring
+        setInterval(() => {
+            const usage = process.cpuUsage();
+            const loadAvg = os.loadavg();
+            
+            console.log('System metrics:', {
+                cpuUsage: {
+                    user: usage.user,
+                    system: usage.system
+                },
+                loadAverage: loadAvg,
+                freeMemory: Math.round(os.freemem() / 1024 / 1024) + 'MB',
+                totalMemory: Math.round(os.totalmem() / 1024 / 1024) + 'MB'
+            });
+        }, 30000);
+        
+        // Handle uncaught exceptions
+        process.on('uncaughtException', (err) => {
+            console.error('Uncaught Exception:', err);
+            // Log to external service
+            process.exit(1);
+        });
+        
+        process.on('unhandledRejection', (reason, promise) => {
+            console.error('Unhandled Rejection at:', promise, 'reason:', reason);
+            // Log to external service
+        });
+    }
+    
+    static setupGracefulShutdown(server) {
+        const shutdown = (signal) => {
+            console.log(`Received ${signal}, shutting down gracefully...`);
+            
+            server.close(() => {
+                console.log('HTTP server closed');
+                
+                // Close database connections
+                // Clear caches
+                // Finish pending operations
+                
+                process.exit(0);
+            });
+            
+            // Force shutdown after 30 seconds
+            setTimeout(() => {
+                console.error('Could not close connections in time, forcefully shutting down');
+                process.exit(1);
+            }, 30000);
+        };
+        
+        process.on('SIGTERM', () => shutdown('SIGTERM'));
+        process.on('SIGINT', () => shutdown('SIGINT'));
+    }
+    
+    static optimizeForProduction(app) {
+        // Disable X-Powered-By header
+        app.disable('x-powered-by');
+        
+        // Set trust proxy for load balancers
+        app.set('trust proxy', 1);
+        
+        // Optimize JSON parsing
+        app.use(express.json({ limit: '1mb' }));
+        
+        // Enable compression
+        const compression = require('compression');
+        app.use(compression());
+        
+        // Set security headers
+        const helmet = require('helmet');
+        app.use(helmet());
+        
+        return app;
+    }
+}
+
+// Usage example
+if (require.main === module) {
+    // Start clustered application
+    ClusterManager.start();
+    
+    // Setup memory monitoring
+    MemoryOptimizer.setupMemoryMonitoring();
+    
+    // Setup production monitoring
+    ProductionOptimizer.setupProcessMonitoring();
+}
+
+module.exports = {
+    PerformanceMonitor,
+    ClusterManager,
+    MemoryOptimizer,
+    CacheManager,
+    DatabaseOptimizer,
+    ProductionOptimizer
+};
+                        </code></pre>
+                    </div>
+                </div>
+                
+                <div class="note-taking-section">
+                    <h3>📝 Your Notes</h3>
+                    <div class="note-editor" data-topic="nodejs-performance">
+                        <textarea placeholder="Add your personal notes about Node.js performance..."></textarea>
+                    </div>
+                </div>
+            </div>
+            """);
+        
+        topic.setEstimatedMinutes(200);
+        topic.setSortOrder(5);
+        module.getTopics().add(topic);
+        topicRepository.save(topic);
+        
+        log.info("✅ Created Node.js Performance topic");
+    } 
+   
+    private void createNodeJsInterviewQuestions(LearningModule module) {
+        List<InterviewQuestion> questions = new ArrayList<>();
+        
+        // Node.js Core Concepts Questions
+        questions.addAll(Arrays.asList(
+            createInterviewQuestion("Explain the Node.js event loop and its phases in detail.", 
+                "HARD", "Amazon", "Node.js", module,
+                "Event loop phases: 1) Timer phase (setTimeout, setInterval) 2) Pending callbacks 3) Idle, prepare 4) Poll (I/O events) 5) Check (setImmediate) 6) Close callbacks. Microtasks (process.nextTick, Promises) execute between phases."),
+            
+            createInterviewQuestion("What is the difference between process.nextTick() and setImmediate()?", 
+                "MEDIUM", "Google", "Node.js", module,
+                "process.nextTick() has highest priority, executes before any other async operation. setImmediate() executes in the Check phase of event loop. nextTick can cause starvation if used recursively."),
+            
+            createInterviewQuestion("How does Node.js handle child processes? Explain spawn, exec, and fork.", 
+                "HARD", "Microsoft", "Node.js", module,
+                "spawn(): Launches new process with given command. exec(): Executes command in shell, buffers output. fork(): Special case of spawn for Node.js processes, enables IPC. execFile(): Like exec but doesn't use shell."),
+            
+            createInterviewQuestion("What are streams in Node.js? Explain the different types.", 
+                "MEDIUM", "Meta", "Node.js", module,
+                "Streams handle data flow efficiently. Types: 1) Readable (fs.createReadStream) 2) Writable (fs.createWriteStream) 3) Duplex (TCP sockets) 4) Transform (zlib, crypto). Benefits: memory efficiency, composability."),
+            
+            createInterviewQuestion("Explain Node.js clustering and how it helps with performance.", 
+                "HARD", "Apple", "Node.js", module,
+                "Clustering creates multiple worker processes sharing the same port. Master process manages workers, handles load balancing. Utilizes multi-core systems since Node.js is single-threaded. Workers can be restarted independently.")
+        ));
+        
+        // Asynchronous Programming Questions
+        questions.addAll(Arrays.asList(
+            createInterviewQuestion("What is callback hell and how do you avoid it?", 
+                "MEDIUM", "Amazon", "Node.js", module,
+                "Callback hell is deeply nested callbacks making code hard to read/maintain. Solutions: 1) Named functions 2) Promises 3) Async/await 4) Libraries like async.js 5) Proper error handling patterns."),
+            
+            createInterviewQuestion("Explain the difference between Promise.all(), Promise.allSettled(), and Promise.race().", 
+                "MEDIUM", "Google", "Node.js", module,
+                "Promise.all(): Resolves when all promises resolve, rejects if any rejects. Promise.allSettled(): Waits for all promises to settle (resolve/reject). Promise.race(): Resolves/rejects with first settled promise."),
+            
+            createInterviewQuestion("How do you handle errors in async/await? What are the best practices?", 
+                "MEDIUM", "Microsoft", "Node.js", module,
+                "Use try/catch blocks for async/await. Handle errors at appropriate levels. Use Promise.catch() for promise chains. Implement global error handlers. Always handle rejected promises to avoid unhandled rejections."),
+            
+            createInterviewQuestion("What are the performance implications of using async/await vs Promises?", 
+                "HARD", "Meta", "Node.js", module,
+                "Async/await is syntactic sugar over Promises. Performance is nearly identical. Async/await can be slower in tight loops due to overhead. Promises allow better parallelization with Promise.all(). Choose based on readability needs."),
+            
+            createInterviewQuestion("Explain how you would implement a retry mechanism with exponential backoff.", 
+                "HARD", "Apple", "Node.js", module,
+                "Implement recursive function with increasing delays: delay = baseDelay * (2 ^ attempt). Add jitter to prevent thundering herd. Set maximum attempts and delay limits. Use setTimeout for delays. Handle different error types appropriately.")
+        ));
+        
+        // Express.js Questions
+        questions.addAll(Arrays.asList(
+            createInterviewQuestion("Explain the Express.js middleware stack and how it works.", 
+                "MEDIUM", "Amazon", "Node.js", module,
+                "Middleware functions execute sequentially in order of definition. Each middleware has access to req, res, and next(). Calling next() passes control to next middleware. Error middleware has 4 parameters (err, req, res, next)."),
+            
+            createInterviewQuestion("How do you implement authentication and authorization in Express.js?", 
+                "HARD", "Google", "Node.js", module,
+                "Authentication: Verify identity using JWT, sessions, or OAuth. Authorization: Check permissions using middleware. Implement role-based access control. Use passport.js for complex auth strategies. Secure routes with middleware guards."),
+            
+            createInterviewQuestion("What are the best practices for error handling in Express.js?", 
+                "MEDIUM", "Microsoft", "Node.js", module,
+                "Use error-handling middleware with 4 parameters. Catch async errors with try/catch or .catch(). Use next(error) to pass errors. Implement global error handler. Log errors appropriately. Return user-friendly error messages."),
+            
+            createInterviewQuestion("How do you implement rate limiting in Express.js applications?", 
+                "MEDIUM", "Meta", "Node.js", module,
+                "Use express-rate-limit middleware. Configure window time and max requests. Store rate limit data in memory/Redis. Implement different limits for different routes. Handle rate limit exceeded responses. Consider distributed rate limiting."),
+            
+            createInterviewQuestion("Explain how to optimize Express.js applications for production.", 
+                "HARD", "Apple", "Node.js", module,
+                "Use compression middleware. Enable gzip. Set proper cache headers. Use helmet for security. Implement clustering. Use reverse proxy (nginx). Monitor performance. Optimize database queries. Use CDN for static assets.")
+        ));
+        
+        // Performance and Scaling Questions
+        questions.addAll(Arrays.asList(
+            createInterviewQuestion("How do you profile and debug performance issues in Node.js?", 
+                "HARD", "Amazon", "Node.js", module,
+                "Use built-in profiler (--prof flag). Use clinic.js for comprehensive profiling. Monitor event loop lag. Use flame graphs for CPU profiling. Check memory usage patterns. Use APM tools like New Relic. Profile database queries."),
+            
+            createInterviewQuestion("What are the common memory leaks in Node.js and how do you prevent them?", 
+                "HARD", "Google", "Node.js", module,
+                "Common leaks: Global variables, closures, event listeners, timers, large objects in cache. Prevention: Use weak references, remove event listeners, clear timers, implement cache TTL, use object pools, monitor heap usage."),
+            
+            createInterviewQuestion("Explain different caching strategies in Node.js applications.", 
+                "MEDIUM", "Microsoft", "Node.js", module,
+                "In-memory caching (Map, LRU cache). Redis for distributed caching. HTTP caching headers. Database query caching. CDN for static assets. Application-level caching. Cache invalidation strategies. Cache-aside, write-through patterns."),
+            
+            createInterviewQuestion("How do you implement horizontal scaling for Node.js applications?", 
+                "HARD", "Meta", "Node.js", module,
+                "Use load balancers (nginx, HAProxy). Implement stateless architecture. Use external session storage (Redis). Database connection pooling. Microservices architecture. Container orchestration (Kubernetes). Auto-scaling based on metrics."),
+            
+            createInterviewQuestion("What are Worker Threads in Node.js and when would you use them?", 
+                "HARD", "Apple", "Node.js", module,
+                "Worker Threads allow parallel execution of JavaScript. Use for CPU-intensive tasks to avoid blocking event loop. Share memory using SharedArrayBuffer. Communicate via message passing. Alternative to child processes for JS code execution.")
+        ));
+        
+        // Module System Questions
+        questions.addAll(Arrays.asList(
+            createInterviewQuestion("What's the difference between CommonJS and ES Modules in Node.js?", 
+                "MEDIUM", "Amazon", "Node.js", module,
+                "CommonJS: require/module.exports, synchronous loading, dynamic imports. ES Modules: import/export, static analysis, asynchronous loading, tree shaking support. ES modules are the future standard."),
+            
+            createInterviewQuestion("How does Node.js module resolution work? Explain the algorithm.", 
+                "HARD", "Google", "Node.js", module,
+                "1) Core modules (fs, path) 2) Relative paths (./file) 3) node_modules traversal upward 4) Global modules 5) File extensions (.js, .json, .node) 6) index.js in directories. Uses require.resolve() algorithm."),
+            
+            createInterviewQuestion("Explain package.json fields and their purposes.", 
+                "MEDIUM", "Microsoft", "Node.js", module,
+                "main: Entry point. scripts: NPM scripts. dependencies/devDependencies: Package deps. engines: Node version requirements. exports: Module exports map. bin: CLI commands. files: Published files list."),
+            
+            createInterviewQuestion("How do you create and publish an npm package?", 
+                "MEDIUM", "Meta", "Node.js", module,
+                "1) Initialize with npm init 2) Write code and tests 3) Configure package.json 4) Add README and documentation 5) Test locally with npm link 6) Publish with npm publish 7) Use semantic versioning 8) Maintain with updates."),
+            
+            createInterviewQuestion("What are peer dependencies and when do you use them?", 
+                "MEDIUM", "Apple", "Node.js", module,
+                "Peer dependencies specify packages that should be installed by the consumer. Used for plugins/extensions that require specific versions of host packages. Prevents version conflicts. Common in React libraries requiring specific React versions.")
+        ));
+        
+        // Advanced Node.js Questions
+        questions.addAll(Arrays.asList(
+            createInterviewQuestion("How do you implement real-time communication in Node.js?", 
+                "HARD", "Amazon", "Node.js", module,
+                "WebSockets with ws library or Socket.io. Server-Sent Events (SSE). Long polling. WebRTC for peer-to-peer. Consider scaling with Redis adapter for Socket.io. Handle connection management and error recovery."),
+            
+            createInterviewQuestion("Explain how to implement microservices architecture with Node.js.", 
+                "HARD", "Google", "Node.js", module,
+                "Separate services by domain. Use API gateways. Implement service discovery. Use message queues (RabbitMQ, Kafka). Handle distributed transactions. Implement circuit breakers. Use containers and orchestration. Monitor service health."),
+            
+            createInterviewQuestion("How do you handle file uploads efficiently in Node.js?", 
+                "MEDIUM", "Microsoft", "Node.js", module,
+                "Use multer middleware for Express. Stream large files to avoid memory issues. Validate file types and sizes. Store files in cloud storage (S3). Implement progress tracking. Handle multiple file uploads. Use temporary storage for processing."),
+            
+            createInterviewQuestion("What are the security best practices for Node.js applications?", 
+                "HARD", "Meta", "Node.js", module,
+                "Use helmet for security headers. Validate/sanitize inputs. Implement rate limiting. Use HTTPS. Secure dependencies (npm audit). Implement proper authentication. Use environment variables for secrets. Regular security updates."),
+            
+            createInterviewQuestion("How do you implement database transactions in Node.js?", 
+                "HARD", "Apple", "Node.js", module,
+                "Use database-specific transaction APIs. Implement try/catch with rollback. Use connection pooling. Handle distributed transactions with 2PC. Implement saga pattern for microservices. Use ORM transaction support (Sequelize, TypeORM).")
+        ));
+        
+        interviewQuestionRepository.saveAll(questions);
+        log.info("✅ Created {} Node.js interview questions", questions.size());
     }

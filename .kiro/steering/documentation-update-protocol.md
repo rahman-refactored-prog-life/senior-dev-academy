@@ -2,7 +2,7 @@
 
 ## Mandatory Post-Phase Documentation Updates
 
-After EVERY phase implementation, the following files MUST be updated in this exact order:
+After EVERY phase implementation, the following 9 files MUST be updated in this exact order:
 
 ### 1. CURRENT_STATUS.md
 - Update exact session state and continuation point
@@ -39,7 +39,25 @@ After EVERY phase implementation, the following files MUST be updated in this ex
 - Modify project status and completion percentages
 - Add new screenshots or demo links if applicable
 
-### 6. Git Commit
+### 6. PROJECT_AUTOMATION_MANAGER.md
+- Update automation progress and phase completion status
+- Record any automation framework improvements
+- Update time estimates based on actual implementation
+- Document lessons learned and optimizations
+
+### 7. AUTOMATION_REVIEW_CHECKLIST.md
+- Update phase completion checkboxes
+- Record quality validation results
+- Update next phase readiness status
+- Document any blockers or dependencies
+
+### 8. SENIOR_DEVELOPER_READINESS_ANALYSIS.md
+- Update skill coverage and competency analysis
+- Record new interview questions and topics covered
+- Update FAANG readiness assessment
+- Document progress toward senior developer goals
+
+### 9. Git Commit
 - Stage all modified files
 - Create descriptive commit message with phase details
 - Include progress summary and next steps
