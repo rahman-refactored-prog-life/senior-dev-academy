@@ -8635,6 +8635,13 @@ public class OrderItem {
         createNodeJsModulesTopic(module);
         createExpressFrameworkTopic(module);
         createNodeJsPerformanceTopic(module);
+        
+        // ZeroToMastery Foundation Topics (6-9)
+        createFileIOStreamsPlanetsTopic(module);
+        createWebServersHTTPTopic(module);
+        createFullStackNASATopic(module);
+        createTestingAPIsJestTopic(module);
+        
         createNodeJsInterviewQuestions(module);
         
         log.info("✅ Created Node.js Fundamentals module with {} topics", module.getTopics().size());
@@ -12081,6 +12088,3476 @@ module.exports = {
                 "Use database-specific transaction APIs. Implement try/catch with rollback. Use connection pooling. Handle distributed transactions with 2PC. Implement saga pattern for microservices. Use ORM transaction support (Sequelize, TypeORM).")
         ));
         
+        // Additional questions for new topics (Topics 6-9)
+        questions.addAll(Arrays.asList(
+            createInterviewQuestion("How do you handle large file processing in Node.js without running out of memory?", 
+                "HARD", "Amazon", "Node.js", module,
+                "Use streams for memory-efficient processing: fs.createReadStream() with pipe() operations. Process data in chunks, use Transform streams for data manipulation, and implement backpressure handling."),
+            
+            createInterviewQuestion("Explain the difference between readable.pipe() and pipeline() in Node.js streams.", 
+                "MEDIUM", "Google", "Node.js", module,
+                "pipe() is the basic method for connecting streams but doesn't handle errors well. pipeline() provides better error handling, automatic cleanup, and proper stream destruction when errors occur."),
+            
+            createInterviewQuestion("How do you implement CORS in a Node.js application and why is it important?", 
+                "MEDIUM", "Microsoft", "Node.js", module,
+                "CORS prevents cross-origin requests by default. Implement using cors middleware or custom headers. Set Access-Control-Allow-Origin, Methods, Headers. Important for API security and browser same-origin policy."),
+            
+            createInterviewQuestion("What are Server-Sent Events (SSE) and how do they differ from WebSockets?", 
+                "MEDIUM", "Meta", "Node.js", module,
+                "SSE provides one-way real-time communication from server to client using HTTP. Simpler than WebSockets, automatic reconnection, but only server-to-client. WebSockets are bidirectional but more complex."),
+            
+            createInterviewQuestion("How do you structure a full-stack Node.js application for scalability?", 
+                "HARD", "Apple", "Node.js", module,
+                "Use layered architecture: Controllers → Services → Repositories. Separate concerns, implement dependency injection, use environment-based configuration, proper error handling, and modular design patterns."),
+            
+            createInterviewQuestion("What's the difference between unit tests, integration tests, and end-to-end tests?", 
+                "MEDIUM", "Amazon", "Node.js", module,
+                "Unit tests: Test individual functions/modules in isolation with mocks. Integration tests: Test component interactions. E2E tests: Test complete user workflows. Each has different scope, speed, and maintenance costs."),
+            
+            createInterviewQuestion("How do you mock external dependencies in Jest tests?", 
+                "MEDIUM", "Google", "Node.js", module,
+                "Use jest.mock() for module mocking, jest.fn() for function mocks, jest.spyOn() for spying on methods. Create __mocks__ directory for manual mocks. Use mockResolvedValue/mockRejectedValue for async operations."),
+            
+            createInterviewQuestion("Explain Test-Driven Development (TDD) and its benefits in Node.js development.", 
+                "MEDIUM", "Microsoft", "Node.js", module,
+                "TDD: Write failing test (Red) → Write minimal code to pass (Green) → Refactor (Refactor). Benefits: Better design, fewer bugs, documentation through tests, confidence in changes."),
+            
+            createInterviewQuestion("How do you test API endpoints with Supertest? Provide examples.", 
+                "MEDIUM", "Meta", "Node.js", module,
+                "Supertest wraps your Express app for HTTP testing. Use request(app).get('/api/endpoint').expect(200). Test status codes, response bodies, headers. Set up test database, mock external services."),
+            
+            createInterviewQuestion("What are the best practices for organizing test files in a Node.js project?", 
+                "MEDIUM", "Apple", "Node.js", module,
+                "Mirror source structure in tests/, use descriptive names (*.test.js), separate unit/integration/e2e tests, create test utilities, use setup/teardown files, maintain test data fixtures.")
+        ));
+        
         interviewQuestionRepository.saveAll(questions);
         log.info("✅ Created {} Node.js interview questions", questions.size());
+    }    
+
+    private void createFileIOStreamsPlanetsTopic(LearningModule module) {
+        Topic topic = new Topic();
+        topic.setTitle("File I/O & Streams: Planets Project");
+        topic.setDescription("Master Node.js file operations and streams through Kepler space telescope data analysis");
+        topic.setContent("""
+            <div class="topic-content">
+                <h2>🪐 File I/O & Streams: Planets Project</h2>
+                
+                <div class="learning-objectives">
+                    <h3>🎯 Learning Objectives</h3>
+                    <ul>
+                        <li>Master Node.js file system operations and stream processing</li>
+                        <li>Analyze real Kepler space telescope data for habitable planets</li>
+                        <li>Implement efficient CSV parsing and data transformation</li>
+                        <li>Handle large datasets with memory-efficient streaming</li>
+                        <li>Build production-ready data processing pipelines</li>
+                    </ul>
+                </div>
+                
+                <div class="concept-section">
+                    <h3>🌌 Kepler Space Telescope Data Analysis Project</h3>
+                    <p>We'll analyze real NASA Kepler mission data to find potentially habitable exoplanets using Node.js streams and file operations.</p>
+                    
+                    <div class="code-example">
+                        <h5>Complete Planets Data Analysis System:</h5>
+                        <pre><code class="language-javascript">
+const fs = require('fs');
+const path = require('path');
+const { parse } = require('csv-parse');
+const { Transform, pipeline } = require('stream');
+const { promisify } = require('util');
+
+// Kepler data analysis for habitable planets
+class KeplerDataAnalyzer {
+    constructor() {
+        this.habitablePlanets = [];
+        this.totalPlanets = 0;
+        this.dataPath = path.join(__dirname, 'data', 'kepler_data.csv');
+    }
+    
+    // Check if planet is potentially habitable
+    isHabitablePlanet(planet) {
+        return planet['koi_disposition'] === 'CONFIRMED' &&
+               planet['koi_insol'] > 0.36 && planet['koi_insol'] < 1.11 &&
+               planet['koi_prad'] < 1.6;
+    }
+    
+    // Stream-based CSV processing for large files
+    async analyzePlanetsWithStreams() {
+        console.log('🔍 Analyzing Kepler data with streams...');
+        
+        return new Promise((resolve, reject) => {
+            const results = [];
+            
+            // Create readable stream from CSV file
+            const readableStream = fs.createReadStream(this.dataPath);
+            
+            // CSV parser transform stream
+            const csvParser = parse({
+                comment: '#',
+                skip_empty_lines: true,
+                columns: true
+            });
+            
+            // Planet filter transform stream
+            const planetFilter = new Transform({
+                objectMode: true,
+                transform(planet, encoding, callback) {
+                    this.push(planet);
+                    callback();
+                }
+            });
+            
+            // Habitability checker transform stream
+            const habitabilityChecker = new Transform({
+                objectMode: true,
+                transform(planet, encoding, callback) {
+                    if (this.isHabitablePlanet(planet)) {
+                        results.push({
+                            name: planet['kepler_name'],
+                            radius: parseFloat(planet['koi_prad']),
+                            insolation: parseFloat(planet['koi_insol']),
+                            disposition: planet['koi_disposition'],
+                            temperature: this.calculateTemperature(planet)
+                        });
+                    }
+                    callback();
+                },
+                
+                isHabitablePlanet(planet) {
+                    return planet['koi_disposition'] === 'CONFIRMED' &&
+                           planet['koi_insol'] > 0.36 && planet['koi_insol'] < 1.11 &&
+                           planet['koi_prad'] < 1.6;
+                },
+                
+                calculateTemperature(planet) {
+                    const insolation = parseFloat(planet['koi_insol']);
+                    return Math.round(255 * Math.pow(insolation, 0.25));
+                }
+            });
+            
+            // Pipeline for stream processing
+            pipeline(
+                readableStream,
+                csvParser,
+                planetFilter,
+                habitabilityChecker,
+                (error) => {
+                    if (error) {
+                        console.error('Pipeline failed:', error);
+                        reject(error);
+                    } else {
+                        console.log(`✅ Found ${results.length} habitable planets`);
+                        resolve(results);
+                    }
+                }
+            );
+        });
+    }
+    
+    // Memory-efficient large file processing
+    async processLargeDataset() {
+        console.log('📊 Processing large dataset with memory optimization...');
+        
+        const stats = {
+            totalProcessed: 0,
+            habitableCount: 0,
+            memoryUsage: []
+        };
+        
+        return new Promise((resolve, reject) => {
+            const readStream = fs.createReadStream(this.dataPath, {
+                highWaterMark: 16 * 1024 // 16KB chunks
+            });
+            
+            const parser = parse({
+                columns: true,
+                skip_empty_lines: true
+            });
+            
+            parser.on('readable', function() {
+                let record;
+                while (record = parser.read()) {
+                    stats.totalProcessed++;
+                    
+                    if (stats.totalProcessed % 1000 === 0) {
+                        const memUsage = process.memoryUsage();
+                        stats.memoryUsage.push({
+                            processed: stats.totalProcessed,
+                            heapUsed: Math.round(memUsage.heapUsed / 1024 / 1024),
+                            rss: Math.round(memUsage.rss / 1024 / 1024)
+                        });
+                        console.log(`Processed ${stats.totalProcessed} records, Memory: ${Math.round(memUsage.heapUsed / 1024 / 1024)}MB`);
+                    }
+                    
+                    if (this.isHabitablePlanet(record)) {
+                        stats.habitableCount++;
+                    }
+                }
+            });
+            
+            parser.on('error', reject);
+            parser.on('end', () => {
+                console.log(`✅ Processing complete: ${stats.totalProcessed} total, ${stats.habitableCount} habitable`);
+                resolve(stats);
+            });
+            
+            readStream.pipe(parser);
+        });
+    }
+    
+    // Advanced file operations with error handling
+    async saveResults(planets, filename = 'habitable_planets.json') {
+        const outputPath = path.join(__dirname, 'results', filename);
+        
+        try {
+            // Ensure results directory exists
+            await fs.promises.mkdir(path.dirname(outputPath), { recursive: true });
+            
+            // Prepare data for saving
+            const results = {
+                timestamp: new Date().toISOString(),
+                totalHabitable: planets.length,
+                planets: planets.map(planet => ({
+                    ...planet,
+                    habitabilityScore: this.calculateHabitabilityScore(planet)
+                })).sort((a, b) => b.habitabilityScore - a.habitabilityScore)
+            };
+            
+            // Write results with atomic operation
+            const tempPath = outputPath + '.tmp';
+            await fs.promises.writeFile(tempPath, JSON.stringify(results, null, 2));
+            await fs.promises.rename(tempPath, outputPath);
+            
+            console.log(`💾 Results saved to ${outputPath}`);
+            return outputPath;
+            
+        } catch (error) {
+            console.error('Error saving results:', error);
+            throw error;
+        }
+    }
+    
+    calculateHabitabilityScore(planet) {
+        // Simple habitability scoring algorithm
+        const radiusScore = Math.max(0, 100 - Math.abs(planet.radius - 1) * 50);
+        const tempScore = Math.max(0, 100 - Math.abs(planet.temperature - 288) / 2);
+        const insolationScore = Math.max(0, 100 - Math.abs(planet.insolation - 1) * 30);
+        
+        return Math.round((radiusScore + tempScore + insolationScore) / 3);
+    }
+    
+    // File watching for real-time data updates
+    watchDataFile() {
+        console.log('👀 Watching for data file changes...');
+        
+        const watcher = fs.watch(this.dataPath, (eventType, filename) => {
+            if (eventType === 'change') {
+                console.log(`📁 Data file changed: ${filename}`);
+                this.analyzePlanetsWithStreams()
+                    .then(planets => {
+                        console.log(`🔄 Reanalysis complete: ${planets.length} habitable planets found`);
+                    })
+                    .catch(error => {
+                        console.error('Reanalysis failed:', error);
+                    });
+            }
+        });
+        
+        return watcher;
+    }
+}
+
+// Advanced stream utilities
+class StreamUtilities {
+    // Custom transform stream for data validation
+    static createValidationStream(validator) {
+        return new Transform({
+            objectMode: true,
+            transform(chunk, encoding, callback) {
+                try {
+                    if (validator(chunk)) {
+                        this.push(chunk);
+                    }
+                    callback();
+                } catch (error) {
+                    callback(error);
+                }
+            }
+        });
+    }
+    
+    // Batch processing stream
+    static createBatchStream(batchSize = 100) {
+        let batch = [];
+        
+        return new Transform({
+            objectMode: true,
+            transform(chunk, encoding, callback) {
+                batch.push(chunk);
+                
+                if (batch.length >= batchSize) {
+                    this.push([...batch]);
+                    batch = [];
+                }
+                callback();
+            },
+            
+            flush(callback) {
+                if (batch.length > 0) {
+                    this.push(batch);
+                }
+                callback();
+            }
+        });
+    }
+    
+    // Progress tracking stream
+    static createProgressStream(totalExpected) {
+        let processed = 0;
+        
+        return new Transform({
+            objectMode: true,
+            transform(chunk, encoding, callback) {
+                processed++;
+                
+                if (processed % 1000 === 0 || processed === totalExpected) {
+                    const percentage = ((processed / totalExpected) * 100).toFixed(1);
+                    console.log(`Progress: ${processed}/${totalExpected} (${percentage}%)`);
+                }
+                
+                this.push(chunk);
+                callback();
+            }
+        });
+    }
+    
+    // Error handling stream wrapper
+    static createErrorHandlingStream(stream, errorHandler) {
+        stream.on('error', (error) => {
+            console.error('Stream error:', error);
+            if (errorHandler) {
+                errorHandler(error);
+            }
+        });
+        
+        return stream;
+    }
+}
+
+// File system utilities for the project
+class FileSystemUtils {
+    // Recursive directory creation with permissions
+    static async ensureDirectory(dirPath, mode = 0o755) {
+        try {
+            await fs.promises.mkdir(dirPath, { recursive: true, mode });
+            console.log(`📁 Directory ensured: ${dirPath}`);
+        } catch (error) {
+            if (error.code !== 'EEXIST') {
+                throw error;
+            }
+        }
+    }
+    
+    // Safe file reading with encoding detection
+    static async readFileWithEncoding(filePath) {
+        try {
+            const buffer = await fs.promises.readFile(filePath);
+            
+            // Simple encoding detection (UTF-8 vs ASCII)
+            const isUTF8 = buffer.every(byte => byte < 128 || byte >= 194);
+            const encoding = isUTF8 ? 'utf8' : 'ascii';
+            
+            return {
+                content: buffer.toString(encoding),
+                encoding,
+                size: buffer.length
+            };
+        } catch (error) {
+            console.error(`Error reading file ${filePath}:`, error);
+            throw error;
+        }
+    }
+    
+    // File statistics and metadata
+    static async getFileInfo(filePath) {
+        try {
+            const stats = await fs.promises.stat(filePath);
+            
+            return {
+                size: stats.size,
+                created: stats.birthtime,
+                modified: stats.mtime,
+                accessed: stats.atime,
+                isFile: stats.isFile(),
+                isDirectory: stats.isDirectory(),
+                permissions: stats.mode.toString(8),
+                sizeFormatted: this.formatFileSize(stats.size)
+            };
+        } catch (error) {
+            console.error(`Error getting file info for ${filePath}:`, error);
+            return null;
+        }
+    }
+    
+    static formatFileSize(bytes) {
+        const units = ['B', 'KB', 'MB', 'GB', 'TB'];
+        let size = bytes;
+        let unitIndex = 0;
+        
+        while (size >= 1024 && unitIndex < units.length - 1) {
+            size /= 1024;
+            unitIndex++;
+        }
+        
+        return `${size.toFixed(1)} ${units[unitIndex]}`;
+    }
+    
+    // Directory traversal with filtering
+    static async* walkDirectory(dirPath, filter = () => true) {
+        try {
+            const entries = await fs.promises.readdir(dirPath, { withFileTypes: true });
+            
+            for (const entry of entries) {
+                const fullPath = path.join(dirPath, entry.name);
+                
+                if (entry.isDirectory()) {
+                    yield* this.walkDirectory(fullPath, filter);
+                } else if (entry.isFile() && filter(fullPath, entry)) {
+                    yield fullPath;
+                }
+            }
+        } catch (error) {
+            console.error(`Error walking directory ${dirPath}:`, error);
+        }
+    }
+}
+
+// Main execution and demonstration
+async function demonstratePlanetsProject() {
+    console.log('🚀 Starting Kepler Planets Analysis Project');
+    
+    const analyzer = new KeplerDataAnalyzer();
+    
+    try {
+        // Analyze planets with streams
+        const habitablePlanets = await analyzer.analyzePlanetsWithStreams();
+        
+        // Save results
+        const outputPath = await analyzer.saveResults(habitablePlanets);
+        
+        // Display summary
+        console.log('\\n📊 Analysis Summary:');
+        console.log(`Found ${habitablePlanets.length} potentially habitable planets`);
+        
+        if (habitablePlanets.length > 0) {
+            console.log('\\n🏆 Top 3 Most Habitable Planets:');
+            habitablePlanets
+                .sort((a, b) => analyzer.calculateHabitabilityScore(b) - analyzer.calculateHabitabilityScore(a))
+                .slice(0, 3)
+                .forEach((planet, index) => {
+                    console.log(`${index + 1}. ${planet.name}`);
+                    console.log(`   Radius: ${planet.radius} Earth radii`);
+                    console.log(`   Temperature: ${planet.temperature}K`);
+                    console.log(`   Habitability Score: ${analyzer.calculateHabitabilityScore(planet)}/100`);
+                });
+        }
+        
+        // Start file watching (optional)
+        // const watcher = analyzer.watchDataFile();
+        
+    } catch (error) {
+        console.error('Analysis failed:', error);
+    }
+}
+
+// Export for use in other modules
+module.exports = {
+    KeplerDataAnalyzer,
+    StreamUtilities,
+    FileSystemUtils,
+    demonstratePlanetsProject
+};
+
+// Run demonstration if this file is executed directly
+if (require.main === module) {
+    demonstratePlanetsProject();
+}
+                        </code></pre>
+                    </div>
+                </div>
+                
+                <div class="concept-section">
+                    <h3>📁 Advanced File Operations</h3>
+                    <p>Master Node.js file system operations for production applications.</p>
+                    
+                    <div class="code-example">
+                        <h5>Production File Management System:</h5>
+                        <pre><code class="language-javascript">
+const fs = require('fs').promises;
+const path = require('path');
+const crypto = require('crypto');
+
+class ProductionFileManager {
+    constructor(baseDir = './data') {
+        this.baseDir = baseDir;
+        this.lockFiles = new Map();
+    }
+    
+    // Atomic file operations with locking
+    async writeFileAtomic(filePath, data, options = {}) {
+        const fullPath = path.resolve(this.baseDir, filePath);
+        const tempPath = fullPath + '.tmp.' + Date.now();
+        const lockPath = fullPath + '.lock';
+        
+        try {
+            // Acquire lock
+            await this.acquireLock(lockPath);
+            
+            // Ensure directory exists
+            await fs.mkdir(path.dirname(fullPath), { recursive: true });
+            
+            // Write to temporary file
+            await fs.writeFile(tempPath, data, options);
+            
+            // Atomic rename
+            await fs.rename(tempPath, fullPath);
+            
+            console.log(`✅ File written atomically: ${filePath}`);
+            
+        } catch (error) {
+            // Cleanup temporary file on error
+            try {
+                await fs.unlink(tempPath);
+            } catch (cleanupError) {
+                // Ignore cleanup errors
+            }
+            throw error;
+        } finally {
+            // Release lock
+            await this.releaseLock(lockPath);
+        }
+    }
+    
+    // File locking mechanism
+    async acquireLock(lockPath, timeout = 5000) {
+        const startTime = Date.now();
+        
+        while (Date.now() - startTime < timeout) {
+            try {
+                await fs.writeFile(lockPath, process.pid.toString(), { flag: 'wx' });
+                this.lockFiles.set(lockPath, Date.now());
+                return;
+            } catch (error) {
+                if (error.code === 'EEXIST') {
+                    // Lock exists, wait and retry
+                    await new Promise(resolve => setTimeout(resolve, 10));
+                    continue;
+                }
+                throw error;
+            }
+        }
+        
+        throw new Error(`Failed to acquire lock: ${lockPath}`);
+    }
+    
+    async releaseLock(lockPath) {
+        try {
+            await fs.unlink(lockPath);
+            this.lockFiles.delete(lockPath);
+        } catch (error) {
+            // Ignore errors when releasing locks
+        }
+    }
+    
+    // File integrity verification
+    async verifyFileIntegrity(filePath, expectedHash) {
+        try {
+            const data = await fs.readFile(path.resolve(this.baseDir, filePath));
+            const actualHash = crypto.createHash('sha256').update(data).digest('hex');
+            
+            return {
+                valid: actualHash === expectedHash,
+                expectedHash,
+                actualHash,
+                fileSize: data.length
+            };
+        } catch (error) {
+            return {
+                valid: false,
+                error: error.message
+            };
+        }
+    }
+    
+    // Backup and versioning system
+    async createBackup(filePath, maxVersions = 5) {
+        const fullPath = path.resolve(this.baseDir, filePath);
+        const backupDir = path.join(path.dirname(fullPath), '.backups');
+        const fileName = path.basename(fullPath);
+        const timestamp = new Date().toISOString().replace(/[:.]/g, '-');
+        const backupPath = path.join(backupDir, `${fileName}.${timestamp}.backup`);
+        
+        try {
+            // Ensure backup directory exists
+            await fs.mkdir(backupDir, { recursive: true });
+            
+            // Copy file to backup
+            await fs.copyFile(fullPath, backupPath);
+            
+            // Cleanup old backups
+            await this.cleanupOldBackups(backupDir, fileName, maxVersions);
+            
+            console.log(`💾 Backup created: ${backupPath}`);
+            return backupPath;
+            
+        } catch (error) {
+            console.error('Backup creation failed:', error);
+            throw error;
+        }
+    }
+    
+    async cleanupOldBackups(backupDir, fileName, maxVersions) {
+        try {
+            const files = await fs.readdir(backupDir);
+            const backupFiles = files
+                .filter(file => file.startsWith(fileName) && file.endsWith('.backup'))
+                .map(file => ({
+                    name: file,
+                    path: path.join(backupDir, file)
+                }));
+            
+            if (backupFiles.length > maxVersions) {
+                // Sort by creation time and remove oldest
+                const stats = await Promise.all(
+                    backupFiles.map(async file => ({
+                        ...file,
+                        stats: await fs.stat(file.path)
+                    }))
+                );
+                
+                stats.sort((a, b) => a.stats.mtime - b.stats.mtime);
+                
+                const toDelete = stats.slice(0, stats.length - maxVersions);
+                await Promise.all(toDelete.map(file => fs.unlink(file.path)));
+                
+                console.log(`🗑️ Cleaned up ${toDelete.length} old backups`);
+            }
+        } catch (error) {
+            console.error('Backup cleanup failed:', error);
+        }
+    }
+}
+                        </code></pre>
+                    </div>
+                </div>
+                
+                <div class="note-taking-section">
+                    <h3>📝 Your Notes</h3>
+                    <div class="note-editor" data-topic="file-io-streams">
+                        <textarea placeholder="Add your personal notes about File I/O and Streams..."></textarea>
+                    </div>
+                </div>
+            </div>
+            """);
+        
+        topic.setEstimatedMinutes(180);
+        topic.setSortOrder(6);
+        module.getTopics().add(topic);
+        topicRepository.save(topic);
+        
+        log.info("✅ Created File I/O & Streams: Planets Project topic");
+    }    
+
+    private void createWebServersHTTPTopic(LearningModule module) {
+        Topic topic = new Topic();
+        topic.setTitle("Web Servers & HTTP Fundamentals");
+        topic.setDescription("Master HTTP protocol, web servers, CORS, and streaming for production web applications");
+        topic.setContent("""
+            <div class="topic-content">
+                <h2>🌐 Web Servers & HTTP Fundamentals</h2>
+                
+                <div class="learning-objectives">
+                    <h3>🎯 Learning Objectives</h3>
+                    <ul>
+                        <li>Understand HTTP protocol fundamentals and request/response cycle</li>
+                        <li>Build production-ready web servers with Node.js</li>
+                        <li>Master CORS, Same Origin Policy, and security considerations</li>
+                        <li>Implement streaming responses and real-time communication</li>
+                        <li>Handle advanced HTTP features: caching, compression, and optimization</li>
+                    </ul>
+                </div>
+                
+                <div class="concept-section">
+                    <h3>🔧 HTTP Protocol Deep Dive</h3>
+                    <p>Understanding HTTP is crucial for building robust web applications and APIs.</p>
+                    
+                    <div class="code-example">
+                        <h5>Complete HTTP Server Implementation:</h5>
+                        <pre><code class="language-javascript">
+const http = require('http');
+const https = require('https');
+const url = require('url');
+const querystring = require('querystring');
+const fs = require('fs');
+const path = require('path');
+const zlib = require('zlib');
+
+class AdvancedHTTPServer {
+    constructor(options = {}) {
+        this.port = options.port || 3000;
+        this.routes = new Map();
+        this.middlewares = [];
+        this.staticPaths = new Map();
+        this.corsOptions = options.cors || {};
+        this.compressionEnabled = options.compression !== false;
+    }
+    
+    // HTTP method handlers
+    get(path, handler) { this.addRoute('GET', path, handler); }
+    post(path, handler) { this.addRoute('POST', path, handler); }
+    put(path, handler) { this.addRoute('PUT', path, handler); }
+    delete(path, handler) { this.addRoute('DELETE', path, handler); }
+    patch(path, handler) { this.addRoute('PATCH', path, handler); }
+    options(path, handler) { this.addRoute('OPTIONS', path, handler); }
+    
+    addRoute(method, path, handler) {
+        const key = `${method}:${path}`;
+        this.routes.set(key, handler);
+    }
+    
+    // Middleware system
+    use(middleware) {
+        this.middlewares.push(middleware);
+    }
+    
+    // Static file serving
+    static(urlPath, localPath) {
+        this.staticPaths.set(urlPath, localPath);
+    }
+    
+    // Main request handler
+    async handleRequest(req, res) {
+        try {
+            // Parse URL and query parameters
+            const parsedUrl = url.parse(req.url, true);
+            req.pathname = parsedUrl.pathname;
+            req.query = parsedUrl.query;
+            
+            // Parse request body for POST/PUT requests
+            if (['POST', 'PUT', 'PATCH'].includes(req.method)) {
+                req.body = await this.parseRequestBody(req);
+            }
+            
+            // Apply CORS headers
+            this.applyCORS(req, res);
+            
+            // Handle preflight OPTIONS requests
+            if (req.method === 'OPTIONS') {
+                res.writeHead(200);
+                res.end();
+                return;
+            }
+            
+            // Apply middlewares
+            for (const middleware of this.middlewares) {
+                const result = await middleware(req, res);
+                if (result === false) return; // Middleware stopped the request
+            }
+            
+            // Check for static file serving
+            const staticResponse = await this.handleStaticFile(req, res);
+            if (staticResponse) return;
+            
+            // Route matching
+            const routeKey = `${req.method}:${req.pathname}`;
+            const handler = this.routes.get(routeKey) || this.findDynamicRoute(req.method, req.pathname);
+            
+            if (handler) {
+                await handler(req, res);
+            } else {
+                this.send404(res);
+            }
+            
+        } catch (error) {
+            this.handleError(error, req, res);
+        }
+    }
+    
+    // Request body parsing
+    async parseRequestBody(req) {
+        return new Promise((resolve, reject) => {
+            let body = '';
+            
+            req.on('data', chunk => {
+                body += chunk.toString();
+            });
+            
+            req.on('end', () => {
+                try {
+                    const contentType = req.headers['content-type'] || '';
+                    
+                    if (contentType.includes('application/json')) {
+                        resolve(JSON.parse(body));
+                    } else if (contentType.includes('application/x-www-form-urlencoded')) {
+                        resolve(querystring.parse(body));
+                    } else {
+                        resolve(body);
+                    }
+                } catch (error) {
+                    reject(error);
+                }
+            });
+            
+            req.on('error', reject);
+        });
+    }
+    
+    // CORS implementation
+    applyCORS(req, res) {
+        const origin = req.headers.origin;
+        const allowedOrigins = this.corsOptions.origins || ['*'];
+        
+        if (allowedOrigins.includes('*') || allowedOrigins.includes(origin)) {
+            res.setHeader('Access-Control-Allow-Origin', origin || '*');
+        }
+        
+        res.setHeader('Access-Control-Allow-Methods', 
+            this.corsOptions.methods || 'GET, POST, PUT, DELETE, OPTIONS');
+        
+        res.setHeader('Access-Control-Allow-Headers', 
+            this.corsOptions.headers || 'Content-Type, Authorization, X-Requested-With');
+        
+        if (this.corsOptions.credentials) {
+            res.setHeader('Access-Control-Allow-Credentials', 'true');
+        }
+        
+        if (this.corsOptions.maxAge) {
+            res.setHeader('Access-Control-Max-Age', this.corsOptions.maxAge);
+        }
+    }
+    
+    // Static file serving with caching
+    async handleStaticFile(req, res) {
+        for (const [urlPath, localPath] of this.staticPaths) {
+            if (req.pathname.startsWith(urlPath)) {
+                const relativePath = req.pathname.slice(urlPath.length);
+                const filePath = path.join(localPath, relativePath);
+                
+                try {
+                    const stats = await fs.promises.stat(filePath);
+                    
+                    if (stats.isFile()) {
+                        // Check if-modified-since header
+                        const ifModifiedSince = req.headers['if-modified-since'];
+                        if (ifModifiedSince && new Date(ifModifiedSince) >= stats.mtime) {
+                            res.writeHead(304);
+                            res.end();
+                            return true;
+                        }
+                        
+                        // Set caching headers
+                        res.setHeader('Last-Modified', stats.mtime.toUTCString());
+                        res.setHeader('Cache-Control', 'public, max-age=3600');
+                        
+                        // Determine content type
+                        const ext = path.extname(filePath).toLowerCase();
+                        const contentType = this.getContentType(ext);
+                        res.setHeader('Content-Type', contentType);
+                        
+                        // Handle compression
+                        if (this.compressionEnabled && this.shouldCompress(contentType)) {
+                            await this.sendCompressedFile(filePath, req, res);
+                        } else {
+                            const fileStream = fs.createReadStream(filePath);
+                            fileStream.pipe(res);
+                        }
+                        
+                        return true;
+                    }
+                } catch (error) {
+                    // File not found, continue to next handler
+                }
+            }
+        }
+        return false;
+    }
+    
+    // Content type detection
+    getContentType(ext) {
+        const types = {
+            '.html': 'text/html',
+            '.css': 'text/css',
+            '.js': 'application/javascript',
+            '.json': 'application/json',
+            '.png': 'image/png',
+            '.jpg': 'image/jpeg',
+            '.jpeg': 'image/jpeg',
+            '.gif': 'image/gif',
+            '.svg': 'image/svg+xml',
+            '.ico': 'image/x-icon',
+            '.pdf': 'application/pdf',
+            '.txt': 'text/plain'
+        };
+        return types[ext] || 'application/octet-stream';
+    }
+    
+    // Compression handling
+    shouldCompress(contentType) {
+        const compressibleTypes = [
+            'text/', 'application/javascript', 'application/json', 
+            'application/xml', 'image/svg+xml'
+        ];
+        return compressibleTypes.some(type => contentType.startsWith(type));
+    }
+    
+    async sendCompressedFile(filePath, req, res) {
+        const acceptEncoding = req.headers['accept-encoding'] || '';
+        
+        if (acceptEncoding.includes('gzip')) {
+            res.setHeader('Content-Encoding', 'gzip');
+            const fileStream = fs.createReadStream(filePath);
+            const gzipStream = zlib.createGzip();
+            fileStream.pipe(gzipStream).pipe(res);
+        } else if (acceptEncoding.includes('deflate')) {
+            res.setHeader('Content-Encoding', 'deflate');
+            const fileStream = fs.createReadStream(filePath);
+            const deflateStream = zlib.createDeflate();
+            fileStream.pipe(deflateStream).pipe(res);
+        } else {
+            const fileStream = fs.createReadStream(filePath);
+            fileStream.pipe(res);
+        }
+    }
+    
+    // Dynamic route matching (for parameterized routes)
+    findDynamicRoute(method, pathname) {
+        for (const [routeKey, handler] of this.routes) {
+            const [routeMethod, routePath] = routeKey.split(':');
+            
+            if (routeMethod === method) {
+                const routeRegex = this.pathToRegex(routePath);
+                const match = pathname.match(routeRegex);
+                
+                if (match) {
+                    // Extract parameters
+                    const params = this.extractParams(routePath, pathname);
+                    return (req, res) => {
+                        req.params = params;
+                        return handler(req, res);
+                    };
+                }
+            }
+        }
+        return null;
+    }
+    
+    pathToRegex(path) {
+        // Convert /users/:id to /users/([^/]+)
+        const regexPath = path.replace(/:([^/]+)/g, '([^/]+)');
+        return new RegExp(`^${regexPath}$`);
+    }
+    
+    extractParams(routePath, actualPath) {
+        const routeParts = routePath.split('/');
+        const actualParts = actualPath.split('/');
+        const params = {};
+        
+        for (let i = 0; i < routeParts.length; i++) {
+            if (routeParts[i].startsWith(':')) {
+                const paramName = routeParts[i].slice(1);
+                params[paramName] = actualParts[i];
+            }
+        }
+        
+        return params;
+    }
+    
+    // Error handling
+    handleError(error, req, res) {
+        console.error('Server error:', error);
+        
+        if (!res.headersSent) {
+            res.writeHead(500, { 'Content-Type': 'application/json' });
+            res.end(JSON.stringify({
+                error: 'Internal Server Error',
+                message: process.env.NODE_ENV === 'development' ? error.message : 'Something went wrong'
+            }));
+        }
+    }
+    
+    send404(res) {
+        res.writeHead(404, { 'Content-Type': 'application/json' });
+        res.end(JSON.stringify({ error: 'Not Found' }));
+    }
+    
+    // Server startup
+    listen(callback) {
+        const server = http.createServer((req, res) => {
+            this.handleRequest(req, res);
+        });
+        
+        server.listen(this.port, () => {
+            console.log(`🚀 Server running on port ${this.port}`);
+            if (callback) callback();
+        });
+        
+        return server;
+    }
+}
+
+// Streaming responses for real-time data
+class StreamingServer extends AdvancedHTTPServer {
+    constructor(options) {
+        super(options);
+        this.setupStreamingRoutes();
+    }
+    
+    setupStreamingRoutes() {
+        // Server-Sent Events endpoint
+        this.get('/events', (req, res) => {
+            this.handleSSE(req, res);
+        });
+        
+        // Chunked transfer encoding for large responses
+        this.get('/large-data', (req, res) => {
+            this.handleChunkedResponse(req, res);
+        });
+        
+        // File upload with progress
+        this.post('/upload', (req, res) => {
+            this.handleFileUpload(req, res);
+        });
+    }
+    
+    // Server-Sent Events implementation
+    handleSSE(req, res) {
+        res.writeHead(200, {
+            'Content-Type': 'text/event-stream',
+            'Cache-Control': 'no-cache',
+            'Connection': 'keep-alive',
+            'Access-Control-Allow-Origin': '*'
+        });
+        
+        // Send initial connection message
+        res.write('data: Connected to event stream\\n\\n');
+        
+        // Send periodic updates
+        const interval = setInterval(() => {
+            const data = {
+                timestamp: new Date().toISOString(),
+                message: 'Server heartbeat',
+                data: Math.random()
+            };
+            
+            res.write(`data: ${JSON.stringify(data)}\\n\\n`);
+        }, 1000);
+        
+        // Cleanup on client disconnect
+        req.on('close', () => {
+            clearInterval(interval);
+            console.log('SSE client disconnected');
+        });
+        
+        req.on('error', (error) => {
+            clearInterval(interval);
+            console.error('SSE error:', error);
+        });
+    }
+    
+    // Chunked response for large data
+    handleChunkedResponse(req, res) {
+        res.writeHead(200, {
+            'Content-Type': 'application/json',
+            'Transfer-Encoding': 'chunked'
+        });
+        
+        // Simulate large dataset processing
+        let count = 0;
+        const maxItems = 1000;
+        
+        const sendChunk = () => {
+            if (count < maxItems) {
+                const chunk = {
+                    id: count,
+                    data: `Item ${count}`,
+                    timestamp: Date.now()
+                };
+                
+                res.write(JSON.stringify(chunk) + '\\n');
+                count++;
+                
+                setTimeout(sendChunk, 10); // Send next chunk after 10ms
+            } else {
+                res.end();
+            }
+        };
+        
+        sendChunk();
+    }
+    
+    // File upload with progress tracking
+    async handleFileUpload(req, res) {
+        const contentLength = parseInt(req.headers['content-length'] || '0');
+        let receivedBytes = 0;
+        
+        const chunks = [];
+        
+        req.on('data', (chunk) => {
+            chunks.push(chunk);
+            receivedBytes += chunk.length;
+            
+            const progress = (receivedBytes / contentLength * 100).toFixed(2);
+            console.log(`Upload progress: ${progress}%`);
+        });
+        
+        req.on('end', () => {
+            const buffer = Buffer.concat(chunks);
+            
+            res.writeHead(200, { 'Content-Type': 'application/json' });
+            res.end(JSON.stringify({
+                message: 'File uploaded successfully',
+                size: buffer.length,
+                receivedBytes
+            }));
+        });
+        
+        req.on('error', (error) => {
+            console.error('Upload error:', error);
+            res.writeHead(500);
+            res.end(JSON.stringify({ error: 'Upload failed' }));
+        });
+    }
+}
+
+// Usage example and demonstration
+function demonstrateWebServer() {
+    const server = new StreamingServer({
+        port: 3000,
+        cors: {
+            origins: ['http://localhost:3000', 'https://example.com'],
+            methods: 'GET, POST, PUT, DELETE',
+            credentials: true
+        },
+        compression: true
+    });
+    
+    // Middleware examples
+    server.use(async (req, res) => {
+        console.log(`${new Date().toISOString()} - ${req.method} ${req.url}`);
+        return true; // Continue to next middleware/handler
+    });
+    
+    server.use(async (req, res) => {
+        // Rate limiting middleware
+        const clientIP = req.connection.remoteAddress;
+        // Implement rate limiting logic here
+        return true;
+    });
+    
+    // Route examples
+    server.get('/', (req, res) => {
+        res.writeHead(200, { 'Content-Type': 'text/html' });
+        res.end(`
+            <html>
+                <body>
+                    <h1>Advanced HTTP Server</h1>
+                    <p>Server running with advanced features:</p>
+                    <ul>
+                        <li><a href="/events">Server-Sent Events</a></li>
+                        <li><a href="/large-data">Chunked Response</a></li>
+                        <li><a href="/api/users">API Endpoint</a></li>
+                    </ul>
+                </body>
+            </html>
+        `);
+    });
+    
+    server.get('/api/users/:id', (req, res) => {
+        const userId = req.params.id;
+        res.writeHead(200, { 'Content-Type': 'application/json' });
+        res.end(JSON.stringify({
+            id: userId,
+            name: `User ${userId}`,
+            timestamp: new Date().toISOString()
+        }));
+    });
+    
+    // Static file serving
+    server.static('/static', './public');
+    
+    // Start server
+    return server.listen(() => {
+        console.log('🌐 Advanced HTTP server started');
+        console.log('📡 Features: CORS, Compression, Streaming, Static Files');
+    });
+}
+
+module.exports = {
+    AdvancedHTTPServer,
+    StreamingServer,
+    demonstrateWebServer
+};
+
+// Run demonstration
+if (require.main === module) {
+    demonstrateWebServer();
+}
+                        </code></pre>
+                    </div>
+                </div>
+                
+                <div class="note-taking-section">
+                    <h3>📝 Your Notes</h3>
+                    <div class="note-editor" data-topic="web-servers-http">
+                        <textarea placeholder="Add your personal notes about Web Servers and HTTP..."></textarea>
+                    </div>
+                </div>
+            </div>
+            """);
+        
+        topic.setEstimatedMinutes(150);
+        topic.setSortOrder(7);
+        module.getTopics().add(topic);
+        topicRepository.save(topic);
+        
+        log.info("✅ Created Web Servers & HTTP Fundamentals topic");
+    } 
+   
+    private void createFullStackNASATopic(LearningModule module) {
+        Topic topic = new Topic();
+        topic.setTitle("Full-Stack NASA Project: Mission Control Dashboard");
+        topic.setDescription("Build a complete NASA mission control dashboard with Node.js backend, React frontend, and real-time data integration");
+        topic.setContent("""
+            <div class="topic-content">
+                <h2>🚀 Full-Stack NASA Project: Mission Control Dashboard</h2>
+                
+                <div class="learning-objectives">
+                    <h3>🎯 Learning Objectives</h3>
+                    <ul>
+                        <li>Build a complete full-stack application with Node.js and React</li>
+                        <li>Implement real-time data streaming and WebSocket communication</li>
+                        <li>Design scalable architecture with proper separation of concerns</li>
+                        <li>Integrate with external APIs and handle data transformation</li>
+                        <li>Deploy and monitor a production-ready application</li>
+                    </ul>
+                </div>
+                
+                <div class="concept-section">
+                    <h3>🏗️ Project Architecture Overview</h3>
+                    <p>We'll build a NASA mission control dashboard that displays real-time spacecraft data, mission schedules, and launch information.</p>
+                    
+                    <div class="code-example">
+                        <h5>Backend Architecture (Node.js + Express):</h5>
+                        <pre><code class="language-javascript">
+// server.js - Main application entry point
+const express = require('express');
+const cors = require('cors');
+const helmet = require('helmet');
+const compression = require('compression');
+const rateLimit = require('express-rate-limit');
+const { createServer } = require('http');
+const { Server } = require('socket.io');
+const path = require('path');
+
+// Import custom modules
+const { connectDatabase } = require('./config/database');
+const { setupRoutes } = require('./routes');
+const { setupWebSocket } = require('./websocket');
+const { DataCollector } = require('./services/dataCollector');
+const { MissionController } = require('./services/missionController');
+
+class NASAMissionControlServer {
+    constructor() {
+        this.app = express();
+        this.server = createServer(this.app);
+        this.io = new Server(this.server, {
+            cors: {
+                origin: process.env.CLIENT_URL || "http://localhost:3000",
+                methods: ["GET", "POST"]
+            }
+        });
+        
+        this.dataCollector = new DataCollector();
+        this.missionController = new MissionController();
+        
+        this.setupMiddleware();
+        this.setupRoutes();
+        this.setupWebSocket();
+        this.startDataCollection();
+    }
+    
+    setupMiddleware() {
+        // Security middleware
+        this.app.use(helmet({
+            contentSecurityPolicy: {
+                directives: {
+                    defaultSrc: ["'self'"],
+                    styleSrc: ["'self'", "'unsafe-inline'"],
+                    scriptSrc: ["'self'"],
+                    imgSrc: ["'self'", "data:", "https:"],
+                    connectSrc: ["'self'", "wss:", "https://api.nasa.gov"]
+                }
+            }
+        }));
+        
+        // CORS configuration
+        this.app.use(cors({
+            origin: process.env.CLIENT_URL || "http://localhost:3000",
+            credentials: true
+        }));
+        
+        // Rate limiting
+        const limiter = rateLimit({
+            windowMs: 15 * 60 * 1000, // 15 minutes
+            max: 100 // limit each IP to 100 requests per windowMs
+        });
+        this.app.use('/api/', limiter);
+        
+        // Compression and parsing
+        this.app.use(compression());
+        this.app.use(express.json({ limit: '10mb' }));
+        this.app.use(express.urlencoded({ extended: true }));
+        
+        // Static file serving for production
+        if (process.env.NODE_ENV === 'production') {
+            this.app.use(express.static(path.join(__dirname, 'build')));
+        }
+        
+        // Request logging
+        this.app.use((req, res, next) => {
+            console.log(`${new Date().toISOString()} - ${req.method} ${req.path}`);
+            next();
+        });
+    }
+    
+    setupRoutes() {
+        // API Routes
+        this.app.use('/api/missions', require('./routes/missions'));
+        this.app.use('/api/spacecraft', require('./routes/spacecraft'));
+        this.app.use('/api/launches', require('./routes/launches'));
+        this.app.use('/api/telemetry', require('./routes/telemetry'));
+        this.app.use('/api/astronauts', require('./routes/astronauts'));
+        
+        // Health check endpoint
+        this.app.get('/api/health', (req, res) => {
+            res.json({
+                status: 'healthy',
+                timestamp: new Date().toISOString(),
+                uptime: process.uptime(),
+                memory: process.memoryUsage()
+            });
+        });
+        
+        // Serve React app for production
+        if (process.env.NODE_ENV === 'production') {
+            this.app.get('*', (req, res) => {
+                res.sendFile(path.join(__dirname, 'build', 'index.html'));
+            });
+        }
+        
+        // Error handling middleware
+        this.app.use((error, req, res, next) => {
+            console.error('Server error:', error);
+            res.status(500).json({
+                error: 'Internal Server Error',
+                message: process.env.NODE_ENV === 'development' ? error.message : 'Something went wrong'
+            });
+        });
+    }
+    
+    setupWebSocket() {
+        this.io.on('connection', (socket) => {
+            console.log(`Client connected: ${socket.id}`);
+            
+            // Send initial data
+            socket.emit('mission-status', this.missionController.getCurrentStatus());
+            
+            // Handle client subscriptions
+            socket.on('subscribe-telemetry', (spacecraftId) => {
+                socket.join(`telemetry-${spacecraftId}`);
+                console.log(`Client ${socket.id} subscribed to telemetry for ${spacecraftId}`);
+            });
+            
+            socket.on('unsubscribe-telemetry', (spacecraftId) => {
+                socket.leave(`telemetry-${spacecraftId}`);
+                console.log(`Client ${socket.id} unsubscribed from telemetry for ${spacecraftId}`);
+            });
+            
+            // Handle mission commands (with authentication)
+            socket.on('mission-command', async (data) => {
+                try {
+                    // Validate command and user permissions
+                    const result = await this.missionController.executeCommand(data);
+                    socket.emit('command-result', result);
+                    
+                    // Broadcast status update to all clients
+                    this.io.emit('mission-status-update', result.status);
+                } catch (error) {
+                    socket.emit('command-error', { error: error.message });
+                }
+            });
+            
+            socket.on('disconnect', () => {
+                console.log(`Client disconnected: ${socket.id}`);
+            });
+        });
+    }
+    
+    startDataCollection() {
+        // Start real-time data collection from NASA APIs
+        this.dataCollector.start();
+        
+        // Broadcast telemetry data every second
+        setInterval(() => {
+            const telemetryData = this.dataCollector.getLatestTelemetry();
+            
+            Object.keys(telemetryData).forEach(spacecraftId => {
+                this.io.to(`telemetry-${spacecraftId}`).emit('telemetry-update', {
+                    spacecraftId,
+                    data: telemetryData[spacecraftId],
+                    timestamp: new Date().toISOString()
+                });
+            });
+        }, 1000);
+        
+        // Broadcast mission updates every 30 seconds
+        setInterval(() => {
+            const missionStatus = this.missionController.getCurrentStatus();
+            this.io.emit('mission-status-update', missionStatus);
+        }, 30000);
+    }
+    
+    async start() {
+        try {
+            // Connect to database
+            await connectDatabase();
+            
+            // Start server
+            const PORT = process.env.PORT || 8000;
+            this.server.listen(PORT, () => {
+                console.log(`🚀 NASA Mission Control Server running on port ${PORT}`);
+                console.log(`🌐 Environment: ${process.env.NODE_ENV || 'development'}`);
+                console.log(`📡 WebSocket server ready for real-time communication`);
+            });
+            
+        } catch (error) {
+            console.error('Failed to start server:', error);
+            process.exit(1);
+        }
+    }
+}
+
+// Data Collection Service
+class DataCollector {
+    constructor() {
+        this.nasaApiKey = process.env.NASA_API_KEY;
+        this.telemetryData = {};
+        this.missionData = {};
+        this.isCollecting = false;
+    }
+    
+    start() {
+        if (this.isCollecting) return;
+        
+        this.isCollecting = true;
+        console.log('📡 Starting NASA data collection...');
+        
+        // Collect different types of data at different intervals
+        this.collectTelemetryData();
+        this.collectMissionData();
+        this.collectLaunchData();
+        
+        // Set up periodic data collection
+        setInterval(() => this.collectTelemetryData(), 5000);
+        setInterval(() => this.collectMissionData(), 60000);
+        setInterval(() => this.collectLaunchData(), 300000);
+    }
+    
+    async collectTelemetryData() {
+        try {
+            // Simulate spacecraft telemetry data
+            const spacecraft = ['ISS', 'Perseverance', 'Ingenuity', 'JWST'];
+            
+            for (const craft of spacecraft) {
+                this.telemetryData[craft] = {
+                    position: {
+                        latitude: (Math.random() - 0.5) * 180,
+                        longitude: (Math.random() - 0.5) * 360,
+                        altitude: Math.random() * 400 + 200
+                    },
+                    velocity: {
+                        x: (Math.random() - 0.5) * 1000,
+                        y: (Math.random() - 0.5) * 1000,
+                        z: (Math.random() - 0.5) * 1000
+                    },
+                    systems: {
+                        power: Math.random() * 100,
+                        communications: Math.random() * 100,
+                        propulsion: Math.random() * 100,
+                        lifeSupport: craft === 'ISS' ? Math.random() * 100 : null
+                    },
+                    temperature: Math.random() * 50 - 25,
+                    timestamp: new Date().toISOString()
+                };
+            }
+        } catch (error) {
+            console.error('Error collecting telemetry data:', error);
+        }
+    }
+    
+    async collectMissionData() {
+        try {
+            // Fetch real NASA mission data
+            const response = await fetch(`https://api.nasa.gov/planetary/apod?api_key=${this.nasaApiKey}`);
+            const apodData = await response.json();
+            
+            this.missionData.apod = apodData;
+            
+            // Simulate mission status updates
+            this.missionData.activeMissions = [
+                {
+                    id: 'artemis-1',
+                    name: 'Artemis I',
+                    status: 'in-progress',
+                    progress: Math.random() * 100,
+                    nextMilestone: 'Lunar orbit insertion',
+                    crew: []
+                },
+                {
+                    id: 'mars-2020',
+                    name: 'Mars 2020 Perseverance',
+                    status: 'operational',
+                    progress: 85,
+                    nextMilestone: 'Sample collection',
+                    location: 'Jezero Crater, Mars'
+                }
+            ];
+            
+        } catch (error) {
+            console.error('Error collecting mission data:', error);
+        }
+    }
+    
+    async collectLaunchData() {
+        try {
+            // Simulate upcoming launch data
+            this.missionData.upcomingLaunches = [
+                {
+                    id: 'falcon-heavy-1',
+                    mission: 'Europa Clipper',
+                    vehicle: 'Falcon Heavy',
+                    launchDate: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString(),
+                    launchSite: 'Kennedy Space Center',
+                    status: 'scheduled'
+                },
+                {
+                    id: 'sls-artemis-2',
+                    mission: 'Artemis II',
+                    vehicle: 'Space Launch System',
+                    launchDate: new Date(Date.now() + 180 * 24 * 60 * 60 * 1000).toISOString(),
+                    launchSite: 'Kennedy Space Center',
+                    status: 'in-preparation'
+                }
+            ];
+        } catch (error) {
+            console.error('Error collecting launch data:', error);
+        }
+    }
+    
+    getLatestTelemetry() {
+        return this.telemetryData;
+    }
+    
+    getMissionData() {
+        return this.missionData;
+    }
+}
+
+// Mission Controller Service
+class MissionController {
+    constructor() {
+        this.currentStatus = {
+            overallStatus: 'nominal',
+            activeMissions: 0,
+            alerts: [],
+            lastUpdate: new Date().toISOString()
+        };
+    }
+    
+    getCurrentStatus() {
+        return {
+            ...this.currentStatus,
+            timestamp: new Date().toISOString()
+        };
+    }
+    
+    async executeCommand(commandData) {
+        const { command, target, parameters, userId } = commandData;
+        
+        // Validate command
+        if (!this.isValidCommand(command, target)) {
+            throw new Error(`Invalid command: ${command} for target: ${target}`);
+        }
+        
+        // Log command execution
+        console.log(`Executing command: ${command} on ${target} by user ${userId}`);
+        
+        // Simulate command execution
+        const result = {
+            commandId: Date.now().toString(),
+            command,
+            target,
+            status: 'executed',
+            result: `Command ${command} executed successfully on ${target}`,
+            timestamp: new Date().toISOString()
+        };
+        
+        // Update mission status based on command
+        this.updateMissionStatus(command, target, result);
+        
+        return result;
+    }
+    
+    isValidCommand(command, target) {
+        const validCommands = {
+            'ISS': ['adjust-orbit', 'system-check', 'communication-test'],
+            'Perseverance': ['move-rover', 'drill-sample', 'camera-capture'],
+            'JWST': ['point-telescope', 'calibrate-instruments', 'data-download']
+        };
+        
+        return validCommands[target] && validCommands[target].includes(command);
+    }
+    
+    updateMissionStatus(command, target, result) {
+        // Update overall mission status based on command results
+        this.currentStatus.lastUpdate = new Date().toISOString();
+        
+        // Add alert if command failed
+        if (result.status === 'failed') {
+            this.currentStatus.alerts.push({
+                id: Date.now().toString(),
+                level: 'warning',
+                message: `Command ${command} failed on ${target}`,
+                timestamp: new Date().toISOString()
+            });
+        }
+    }
+}
+
+// Start the server
+const server = new NASAMissionControlServer();
+server.start();
+
+module.exports = {
+    NASAMissionControlServer,
+    DataCollector,
+    MissionController
+};
+                        </code></pre>
+                    </div>
+                </div>
+                
+                <div class="concept-section">
+                    <h3>⚛️ Frontend Architecture (React)</h3>
+                    <p>The React frontend provides a real-time mission control interface with live data visualization.</p>
+                    
+                    <div class="code-example">
+                        <h5>Mission Control Dashboard Components:</h5>
+                        <pre><code class="language-javascript">
+// src/App.js - Main application component
+import React, { useState, useEffect } from 'react';
+import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import { io } from 'socket.io-client';
+import './App.css';
+
+// Import components
+import Header from './components/Header';
+import Sidebar from './components/Sidebar';
+import Dashboard from './components/Dashboard';
+import TelemetryView from './components/TelemetryView';
+import MissionControl from './components/MissionControl';
+import LaunchSchedule from './components/LaunchSchedule';
+import { WebSocketProvider } from './context/WebSocketContext';
+import { MissionDataProvider } from './context/MissionDataContext';
+
+function App() {
+    const [socket, setSocket] = useState(null);
+    const [isConnected, setIsConnected] = useState(false);
+    
+    useEffect(() => {
+        // Initialize WebSocket connection
+        const newSocket = io(process.env.REACT_APP_SERVER_URL || 'http://localhost:8000');
+        
+        newSocket.on('connect', () => {
+            console.log('Connected to mission control server');
+            setIsConnected(true);
+        });
+        
+        newSocket.on('disconnect', () => {
+            console.log('Disconnected from mission control server');
+            setIsConnected(false);
+        });
+        
+        setSocket(newSocket);
+        
+        return () => {
+            newSocket.close();
+        };
+    }, []);
+    
+    return (
+        <WebSocketProvider socket={socket}>
+            <MissionDataProvider>
+                <Router>
+                    <div className="app">
+                        <Header isConnected={isConnected} />
+                        <div className="app-body">
+                            <Sidebar />
+                            <main className="main-content">
+                                <Routes>
+                                    <Route path="/" element={<Dashboard />} />
+                                    <Route path="/telemetry" element={<TelemetryView />} />
+                                    <Route path="/missions" element={<MissionControl />} />
+                                    <Route path="/launches" element={<LaunchSchedule />} />
+                                </Routes>
+                            </main>
+                        </div>
+                    </div>
+                </Router>
+            </MissionDataProvider>
+        </WebSocketProvider>
+    );
+}
+
+// src/components/Dashboard.js - Main dashboard component
+import React, { useState, useEffect, useContext } from 'react';
+import { WebSocketContext } from '../context/WebSocketContext';
+import TelemetryCard from './TelemetryCard';
+import MissionStatusCard from './MissionStatusCard';
+import AlertsPanel from './AlertsPanel';
+import LiveChart from './LiveChart';
+
+const Dashboard = () => {
+    const { socket } = useContext(WebSocketContext);
+    const [telemetryData, setTelemetryData] = useState({});
+    const [missionStatus, setMissionStatus] = useState(null);
+    const [alerts, setAlerts] = useState([]);
+    
+    useEffect(() => {
+        if (!socket) return;
+        
+        // Subscribe to real-time updates
+        socket.on('telemetry-update', (data) => {
+            setTelemetryData(prev => ({
+                ...prev,
+                [data.spacecraftId]: data.data
+            }));
+        });
+        
+        socket.on('mission-status-update', (status) => {
+            setMissionStatus(status);
+        });
+        
+        socket.on('alert', (alert) => {
+            setAlerts(prev => [alert, ...prev.slice(0, 9)]); // Keep last 10 alerts
+        });
+        
+        // Subscribe to all spacecraft telemetry
+        ['ISS', 'Perseverance', 'Ingenuity', 'JWST'].forEach(spacecraft => {
+            socket.emit('subscribe-telemetry', spacecraft);
+        });
+        
+        return () => {
+            socket.off('telemetry-update');
+            socket.off('mission-status-update');
+            socket.off('alert');
+        };
+    }, [socket]);
+    
+    return (
+        <div className="dashboard">
+            <div className="dashboard-header">
+                <h1>NASA Mission Control Dashboard</h1>
+                <div className="status-indicator">
+                    <span className={`status-dot ${missionStatus?.overallStatus || 'unknown'}`}></span>
+                    <span>System Status: {missionStatus?.overallStatus || 'Unknown'}</span>
+                </div>
+            </div>
+            
+            <div className="dashboard-grid">
+                {/* Mission Status Overview */}
+                <div className="grid-item span-2">
+                    <MissionStatusCard status={missionStatus} />
+                </div>
+                
+                {/* Alerts Panel */}
+                <div className="grid-item">
+                    <AlertsPanel alerts={alerts} />
+                </div>
+                
+                {/* Spacecraft Telemetry Cards */}
+                {Object.entries(telemetryData).map(([spacecraft, data]) => (
+                    <div key={spacecraft} className="grid-item">
+                        <TelemetryCard 
+                            spacecraft={spacecraft} 
+                            data={data}
+                            onCommand={(command) => handleCommand(spacecraft, command)}
+                        />
+                    </div>
+                ))}
+                
+                {/* Live Data Charts */}
+                <div className="grid-item span-3">
+                    <LiveChart 
+                        title="System Performance"
+                        data={telemetryData}
+                        type="line"
+                    />
+                </div>
+            </div>
+        </div>
+    );
+    
+    const handleCommand = (spacecraft, command) => {
+        if (socket) {
+            socket.emit('mission-command', {
+                command: command.type,
+                target: spacecraft,
+                parameters: command.parameters,
+                userId: 'mission-controller-1' // In real app, get from auth
+            });
+        }
+    };
+};
+
+// src/components/TelemetryCard.js - Individual spacecraft telemetry
+import React, { useState } from 'react';
+import { LineChart, Line, XAxis, YAxis, ResponsiveContainer } from 'recharts';
+
+const TelemetryCard = ({ spacecraft, data, onCommand }) => {
+    const [commandMode, setCommandMode] = useState(false);
+    
+    if (!data) {
+        return (
+            <div className="telemetry-card loading">
+                <h3>{spacecraft}</h3>
+                <p>Waiting for telemetry data...</p>
+            </div>
+        );
+    }
+    
+    const getStatusColor = (value) => {
+        if (value > 80) return 'good';
+        if (value > 50) return 'warning';
+        return 'critical';
+    };
+    
+    return (
+        <div className="telemetry-card">
+            <div className="card-header">
+                <h3>{spacecraft}</h3>
+                <button 
+                    className="command-btn"
+                    onClick={() => setCommandMode(!commandMode)}
+                >
+                    {commandMode ? 'Cancel' : 'Command'}
+                </button>
+            </div>
+            
+            {commandMode ? (
+                <CommandPanel 
+                    spacecraft={spacecraft}
+                    onCommand={onCommand}
+                    onCancel={() => setCommandMode(false)}
+                />
+            ) : (
+                <div className="telemetry-data">
+                    {/* Position Data */}
+                    <div className="data-section">
+                        <h4>Position</h4>
+                        <div className="data-grid">
+                            <div className="data-item">
+                                <span>Lat:</span>
+                                <span>{data.position?.latitude?.toFixed(2)}°</span>
+                            </div>
+                            <div className="data-item">
+                                <span>Lon:</span>
+                                <span>{data.position?.longitude?.toFixed(2)}°</span>
+                            </div>
+                            <div className="data-item">
+                                <span>Alt:</span>
+                                <span>{data.position?.altitude?.toFixed(0)} km</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    {/* System Status */}
+                    <div className="data-section">
+                        <h4>Systems</h4>
+                        <div className="systems-grid">
+                            {Object.entries(data.systems || {}).map(([system, value]) => (
+                                value !== null && (
+                                    <div key={system} className="system-status">
+                                        <span className="system-name">{system}</span>
+                                        <div className="status-bar">
+                                            <div 
+                                                className={`status-fill ${getStatusColor(value)}`}
+                                                style={{ width: `${value}%` }}
+                                            ></div>
+                                        </div>
+                                        <span className="status-value">{value.toFixed(0)}%</span>
+                                    </div>
+                                )
+                            ))}
+                        </div>
+                    </div>
+                    
+                    {/* Temperature */}
+                    <div className="data-section">
+                        <h4>Temperature</h4>
+                        <div className={`temperature ${data.temperature > 0 ? 'positive' : 'negative'}`}>
+                            {data.temperature?.toFixed(1)}°C
+                        </div>
+                    </div>
+                    
+                    {/* Last Update */}
+                    <div className="last-update">
+                        Last update: {new Date(data.timestamp).toLocaleTimeString()}
+                    </div>
+                </div>
+            )}
+        </div>
+    );
+};
+
+// Command Panel Component
+const CommandPanel = ({ spacecraft, onCommand, onCancel }) => {
+    const [selectedCommand, setSelectedCommand] = useState('');
+    const [parameters, setParameters] = useState({});
+    
+    const availableCommands = {
+        'ISS': [
+            { id: 'adjust-orbit', name: 'Adjust Orbit', params: ['altitude', 'inclination'] },
+            { id: 'system-check', name: 'System Check', params: ['system'] },
+            { id: 'communication-test', name: 'Communication Test', params: [] }
+        ],
+        'Perseverance': [
+            { id: 'move-rover', name: 'Move Rover', params: ['direction', 'distance'] },
+            { id: 'drill-sample', name: 'Drill Sample', params: ['depth'] },
+            { id: 'camera-capture', name: 'Camera Capture', params: ['camera', 'resolution'] }
+        ],
+        'JWST': [
+            { id: 'point-telescope', name: 'Point Telescope', params: ['target', 'coordinates'] },
+            { id: 'calibrate-instruments', name: 'Calibrate Instruments', params: ['instrument'] },
+            { id: 'data-download', name: 'Data Download', params: ['dataset'] }
+        ]
+    };
+    
+    const commands = availableCommands[spacecraft] || [];
+    
+    const handleExecute = () => {
+        if (selectedCommand) {
+            onCommand({
+                type: selectedCommand,
+                parameters
+            });
+            onCancel();
+        }
+    };
+    
+    return (
+        <div className="command-panel">
+            <h4>Send Command to {spacecraft}</h4>
+            
+            <div className="command-select">
+                <label>Command:</label>
+                <select 
+                    value={selectedCommand} 
+                    onChange={(e) => setSelectedCommand(e.target.value)}
+                >
+                    <option value="">Select command...</option>
+                    {commands.map(cmd => (
+                        <option key={cmd.id} value={cmd.id}>{cmd.name}</option>
+                    ))}
+                </select>
+            </div>
+            
+            {selectedCommand && (
+                <div className="command-parameters">
+                    {commands.find(cmd => cmd.id === selectedCommand)?.params.map(param => (
+                        <div key={param} className="parameter-input">
+                            <label>{param}:</label>
+                            <input
+                                type="text"
+                                value={parameters[param] || ''}
+                                onChange={(e) => setParameters(prev => ({
+                                    ...prev,
+                                    [param]: e.target.value
+                                }))}
+                            />
+                        </div>
+                    ))}
+                </div>
+            )}
+            
+            <div className="command-actions">
+                <button className="execute-btn" onClick={handleExecute} disabled={!selectedCommand}>
+                    Execute Command
+                </button>
+                <button className="cancel-btn" onClick={onCancel}>
+                    Cancel
+                </button>
+            </div>
+        </div>
+    );
+};
+
+export default Dashboard;
+                        </code></pre>
+                    </div>
+                </div>
+                
+                <div class="note-taking-section">
+                    <h3>📝 Your Notes</h3>
+                    <div class="note-editor" data-topic="nasa-project">
+                        <textarea placeholder="Add your personal notes about the NASA Project..."></textarea>
+                    </div>
+                </div>
+            </div>
+            """);
+        
+        topic.setEstimatedMinutes(240);
+        topic.setSortOrder(8);
+        module.getTopics().add(topic);
+        topicRepository.save(topic);
+        
+        log.info("✅ Created Full-Stack NASA Project topic");
+    } 
+   
+    private void createTestingAPIsJestTopic(LearningModule module) {
+        Topic topic = new Topic();
+        topic.setTitle("Testing APIs with Jest & Supertest");
+        topic.setDescription("Master API testing with Jest and Supertest: unit tests, integration tests, TDD, and test automation");
+        topic.setContent("""
+            <div class="topic-content">
+                <h2>🧪 Testing APIs with Jest & Supertest</h2>
+                
+                <div class="learning-objectives">
+                    <h3>🎯 Learning Objectives</h3>
+                    <ul>
+                        <li>Master Jest testing framework for Node.js applications</li>
+                        <li>Implement comprehensive API testing with Supertest</li>
+                        <li>Practice Test-Driven Development (TDD) methodology</li>
+                        <li>Create integration tests and end-to-end test suites</li>
+                        <li>Set up continuous testing and test automation pipelines</li>
+                    </ul>
+                </div>
+                
+                <div class="concept-section">
+                    <h3>🔬 Jest Testing Framework Fundamentals</h3>
+                    <p>Jest is a comprehensive testing framework that provides everything needed for testing Node.js applications.</p>
+                    
+                    <div class="code-example">
+                        <h5>Complete Jest Testing Setup:</h5>
+                        <pre><code class="language-javascript">
+// jest.config.js - Jest configuration
+module.exports = {
+    testEnvironment: 'node',
+    collectCoverageFrom: [
+        'src/**/*.js',
+        '!src/**/*.test.js',
+        '!src/config/**',
+        '!src/migrations/**'
+    ],
+    coverageDirectory: 'coverage',
+    coverageReporters: ['text', 'lcov', 'html'],
+    testMatch: [
+        '**/__tests__/**/*.js',
+        '**/?(*.)+(spec|test).js'
+    ],
+    setupFilesAfterEnv: ['<rootDir>/tests/setup.js'],
+    testTimeout: 10000,
+    verbose: true,
+    collectCoverage: true,
+    coverageThreshold: {
+        global: {
+            branches: 80,
+            functions: 80,
+            lines: 80,
+            statements: 80
+        }
+    }
+};
+
+// tests/setup.js - Test environment setup
+const { MongoMemoryServer } = require('mongodb-memory-server');
+const mongoose = require('mongoose');
+
+let mongoServer;
+
+// Setup before all tests
+beforeAll(async () => {
+    // Start in-memory MongoDB instance
+    mongoServer = await MongoMemoryServer.create();
+    const mongoUri = mongoServer.getUri();
+    
+    await mongoose.connect(mongoUri, {
+        useNewUrlParser: true,
+        useUnifiedTopology: true
+    });
+    
+    console.log('Test database connected');
+});
+
+// Cleanup after all tests
+afterAll(async () => {
+    await mongoose.disconnect();
+    await mongoServer.stop();
+    console.log('Test database disconnected');
+});
+
+// Clear database between tests
+afterEach(async () => {
+    const collections = mongoose.connection.collections;
+    
+    for (const key in collections) {
+        const collection = collections[key];
+        await collection.deleteMany({});
+    }
+});
+
+// Global test utilities
+global.testUtils = {
+    createTestUser: (overrides = {}) => ({
+        username: 'testuser',
+        email: 'test@example.com',
+        password: 'password123',
+        ...overrides
+    }),
+    
+    createTestMission: (overrides = {}) => ({
+        name: 'Test Mission',
+        description: 'A test mission',
+        status: 'active',
+        launchDate: new Date(),
+        ...overrides
+    }),
+    
+    delay: (ms) => new Promise(resolve => setTimeout(resolve, ms))
+};
+
+// Unit Testing Examples
+// tests/unit/services/userService.test.js
+const UserService = require('../../../src/services/UserService');
+const User = require('../../../src/models/User');
+
+// Mock external dependencies
+jest.mock('../../../src/models/User');
+jest.mock('../../../src/utils/emailService');
+
+describe('UserService', () => {
+    let userService;
+    
+    beforeEach(() => {
+        userService = new UserService();
+        jest.clearAllMocks();
+    });
+    
+    describe('createUser', () => {
+        it('should create a new user with valid data', async () => {
+            // Arrange
+            const userData = testUtils.createTestUser();
+            const mockUser = { id: 1, ...userData };
+            
+            User.create.mockResolvedValue(mockUser);
+            
+            // Act
+            const result = await userService.createUser(userData);
+            
+            // Assert
+            expect(User.create).toHaveBeenCalledWith(userData);
+            expect(result).toEqual(mockUser);
+        });
+        
+        it('should throw error for duplicate email', async () => {
+            // Arrange
+            const userData = testUtils.createTestUser();
+            const duplicateError = new Error('Email already exists');
+            duplicateError.code = 11000;
+            
+            User.create.mockRejectedValue(duplicateError);
+            
+            // Act & Assert
+            await expect(userService.createUser(userData))
+                .rejects.toThrow('Email already exists');
+        });
+        
+        it('should hash password before saving', async () => {
+            // Arrange
+            const userData = testUtils.createTestUser({ password: 'plaintext' });
+            const mockUser = { id: 1, ...userData, password: 'hashed_password' };
+            
+            User.create.mockResolvedValue(mockUser);
+            
+            // Act
+            await userService.createUser(userData);
+            
+            // Assert
+            const createCall = User.create.mock.calls[0][0];
+            expect(createCall.password).not.toBe('plaintext');
+            expect(createCall.password).toMatch(/^\\$2[aby]\\$\\d+\\$/); // bcrypt hash pattern
+        });
+    });
+    
+    describe('getUserById', () => {
+        it('should return user when found', async () => {
+            // Arrange
+            const userId = 1;
+            const mockUser = { id: userId, username: 'testuser' };
+            
+            User.findById.mockResolvedValue(mockUser);
+            
+            // Act
+            const result = await userService.getUserById(userId);
+            
+            // Assert
+            expect(User.findById).toHaveBeenCalledWith(userId);
+            expect(result).toEqual(mockUser);
+        });
+        
+        it('should return null when user not found', async () => {
+            // Arrange
+            const userId = 999;
+            User.findById.mockResolvedValue(null);
+            
+            // Act
+            const result = await userService.getUserById(userId);
+            
+            // Assert
+            expect(result).toBeNull();
+        });
+        
+        it('should handle database errors', async () => {
+            // Arrange
+            const userId = 1;
+            const dbError = new Error('Database connection failed');
+            
+            User.findById.mkRejectedValue(dbError);
+            
+            // Act & Assert
+            await expect(userService.getUserById(userId))
+                .rejects.toThrow('Database connection failed');
+        });
+    });
+    
+    describe('updateUser', () => {
+        it('should update user with valid data', async () => {
+            // Arrange
+            const userId = 1;
+            const updateData = { username: 'newusername' };
+            const mockUpdatedUser = { id: userId, ...updateData };
+            
+            User.findByIdAndUpdate.mockResolvedValue(mockUpdatedUser);
+            
+            // Act
+            const result = await userService.updateUser(userId, updateData);
+            
+            // Assert
+            expect(User.findByIdAndUpdate).toHaveBeenCalledWith(
+                userId, 
+                updateData, 
+                { new: true, runValidators: true }
+            );
+            expect(result).toEqual(mockUpdatedUser);
+        });
+        
+        it('should not allow updating sensitive fields', async () => {
+            // Arrange
+            const userId = 1;
+            const updateData = { 
+                username: 'newusername',
+                password: 'newpassword',
+                role: 'admin' // Should be filtered out
+            };
+            
+            // Act
+            await userService.updateUser(userId, updateData);
+            
+            // Assert
+            const updateCall = User.findByIdAndUpdate.mock.calls[0][1];
+            expect(updateCall).not.toHaveProperty('role');
+            expect(updateCall).toHaveProperty('username');
+        });
+    });
+});
+
+// Integration Testing with Supertest
+// tests/integration/api/users.test.js
+const request = require('supertest');
+const app = require('../../../src/app');
+const User = require('../../../src/models/User');
+
+describe('Users API Integration Tests', () => {
+    describe('POST /api/users', () => {
+        it('should create a new user with valid data', async () => {
+            // Arrange
+            const userData = testUtils.createTestUser();
+            
+            // Act
+            const response = await request(app)
+                .post('/api/users')
+                .send(userData)
+                .expect(201);
+            
+            // Assert
+            expect(response.body).toHaveProperty('id');
+            expect(response.body.username).toBe(userData.username);
+            expect(response.body.email).toBe(userData.email);
+            expect(response.body).not.toHaveProperty('password'); // Should not return password
+            
+            // Verify user was saved to database
+            const savedUser = await User.findById(response.body.id);
+            expect(savedUser).toBeTruthy();
+            expect(savedUser.username).toBe(userData.username);
+        });
+        
+        it('should return 400 for invalid email format', async () => {
+            // Arrange
+            const userData = testUtils.createTestUser({ email: 'invalid-email' });
+            
+            // Act
+            const response = await request(app)
+                .post('/api/users')
+                .send(userData)
+                .expect(400);
+            
+            // Assert
+            expect(response.body).toHaveProperty('error');
+            expect(response.body.error).toContain('email');
+        });
+        
+        it('should return 409 for duplicate email', async () => {
+            // Arrange
+            const userData = testUtils.createTestUser();
+            
+            // Create first user
+            await request(app)
+                .post('/api/users')
+                .send(userData)
+                .expect(201);
+            
+            // Act - Try to create duplicate
+            const response = await request(app)
+                .post('/api/users')
+                .send(userData)
+                .expect(409);
+            
+            // Assert
+            expect(response.body).toHaveProperty('error');
+            expect(response.body.error).toContain('already exists');
+        });
+        
+        it('should validate required fields', async () => {
+            // Arrange
+            const incompleteData = { username: 'testuser' }; // Missing email and password
+            
+            // Act
+            const response = await request(app)
+                .post('/api/users')
+                .send(incompleteData)
+                .expect(400);
+            
+            // Assert
+            expect(response.body).toHaveProperty('errors');
+            expect(response.body.errors).toContain('email is required');
+            expect(response.body.errors).toContain('password is required');
+        });
+    });
+    
+    describe('GET /api/users/:id', () => {
+        let testUser;
+        
+        beforeEach(async () => {
+            // Create test user
+            const userData = testUtils.createTestUser();
+            testUser = await User.create(userData);
+        });
+        
+        it('should return user by id', async () => {
+            // Act
+            const response = await request(app)
+                .get(`/api/users/${testUser.id}`)
+                .expect(200);
+            
+            // Assert
+            expect(response.body.id).toBe(testUser.id.toString());
+            expect(response.body.username).toBe(testUser.username);
+            expect(response.body).not.toHaveProperty('password');
+        });
+        
+        it('should return 404 for non-existent user', async () => {
+            // Act
+            const response = await request(app)
+                .get('/api/users/999999')
+                .expect(404);
+            
+            // Assert
+            expect(response.body).toHaveProperty('error');
+            expect(response.body.error).toContain('not found');
+        });
+        
+        it('should return 400 for invalid id format', async () => {
+            // Act
+            const response = await request(app)
+                .get('/api/users/invalid-id')
+                .expect(400);
+            
+            // Assert
+            expect(response.body).toHaveProperty('error');
+            expect(response.body.error).toContain('Invalid ID');
+        });
+    });
+    
+    describe('PUT /api/users/:id', () => {
+        let testUser;
+        
+        beforeEach(async () => {
+            const userData = testUtils.createTestUser();
+            testUser = await User.create(userData);
+        });
+        
+        it('should update user with valid data', async () => {
+            // Arrange
+            const updateData = { username: 'updateduser' };
+            
+            // Act
+            const response = await request(app)
+                .put(`/api/users/${testUser.id}`)
+                .send(updateData)
+                .expect(200);
+            
+            // Assert
+            expect(response.body.username).toBe(updateData.username);
+            
+            // Verify in database
+            const updatedUser = await User.findById(testUser.id);
+            expect(updatedUser.username).toBe(updateData.username);
+        });
+        
+        it('should not allow updating to duplicate email', async () => {
+            // Arrange
+            const otherUser = await User.create(testUtils.createTestUser({
+                email: 'other@example.com',
+                username: 'otheruser'
+            }));
+            
+            // Act
+            const response = await request(app)
+                .put(`/api/users/${testUser.id}`)
+                .send({ email: otherUser.email })
+                .expect(409);
+            
+            // Assert
+            expect(response.body).toHaveProperty('error');
+        });
+    });
+    
+    describe('DELETE /api/users/:id', () => {
+        let testUser;
+        
+        beforeEach(async () => {
+            const userData = testUtils.createTestUser();
+            testUser = await User.create(userData);
+        });
+        
+        it('should delete user by id', async () => {
+            // Act
+            await request(app)
+                .delete(`/api/users/${testUser.id}`)
+                .expect(204);
+            
+            // Assert - User should be deleted from database
+            const deletedUser = await User.findById(testUser.id);
+            expect(deletedUser).toBeNull();
+        });
+        
+        it('should return 404 when deleting non-existent user', async () => {
+            // Act
+            const response = await request(app)
+                .delete('/api/users/999999')
+                .expect(404);
+            
+            // Assert
+            expect(response.body).toHaveProperty('error');
+        });
+    });
+});
+
+// Test-Driven Development (TDD) Example
+// tests/tdd/missionService.test.js
+const MissionService = require('../../../src/services/MissionService');
+
+describe('MissionService - TDD Example', () => {
+    let missionService;
+    
+    beforeEach(() => {
+        missionService = new MissionService();
+    });
+    
+    // RED: Write failing test first
+    describe('calculateMissionDuration', () => {
+        it('should calculate duration between launch and landing dates', () => {
+            // Arrange
+            const launchDate = new Date('2024-01-01');
+            const landingDate = new Date('2024-01-15');
+            
+            // Act & Assert - This will fail initially (RED)
+            expect(() => {
+                missionService.calculateMissionDuration(launchDate, landingDate);
+            }).not.toThrow();
+        });
+        
+        it('should return duration in days', () => {
+            // Arrange
+            const launchDate = new Date('2024-01-01');
+            const landingDate = new Date('2024-01-15');
+            const expectedDuration = 14; // days
+            
+            // Act
+            const duration = missionService.calculateMissionDuration(launchDate, landingDate);
+            
+            // Assert
+            expect(duration).toBe(expectedDuration);
+        });
+        
+        it('should handle same-day missions', () => {
+            // Arrange
+            const sameDate = new Date('2024-01-01');
+            
+            // Act
+            const duration = missionService.calculateMissionDuration(sameDate, sameDate);
+            
+            // Assert
+            expect(duration).toBe(0);
+        });
+        
+        it('should throw error for invalid date order', () => {
+            // Arrange
+            const launchDate = new Date('2024-01-15');
+            const landingDate = new Date('2024-01-01'); // Earlier than launch
+            
+            // Act & Assert
+            expect(() => {
+                missionService.calculateMissionDuration(launchDate, landingDate);
+            }).toThrow('Landing date cannot be before launch date');
+        });
+    });
+    
+    // GREEN: Implement minimal code to pass tests
+    // REFACTOR: Improve code while keeping tests green
+});
+
+// Advanced Testing Patterns
+// tests/patterns/testPatterns.test.js
+describe('Advanced Testing Patterns', () => {
+    
+    // Test Doubles: Mocks, Stubs, Spies
+    describe('Test Doubles', () => {
+        it('should use mock functions', () => {
+            const mockCallback = jest.fn();
+            mockCallback.mockReturnValue(42);
+            
+            const result = mockCallback();
+            
+            expect(mockCallback).toHaveBeenCalled();
+            expect(result).toBe(42);
+        });
+        
+        it('should use spies to monitor function calls', () => {
+            const mathObject = {
+                add: (a, b) => a + b
+            };
+            
+            const addSpy = jest.spyOn(mathObject, 'add');
+            
+            const result = mathObject.add(2, 3);
+            
+            expect(addSpy).toHaveBeenCalledWith(2, 3);
+            expect(result).toBe(5);
+            
+            addSpy.mockRestore();
+        });
+    });
+    
+    // Parameterized Tests
+    describe('Parameterized Tests', () => {
+        const testCases = [
+            { input: [1, 2], expected: 3 },
+            { input: [0, 0], expected: 0 },
+            { input: [-1, 1], expected: 0 },
+            { input: [100, 200], expected: 300 }
+        ];
+        
+        testCases.forEach(({ input, expected }) => {
+            it(`should add ${input[0]} + ${input[1]} = ${expected}`, () => {
+                const result = input[0] + input[1];
+                expect(result).toBe(expected);
+            });
+        });
+    });
+    
+    // Async Testing
+    describe('Async Testing', () => {
+        it('should handle promises', async () => {
+            const asyncFunction = () => Promise.resolve('success');
+            
+            const result = await asyncFunction();
+            
+            expect(result).toBe('success');
+        });
+        
+        it('should handle promise rejections', async () => {
+            const asyncFunction = () => Promise.reject(new Error('failure'));
+            
+            await expect(asyncFunction()).rejects.toThrow('failure');
+        });
+        
+        it('should test with done callback', (done) => {
+            setTimeout(() => {
+                expect(true).toBe(true);
+                done();
+            }, 100);
+        });
+    });
+    
+    // Snapshot Testing
+    describe('Snapshot Testing', () => {
+        it('should match component snapshot', () => {
+            const component = {
+                type: 'div',
+                props: { className: 'test' },
+                children: ['Hello World']
+            };
+            
+            expect(component).toMatchSnapshot();
+        });
+    });
+});
+
+// Performance Testing
+// tests/performance/performance.test.js
+describe('Performance Tests', () => {
+    it('should complete operation within time limit', async () => {
+        const startTime = Date.now();
+        
+        // Simulate operation
+        await testUtils.delay(100);
+        
+        const endTime = Date.now();
+        const duration = endTime - startTime;
+        
+        expect(duration).toBeLessThan(200); // Should complete within 200ms
+    });
+    
+    it('should handle concurrent requests', async () => {
+        const concurrentRequests = 10;
+        const promises = [];
+        
+        for (let i = 0; i < concurrentRequests; i++) {
+            promises.push(
+                request(app)
+                    .get('/api/health')
+                    .expect(200)
+            );
+        }
+        
+        const results = await Promise.all(promises);
+        
+        expect(results).toHaveLength(concurrentRequests);
+        results.forEach(result => {
+            expect(result.status).toBe(200);
+        });
+    });
+});
+
+module.exports = {
+    // Export test utilities for reuse
+    testUtils: global.testUtils
+};
+                        </code></pre>
+                    </div>
+                </div>
+                
+                <div class="note-taking-section">
+                    <h3>📝 Your Notes</h3>
+                    <div class="note-editor" data-topic="testing-apis-jest">
+                        <textarea placeholder="Add your personal notes about Testing APIs with Jest..."></textarea>
+                    </div>
+                </div>
+            </div>
+            """);
+        
+        topic.setEstimatedMinutes(180);
+        topic.setSortOrder(9);
+        module.getTopics().add(topic);
+        topicRepository.save(topic);
+        
+        log.info("✅ Created Testing APIs with Jest & Supertest topic");
+    } 
+   
+    private void createDatabaseIntegrationTopic(LearningModule module) {
+        Topic topic = new Topic();
+        topic.setTitle("Database Integration: MongoDB & Mongoose");
+        topic.setDescription("Master MongoDB and Mongoose ODM: schema design, queries, relationships, and performance optimization");
+        topic.setContent("""
+            <div class="topic-content">
+                <h2>🗄️ Database Integration: MongoDB & Mongoose</h2>
+                
+                <div class="learning-objectives">
+                    <h3>🎯 Learning Objectives</h3>
+                    <ul>
+                        <li>Master MongoDB database operations and query optimization</li>
+                        <li>Implement Mongoose ODM with advanced schema patterns</li>
+                        <li>Design scalable database architecture and relationships</li>
+                        <li>Handle data validation, middleware, and population strategies</li>
+                        <li>Optimize performance with indexing and aggregation pipelines</li>
+                    </ul>
+                </div>
+                
+                <div class="concept-section">
+                    <h3>🏗️ MongoDB & Mongoose Setup</h3>
+                    <p>MongoDB is a NoSQL document database that pairs perfectly with Node.js for flexible, scalable applications.</p>
+                    
+                    <div class="code-example">
+                        <h5>Complete MongoDB Integration:</h5>
+                        <pre><code class="language-javascript">
+const mongoose = require('mongoose');
+const bcrypt = require('bcrypt');
+const validator = require('validator');
+
+// Database connection with advanced configuration
+class DatabaseManager {
+    constructor() {
+        this.connection = null;
+        this.isConnected = false;
+    }
+    
+    async connect(uri, options = {}) {
+        try {
+            const defaultOptions = {
+                useNewUrlParser: true,
+                useUnifiedTopology: true,
+                maxPoolSize: 10,
+                serverSelectionTimeoutMS: 5000,
+                socketTimeoutMS: 45000,
+                bufferMaxEntries: 0,
+                bufferCommands: false
+            };
+            
+            this.connection = await mongoose.connect(uri, { ...defaultOptions, ...options });
+            this.isConnected = true;
+            
+            console.log('✅ MongoDB connected successfully');
+            
+            // Connection event handlers
+            mongoose.connection.on('error', (error) => {
+                console.error('MongoDB connection error:', error);
+                this.isConnected = false;
+            });
+            
+            mongoose.connection.on('disconnected', () => {
+                console.warn('MongoDB disconnected');
+                this.isConnected = false;
+            });
+            
+            mongoose.connection.on('reconnected', () => {
+                console.log('MongoDB reconnected');
+                this.isConnected = true;
+            });
+            
+            return this.connection;
+            
+        } catch (error) {
+            console.error('MongoDB connection failed:', error);
+            throw error;
+        }
+    }
+    
+    async disconnect() {
+        if (this.connection) {
+            await mongoose.disconnect();
+            this.isConnected = false;
+            console.log('MongoDB disconnected');
+        }
+    }
+    
+    getConnectionStatus() {
+        return {
+            isConnected: this.isConnected,
+            readyState: mongoose.connection.readyState,
+            host: mongoose.connection.host,
+            port: mongoose.connection.port,
+            name: mongoose.connection.name
+        };
+    }
+}
+
+// Advanced Schema Design
+const userSchema = new mongoose.Schema({
+    username: {
+        type: String,
+        required: [true, 'Username is required'],
+        unique: true,
+        trim: true,
+        minlength: [3, 'Username must be at least 3 characters'],
+        maxlength: [30, 'Username cannot exceed 30 characters'],
+        match: [/^[a-zA-Z0-9_]+$/, 'Username can only contain letters, numbers, and underscores']
+    },
+    
+    email: {
+        type: String,
+        required: [true, 'Email is required'],
+        unique: true,
+        lowercase: true,
+        validate: {
+            validator: validator.isEmail,
+            message: 'Please provide a valid email address'
+        }
+    },
+    
+    password: {
+        type: String,
+        required: [true, 'Password is required'],
+        minlength: [8, 'Password must be at least 8 characters'],
+        select: false // Don't include in queries by default
+    },
+    
+    profile: {
+        firstName: { type: String, trim: true },
+        lastName: { type: String, trim: true },
+        avatar: { type: String },
+        bio: { type: String, maxlength: 500 },
+        location: { type: String },
+        website: { 
+            type: String,
+            validate: {
+                validator: function(v) {
+                    return !v || validator.isURL(v);
+                },
+                message: 'Please provide a valid URL'
+            }
+        }
+    },
+    
+    preferences: {
+        theme: { type: String, enum: ['light', 'dark'], default: 'light' },
+        notifications: {
+            email: { type: Boolean, default: true },
+            push: { type: Boolean, default: false },
+            sms: { type: Boolean, default: false }
+        },
+        privacy: {
+            profileVisible: { type: Boolean, default: true },
+            emailVisible: { type: Boolean, default: false }
+        }
+    },
+    
+    role: {
+        type: String,
+        enum: ['user', 'admin', 'moderator'],
+        default: 'user'
+    },
+    
+    status: {
+        type: String,
+        enum: ['active', 'inactive', 'suspended', 'pending'],
+        default: 'pending'
+    },
+    
+    loginAttempts: { type: Number, default: 0 },
+    lockUntil: Date,
+    
+    // Timestamps
+    lastLogin: Date,
+    emailVerifiedAt: Date,
+    
+}, {
+    timestamps: true, // Adds createdAt and updatedAt
+    toJSON: { 
+        virtuals: true,
+        transform: function(doc, ret) {
+            delete ret.password;
+            delete ret.__v;
+            return ret;
+        }
+    },
+    toObject: { virtuals: true }
+});
+
+// Virtual properties
+userSchema.virtual('fullName').get(function() {
+    return `${this.profile.firstName} ${this.profile.lastName}`.trim();
+});
+
+userSchema.virtual('isLocked').get(function() {
+    return !!(this.lockUntil && this.lockUntil > Date.now());
+});
+
+// Indexes for performance
+userSchema.index({ email: 1 });
+userSchema.index({ username: 1 });
+userSchema.index({ 'profile.firstName': 1, 'profile.lastName': 1 });
+userSchema.index({ createdAt: -1 });
+userSchema.index({ lastLogin: -1 });
+
+// Pre-save middleware
+userSchema.pre('save', async function(next) {
+    // Hash password if modified
+    if (this.isModified('password')) {
+        try {
+            const saltRounds = 12;
+            this.password = await bcrypt.hash(this.password, saltRounds);
+        } catch (error) {
+            return next(error);
+        }
+    }
+    
+    // Update email verification status
+    if (this.isModified('email')) {
+        this.emailVerifiedAt = null;
+    }
+    
+    next();
+});
+
+// Instance methods
+userSchema.methods.comparePassword = async function(candidatePassword) {
+    if (!this.password) return false;
+    return bcrypt.compare(candidatePassword, this.password);
+};
+
+userSchema.methods.incrementLoginAttempts = function() {
+    // If we have a previous lock that has expired, restart at 1
+    if (this.lockUntil && this.lockUntil < Date.now()) {
+        return this.updateOne({
+            $unset: { lockUntil: 1 },
+            $set: { loginAttempts: 1 }
+        });
+    }
+    
+    const updates = { $inc: { loginAttempts: 1 } };
+    
+    // If we're at max attempts and not locked, lock account
+    if (this.loginAttempts + 1 >= 5 && !this.isLocked) {
+        updates.$set = { lockUntil: Date.now() + 2 * 60 * 60 * 1000 }; // 2 hours
+    }
+    
+    return this.updateOne(updates);
+};
+
+userSchema.methods.resetLoginAttempts = function() {
+    return this.updateOne({
+        $unset: { loginAttempts: 1, lockUntil: 1 }
+    });
+};
+
+// Static methods
+userSchema.statics.findByEmail = function(email) {
+    return this.findOne({ email: email.toLowerCase() });
+};
+
+userSchema.statics.findActiveUsers = function() {
+    return this.find({ status: 'active' }).sort({ lastLogin: -1 });
+};
+
+// Create User model
+const User = mongoose.model('User', userSchema);
+
+// Mission Schema for NASA project
+const missionSchema = new mongoose.Schema({
+    name: {
+        type: String,
+        required: true,
+        unique: true,
+        trim: true
+    },
+    
+    description: {
+        type: String,
+        required: true,
+        maxlength: 1000
+    },
+    
+    type: {
+        type: String,
+        enum: ['robotic', 'crewed', 'cargo', 'science'],
+        required: true
+    },
+    
+    status: {
+        type: String,
+        enum: ['planning', 'development', 'testing', 'launched', 'active', 'completed', 'failed'],
+        default: 'planning'
+    },
+    
+    spacecraft: [{
+        name: String,
+        type: String,
+        status: String,
+        telemetry: {
+            position: {
+                latitude: Number,
+                longitude: Number,
+                altitude: Number
+            },
+            velocity: {
+                x: Number,
+                y: Number,
+                z: Number
+            },
+            systems: {
+                power: Number,
+                communications: Number,
+                propulsion: Number,
+                lifeSupport: Number
+            }
+        },
+        lastUpdate: { type: Date, default: Date.now }
+    }],
+    
+    timeline: {
+        plannedLaunch: Date,
+        actualLaunch: Date,
+        plannedEnd: Date,
+        actualEnd: Date
+    },
+    
+    budget: {
+        allocated: Number,
+        spent: Number,
+        currency: { type: String, default: 'USD' }
+    },
+    
+    team: [{
+        userId: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
+        role: String,
+        joinedAt: { type: Date, default: Date.now }
+    }],
+    
+    objectives: [String],
+    achievements: [String],
+    
+    location: {
+        target: String, // Mars, Moon, ISS, etc.
+        coordinates: {
+            latitude: Number,
+            longitude: Number
+        }
+    }
+    
+}, {
+    timestamps: true,
+    toJSON: { virtuals: true }
+});
+
+// Mission virtual properties
+missionSchema.virtual('duration').get(function() {
+    if (this.timeline.actualLaunch && this.timeline.actualEnd) {
+        return this.timeline.actualEnd - this.timeline.actualLaunch;
+    }
+    return null;
+});
+
+missionSchema.virtual('budgetUtilization').get(function() {
+    if (this.budget.allocated > 0) {
+        return (this.budget.spent / this.budget.allocated * 100).toFixed(2);
+    }
+    return 0;
+});
+
+// Mission indexes
+missionSchema.index({ status: 1 });
+missionSchema.index({ type: 1 });
+missionSchema.index({ 'timeline.plannedLaunch': 1 });
+missionSchema.index({ 'team.userId': 1 });
+
+// Mission methods
+missionSchema.methods.addTeamMember = function(userId, role) {
+    this.team.push({ userId, role });
+    return this.save();
+};
+
+missionSchema.methods.updateSpacecraftTelemetry = function(spacecraftName, telemetryData) {
+    const spacecraft = this.spacecraft.find(sc => sc.name === spacecraftName);
+    if (spacecraft) {
+        spacecraft.telemetry = { ...spacecraft.telemetry, ...telemetryData };
+        spacecraft.lastUpdate = new Date();
+        return this.save();
+    }
+    throw new Error(`Spacecraft ${spacecraftName} not found`);
+};
+
+const Mission = mongoose.model('Mission', missionSchema);
+
+// Repository Pattern Implementation
+class UserRepository {
+    async create(userData) {
+        try {
+            const user = new User(userData);
+            return await user.save();
+        } catch (error) {
+            if (error.code === 11000) {
+                throw new Error('Email or username already exists');
+            }
+            throw error;
+        }
+    }
+    
+    async findById(id) {
+        return User.findById(id).select('+password');
+    }
+    
+    async findByEmail(email) {
+        return User.findByEmail(email).select('+password');
+    }
+    
+    async findWithPagination(page = 1, limit = 10, filter = {}) {
+        const skip = (page - 1) * limit;
+        
+        const [users, total] = await Promise.all([
+            User.find(filter)
+                .skip(skip)
+                .limit(limit)
+                .sort({ createdAt: -1 }),
+            User.countDocuments(filter)
+        ]);
+        
+        return {
+            users,
+            pagination: {
+                page,
+                limit,
+                total,
+                pages: Math.ceil(total / limit)
+            }
+        };
+    }
+    
+    async update(id, updateData) {
+        return User.findByIdAndUpdate(
+            id, 
+            updateData, 
+            { new: true, runValidators: true }
+        );
+    }
+    
+    async delete(id) {
+        return User.findByIdAndDelete(id);
+    }
+    
+    // Advanced queries
+    async findUsersWithRecentActivity(days = 30) {
+        const cutoffDate = new Date();
+        cutoffDate.setDate(cutoffDate.getDate() - days);
+        
+        return User.find({
+            lastLogin: { $gte: cutoffDate },
+            status: 'active'
+        }).sort({ lastLogin: -1 });
+    }
+    
+    async getUserStatistics() {
+        return User.aggregate([
+            {
+                $group: {
+                    _id: '$status',
+                    count: { $sum: 1 },
+                    avgLoginAttempts: { $avg: '$loginAttempts' }
+                }
+            },
+            {
+                $sort: { count: -1 }
+            }
+        ]);
+    }
+}
+
+// Service Layer with Business Logic
+class UserService {
+    constructor() {
+        this.userRepository = new UserRepository();
+    }
+    
+    async createUser(userData) {
+        // Validate business rules
+        await this.validateUserData(userData);
+        
+        // Create user
+        const user = await this.userRepository.create(userData);
+        
+        // Send welcome email (async, don't wait)
+        this.sendWelcomeEmail(user.email).catch(error => {
+            console.error('Failed to send welcome email:', error);
+        });
+        
+        return user;
+    }
+    
+    async authenticateUser(email, password) {
+        const user = await this.userRepository.findByEmail(email);
+        
+        if (!user) {
+            throw new Error('Invalid credentials');
+        }
+        
+        if (user.isLocked) {
+            throw new Error('Account is temporarily locked');
+        }
+        
+        const isValidPassword = await user.comparePassword(password);
+        
+        if (!isValidPassword) {
+            await user.incrementLoginAttempts();
+            throw new Error('Invalid credentials');
+        }
+        
+        // Reset login attempts on successful login
+        if (user.loginAttempts > 0) {
+            await user.resetLoginAttempts();
+        }
+        
+        // Update last login
+        user.lastLogin = new Date();
+        await user.save();
+        
+        return user;
+    }
+    
+    async validateUserData(userData) {
+        // Custom business validation
+        if (userData.username && userData.username.includes('admin')) {
+            throw new Error('Username cannot contain "admin"');
+        }
+        
+        // Check for disposable email domains
+        const disposableDomains = ['tempmail.com', '10minutemail.com'];
+        const emailDomain = userData.email.split('@')[1];
+        
+        if (disposableDomains.includes(emailDomain)) {
+            throw new Error('Disposable email addresses are not allowed');
+        }
+    }
+    
+    async sendWelcomeEmail(email) {
+        // Email service integration
+        console.log(`Sending welcome email to ${email}`);
+        // Implementation would integrate with email service
+    }
+}
+
+// Advanced Mongoose Features
+class AdvancedMongoosePatterns {
+    
+    // Aggregation Pipeline Examples
+    static async getUserEngagementStats() {
+        return User.aggregate([
+            // Match active users
+            { $match: { status: 'active' } },
+            
+            // Add computed fields
+            {
+                $addFields: {
+                    daysSinceLastLogin: {
+                        $divide: [
+                            { $subtract: [new Date(), '$lastLogin'] },
+                            1000 * 60 * 60 * 24
+                        ]
+                    }
+                }
+            },
+            
+            // Group by engagement level
+            {
+                $group: {
+                    _id: {
+                        $switch: {
+                            branches: [
+                                { case: { $lte: ['$daysSinceLastLogin', 1] }, then: 'daily' },
+                                { case: { $lte: ['$daysSinceLastLogin', 7] }, then: 'weekly' },
+                                { case: { $lte: ['$daysSinceLastLogin', 30] }, then: 'monthly' }
+                            ],
+                            default: 'inactive'
+                        }
+                    },
+                    count: { $sum: 1 },
+                    avgLoginAttempts: { $avg: '$loginAttempts' },
+                    users: { $push: { id: '$_id', username: '$username' } }
+                }
+            },
+            
+            // Sort by count
+            { $sort: { count: -1 } }
+        ]);
+    }
+    
+    // Population with advanced options
+    static async getMissionsWithTeamDetails() {
+        return Mission.find({ status: 'active' })
+            .populate({
+                path: 'team.userId',
+                select: 'username email profile.firstName profile.lastName',
+                match: { status: 'active' }
+            })
+            .populate({
+                path: 'createdBy',
+                select: 'username'
+            })
+            .lean(); // Return plain JavaScript objects for better performance
+    }
+    
+    // Transaction handling
+    static async transferMissionOwnership(fromUserId, toUserId, missionId) {
+        const session = await mongoose.startSession();
+        
+        try {
+            await session.withTransaction(async () => {
+                // Remove from old owner
+                await User.findByIdAndUpdate(
+                    fromUserId,
+                    { $pull: { ownedMissions: missionId } },
+                    { session }
+                );
+                
+                // Add to new owner
+                await User.findByIdAndUpdate(
+                    toUserId,
+                    { $push: { ownedMissions: missionId } },
+                    { session }
+                );
+                
+                // Update mission
+                await Mission.findByIdAndUpdate(
+                    missionId,
+                    { 
+                        owner: toUserId,
+                        transferredAt: new Date()
+                    },
+                    { session }
+                );
+            });
+            
+            console.log('Mission ownership transferred successfully');
+            
+        } catch (error) {
+            console.error('Mission transfer failed:', error);
+            throw error;
+        } finally {
+            await session.endSession();
+        }
+    }
+    
+    // Change streams for real-time updates
+    static setupChangeStreams() {
+        const userChangeStream = User.watch();
+        
+        userChangeStream.on('change', (change) => {
+            console.log('User collection changed:', change.operationType);
+            
+            switch (change.operationType) {
+                case 'insert':
+                    console.log('New user created:', change.fullDocument.username);
+                    break;
+                case 'update':
+                    console.log('User updated:', change.documentKey._id);
+                    break;
+                case 'delete':
+                    console.log('User deleted:', change.documentKey._id);
+                    break;
+            }
+        });
+        
+        return userChangeStream;
+    }
+}
+
+// Usage Examples and Best Practices
+async function demonstrateMongoDBIntegration() {
+    const dbManager = new DatabaseManager();
+    const userService = new UserService();
+    
+    try {
+        // Connect to database
+        await dbManager.connect(process.env.MONGODB_URI || 'mongodb://localhost:27017/nasa_mission_control');
+        
+        // Create test user
+        const userData = {
+            username: 'astronaut1',
+            email: 'astronaut@nasa.gov',
+            password: 'securepassword123',
+            profile: {
+                firstName: 'Neil',
+                lastName: 'Armstrong',
+                bio: 'First person to walk on the Moon'
+            },
+            role: 'admin'
+        };
+        
+        const user = await userService.createUser(userData);
+        console.log('✅ User created:', user.username);
+        
+        // Authenticate user
+        const authenticatedUser = await userService.authenticateUser(userData.email, userData.password);
+        console.log('✅ User authenticated:', authenticatedUser.username);
+        
+        // Get user statistics
+        const stats = await AdvancedMongoosePatterns.getUserEngagementStats();
+        console.log('📊 User engagement stats:', stats);
+        
+        // Setup change streams
+        const changeStream = AdvancedMongoosePatterns.setupChangeStreams();
+        
+        // Cleanup
+        setTimeout(() => {
+            changeStream.close();
+        }, 10000);
+        
+    } catch (error) {
+        console.error('Database integration demo failed:', error);
+    }
+}
+
+module.exports = {
+    DatabaseManager,
+    User,
+    Mission,
+    UserRepository,
+    UserService,
+    AdvancedMongoosePatterns,
+    demonstrateMongoDBIntegration
+};
+
+// Run demonstration
+if (require.main === module) {
+    demonstrateMongoDBIntegration();
+}
+                        </code></pre>
+                    </div>
+                </div>
+                
+                <div class="note-taking-section">
+                    <h3>📝 Your Notes</h3>
+                    <div class="note-editor" data-topic="database-integration">
+                        <textarea placeholder="Add your personal notes about Database Integration..."></textarea>
+                    </div>
+                </div>
+            </div>
+            """);
+        
+        topic.setEstimatedMinutes(200);
+        topic.setSortOrder(10);
+        module.getTopics().add(topic);
+        topicRepository.save(topic);
+        
+        log.info("✅ Created Database Integration: MongoDB & Mongoose topic");
     }
