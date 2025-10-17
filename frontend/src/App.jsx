@@ -17,6 +17,7 @@ import CodePlayground from './pages/CodePlayground'
 import Progress from './pages/Progress'
 import Notes from './pages/Notes'
 import Profile from './pages/Profile'
+import NodeJSShowcase from './pages/NodeJSShowcase'
 
 // Test Component
 import TestComponent from './components/TestComponent'
@@ -115,6 +116,8 @@ function App() {
                   <Route path="/test" element={<TestComponent />} />
                   <Route path="/learning-path" element={<LearningPath />} />
                   <Route path="/modules/:moduleId" element={<ModuleDetail />} />
+                  <Route path="/modules/nodejs" element={<ModuleDetail />} />
+                  <Route path="/nodejs-showcase" element={<NodeJSShowcase />} />
                   <Route path="/modules/java" element={<ModuleDetail />} />
                   <Route path="/modules/spring" element={<ModuleDetail />} />
                   <Route path="/modules/react" element={<ModuleDetail />} />
