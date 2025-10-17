@@ -1,0 +1,186 @@
+/**
+ * AWS Console Sidebar Override - Clean Professional Design
+ * 
+ * This file ensures the modern AWS Console design is applied
+ * and removes any conflicting styles from other CSS files
+ */
+
+/* ===== FORCE CLEAN AWS CONSOLE DESIGN ===== */
+.aws-console-sidebar,
+.aws-console-sidebar.enhanced,
+.aws-console-sidebar.enhanced.glow-effects {
+  /* Remove any background colors that might be pale yellow */
+  background: var(--aws-bg-primary, #ffffff) !important;
+  border-right: 1px solid var(--aws-border-color, #d5dbdb) !important;
+  box-shadow: var(--aws-shadow, 0 2px 8px rgba(0, 0, 0, 0.1)) !important;
+  
+  /* Remove any unwanted transforms or animations */
+  backdrop-filter: none !important;
+  filter: none !important;
+}
+
+/* ===== CLEAN NAVIGATION ITEMS ===== */
+.aws-console-sidebar .nav-item,
+.aws-console-sidebar.enhanced .nav-item,
+.aws-console-sidebar.enhanced.glow-effects .nav-item {
+  /* Remove pale yellow or any unwanted background colors */
+  background: transparent !important;
+  color: var(--aws-text-primary, #16191f) !important;
+  
+  /* Clean borders and spacing */
+  border: none !important;
+  border-left: 3px solid transparent !important;
+  border-radius: 0 !important;
+  margin: 0 !important;
+  
+  /* Remove any unwanted effects */
+  box-shadow: none !important;
+  text-shadow: none !important;
+  filter: none !important;
+}
+
+.aws-console-sidebar .nav-item:hover,
+.aws-console-sidebar.enhanced .nav-item:hover,
+.aws-console-sidebar.enhanced.glow-effects .nav-item:hover {
+  background: var(--aws-hover-bg, #f2f3f3) !important;
+  color: var(--aws-text-primary, #16191f) !important;
+  
+  /* Clean hover effects */
+  box-shadow: none !important;
+  text-shadow: none !important;
+  filter: none !important;
+}
+
+.aws-console-sidebar .nav-item.active,
+.aws-console-sidebar.enhanced .nav-item.active,
+.aws-console-sidebar.enhanced.glow-effects .nav-item.active {
+  background: var(--aws-blue-light, #e7f3ff) !important;
+  color: var(--aws-blue-primary, #0073bb) !important;
+  border-left-color: var(--aws-blue-primary, #0073bb) !important;
+  
+  /* Clean active state */
+  box-shadow: none !important;
+  text-shadow: none !important;
+  filter: none !important;
+}
+
+/* ===== MODERN CLOSE BUTTON OVERRIDE ===== */
+.aws-console-sidebar .sidebar-close-btn,
+.aws-console-sidebar.enhanced .sidebar-close-btn,
+.aws-console-sidebar.enhanced.glow-effects .sidebar-close-btn {
+  /* Remove red colors and modernize */
+  background: transparent !important;
+  border: 1px solid var(--aws-border-color, #d5dbdb) !important;
+  color: var(--aws-text-secondary, #414d5c) !important;
+  border-radius: 6px !important;
+  
+  /* Remove unwanted effects */
+  box-shadow: none !important;
+  text-shadow: none !important;
+  filter: none !important;
+}
+
+.aws-console-sidebar .sidebar-close-btn:hover,
+.aws-console-sidebar.enhanced .sidebar-close-btn:hover,
+.aws-console-sidebar.enhanced.glow-effects .sidebar-close-btn:hover {
+  background: var(--aws-hover-bg, #f2f3f3) !important;
+  border-color: var(--aws-blue-primary, #0073bb) !important;
+  color: var(--aws-blue-primary, #0073bb) !important;
+  
+  /* Modern hover effect */
+  box-shadow: 0 2px 8px rgba(0, 115, 187, 0.15) !important;
+  text-shadow: none !important;
+  filter: none !important;
+}
+
+/* ===== CLEAN SECTION TITLES ===== */
+.aws-console-sidebar .nav-section-title,
+.aws-console-sidebar.enhanced .nav-section-title,
+.aws-console-sidebar.enhanced.glow-effects .nav-section-title {
+  color: var(--aws-text-muted, #687078) !important;
+  
+  /* Remove unwanted effects */
+  background: transparent !important;
+  text-shadow: none !important;
+  filter: none !important;
+}
+
+/* ===== CLEAN BRAND ELEMENTS ===== */
+.aws-console-sidebar .sidebar-brand .brand-icon,
+.aws-console-sidebar.enhanced .sidebar-brand .brand-icon,
+.aws-console-sidebar.enhanced.glow-effects .sidebar-brand .brand-icon {
+  color: var(--aws-text-primary, #16191f) !important;
+  
+  /* Remove unwanted effects */
+  text-shadow: none !important;
+  filter: none !important;
+}
+
+.aws-console-sidebar .sidebar-brand .brand-text,
+.aws-console-sidebar.enhanced .sidebar-brand .brand-text,
+.aws-console-sidebar.enhanced.glow-effects .sidebar-brand .brand-text {
+  color: var(--aws-text-primary, #16191f) !important;
+  
+  /* Remove unwanted effects */
+  text-shadow: none !important;
+  filter: none !important;
+}
+
+/* ===== CLEAN HEADER AND FOOTER ===== */
+.aws-console-sidebar .sidebar-header,
+.aws-console-sidebar.enhanced .sidebar-header,
+.aws-console-sidebar.enhanced.glow-effects .sidebar-header {
+  background: var(--aws-bg-secondary, #f9f9f9) !important;
+  border-bottom: 1px solid var(--aws-border-color, #d5dbdb) !important;
+  
+  /* Remove unwanted effects */
+  backdrop-filter: none !important;
+  filter: none !important;
+}
+
+.aws-console-sidebar .sidebar-footer,
+.aws-console-sidebar.enhanced .sidebar-footer,
+.aws-console-sidebar.enhanced.glow-effects .sidebar-footer {
+  background: var(--aws-bg-secondary, #f9f9f9) !important;
+  border-top: 1px solid var(--aws-border-color, #d5dbdb) !important;
+  
+  /* Remove unwanted effects */
+  backdrop-filter: none !important;
+  filter: none !important;
+}
+
+/* ===== REMOVE ALL PROBLEMATIC PSEUDO-ELEMENTS ===== */
+.aws-console-sidebar .nav-item::after,
+.aws-console-sidebar.enhanced .nav-item::after,
+.aws-console-sidebar.enhanced.glow-effects .nav-item::after {
+  display: none !important;
+}
+
+/* ===== ENSURE CLEAN ANIMATIONS ===== */
+.aws-console-sidebar * {
+  animation: none !important;
+}
+
+/* ===== REMOVE ANY YELLOW TINTS ===== */
+.aws-console-sidebar,
+.aws-console-sidebar * {
+  /* Force remove any yellow backgrounds */
+  background-color: transparent !important;
+}
+
+.aws-console-sidebar {
+  background: #ffffff !important;
+}
+
+.aws-console-sidebar .sidebar-header,
+.aws-console-sidebar .sidebar-footer {
+  background: #f9f9f9 !important;
+}
+
+.aws-console-sidebar .nav-item:hover {
+  background: #f2f3f3 !important;
+}
+
+.aws-console-sidebar .nav-item.active {
+  background: #e7f3ff !important;
+}

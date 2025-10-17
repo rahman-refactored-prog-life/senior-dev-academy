@@ -102,6 +102,7 @@ public class LearningModule {
         DESIGN_PATTERNS("Design Patterns"),
         
         // Database Learning Modules
+        DATABASE_SYSTEMS("Database Systems"),
         SQL_FUNDAMENTALS("SQL Fundamentals"),
         ADVANCED_SQL("Advanced SQL"),
         DATABASE_DESIGN("Database Design & Normalization"),

@@ -215,6 +215,7 @@ public class InterviewQuestion {
         MICROSERVICES("Microservices"),
         
         // Database Categories
+        DATABASE("Database"),
         SQL_FUNDAMENTALS("SQL Fundamentals"),
         ADVANCED_SQL("Advanced SQL"),
         DATABASE_DESIGN("Database Design"),

@@ -1,0 +1,471 @@
+/* Component-specific styles */
+
+/* ===== LOADING SPINNER ===== */
+.loading-spinner-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 200px;
+  gap: var(--space-4);
+}
+
+.loading-spinner {
+  position: relative;
+  display: inline-block;
+}
+
+.spinner-ring {
+  position: absolute;
+  border: 2px solid transparent;
+  border-top: 2px solid var(--color-primary);
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+.spinner-ring:nth-child(1) {
+  width: 100%;
+  height: 100%;
+  animation-delay: 0s;
+}
+
+.spinner-ring:nth-child(2) {
+  width: 80%;
+  height: 80%;
+  top: 10%;
+  left: 10%;
+  animation-delay: -0.1s;
+  border-top-color: var(--aws-orange-light);
+}
+
+.spinner-ring:nth-child(3) {
+  width: 60%;
+  height: 60%;
+  top: 20%;
+  left: 20%;
+  animation-delay: -0.2s;
+  border-top-color: var(--aws-blue-light);
+}
+
+.spinner-ring:nth-child(4) {
+  width: 40%;
+  height: 40%;
+  top: 30%;
+  left: 30%;
+  animation-delay: -0.3s;
+  border-top-color: var(--color-primary);
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+.loading-text {
+  font-size: var(--font-size-sm);
+  color: var(--color-text-muted);
+  margin: 0;
+}
+
+/* ===== SIDEBAR STYLES ===== */
+.sidebar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: var(--sidebar-width);
+  height: 100vh;
+  background: linear-gradient(180deg, #1e293b 0%, #0f172a 100%);
+  border-right: 2px solid transparent;
+  border-image: linear-gradient(180deg, rgba(96, 165, 250, 0.3), rgba(139, 92, 246, 0.3)) 1;
+  box-shadow: 
+    0 25px 50px rgba(0, 0, 0, 0.25),
+    inset -1px 0 0 rgba(96, 165, 250, 0.1);
+  z-index: 1060;
+  transform: translateX(-100%);
+  transition: all 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  pointer-events: auto;
+  backdrop-filter: blur(20px);
+  position: relative;
+}
+
+/* Add a subtle glow to the entire sidebar */
+.sidebar::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  right: -4px;
+  width: 4px;
+  height: 100%;
+  background: linear-gradient(180deg, 
+    rgba(96, 165, 250, 0.4) 0%,
+    rgba(139, 92, 246, 0.4) 50%,
+    rgba(6, 182, 212, 0.4) 100%);
+  opacity: 0.6;
+  filter: blur(2px);
+}
+
+.sidebar.open {
+  transform: translateX(0);
+}
+
+.sidebar-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: var(--space-4) var(--space-6);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  background: rgba(255, 255, 255, 0.05);
+  backdrop-filter: blur(10px);
+}
+
+.sidebar-brand {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+}
+
+.sidebar-brand .brand-icon {
+  color: #60a5fa;
+  filter: drop-shadow(0 0 12px rgba(96, 165, 250, 0.6));
+  transition: all 0.3s ease;
+}
+
+.sidebar-brand:hover .brand-icon {
+  color: #8b5cf6;
+  filter: drop-shadow(0 0 20px rgba(139, 92, 246, 0.8));
+  transform: scale(1.1) rotate(5deg);
+}
+
+.sidebar-brand .brand-text {
+  font-size: var(--font-size-lg);
+  font-weight: var(--font-weight-semibold);
+  color: #f8fafc;
+  text-shadow: 0 0 15px rgba(248, 250, 252, 0.4);
+  transition: all 0.3s ease;
+}
+
+.sidebar-brand:hover .brand-text {
+  color: #60a5fa;
+  text-shadow: 0 0 20px rgba(96, 165, 250, 0.6);
+}
+
+.sidebar-close-btn {
+  display: flex !important;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: var(--radius-lg);
+  color: #e2e8f0;
+  cursor: pointer;
+  transition: all 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  flex-shrink: 0;
+  backdrop-filter: blur(10px);
+  position: relative;
+  overflow: hidden;
+}
+
+.sidebar-close-btn::before {
+  content: '';
+  position: absolute;
+  top: -2px;
+  left: -2px;
+  right: -2px;
+  bottom: -2px;
+  background: linear-gradient(45deg, 
+    #60a5fa, #8b5cf6, #06b6d4, #60a5fa);
+  background-size: 300% 300%;
+  border-radius: var(--radius-lg);
+  opacity: 0;
+  z-index: -1;
+  transition: opacity 0.3s ease;
+  animation: aws-close-btn-glow 2s linear infinite;
+}
+
+@keyframes aws-close-btn-glow {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+
+.sidebar-close-btn:hover::before {
+  opacity: 1;
+}
+
+.sidebar-close-btn:hover {
+  background: rgba(255, 255, 255, 0.15);
+  color: #60a5fa;
+  border-color: rgba(96, 165, 250, 0.4);
+  box-shadow: 0 0 20px rgba(96, 165, 250, 0.5);
+  transform: scale(1.1) rotate(90deg);
+}
+
+.sidebar-nav {
+  flex: 1;
+  padding: var(--space-4) 0;
+}
+
+.nav-section {
+  margin-bottom: var(--space-6);
+}
+
+.nav-section-title {
+  padding: 0 var(--space-6) var(--space-2) var(--space-6);
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-semibold);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: #94a3b8;
+  text-shadow: 0 0 8px rgba(148, 163, 184, 0.4);
+  position: relative;
+}
+
+.nav-section-title::after {
+  content: '';
+  position: absolute;
+  bottom: -4px;
+  left: var(--space-6);
+  right: var(--space-6);
+  height: 1px;
+  background: linear-gradient(90deg, 
+    transparent, 
+    rgba(148, 163, 184, 0.3), 
+    transparent);
+}
+
+.nav-items {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.nav-item {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  padding: var(--space-3) var(--space-6);
+  margin: 0 var(--space-3);
+  color: #cbd5e1;
+  text-decoration: none;
+  transition: all 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  border-radius: var(--radius-lg);
+  position: relative;
+  overflow: hidden;
+  border: 1px solid transparent;
+}
+
+/* AWS-style glow effect for navigation items */
+.nav-item::before {
+  content: '';
+  position: absolute;
+  top: -1px;
+  left: -1px;
+  right: -1px;
+  bottom: -1px;
+  background: linear-gradient(45deg, 
+    #3b82f6, #8b5cf6, #06b6d4, #10b981, #3b82f6);
+  background-size: 300% 300%;
+  border-radius: var(--radius-lg);
+  opacity: 0;
+  z-index: -1;
+  transition: opacity 0.3s ease;
+  animation: aws-nav-glow 3s linear infinite;
+}
+
+@keyframes aws-nav-glow {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+
+/* Inner glow effect */
+.nav-item::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: radial-gradient(circle at center, 
+    rgba(59, 130, 246, 0.1) 0%, 
+    rgba(139, 92, 246, 0.05) 50%, 
+    transparent 70%);
+  border-radius: var(--radius-lg);
+  opacity: 0;
+  transition: opacity 0.3s ease;
+  pointer-events: none;
+}
+
+.nav-item:hover::before {
+  opacity: 1;
+}
+
+.nav-item:hover::after {
+  opacity: 1;
+}
+
+.nav-item:hover {
+  color: #f8fafc;
+  transform: translateX(6px) scale(1.02);
+  box-shadow: 
+    0 8px 25px rgba(0, 0, 0, 0.2),
+    0 0 20px rgba(59, 130, 246, 0.3);
+}
+
+.nav-item.active {
+  color: #60a5fa;
+  font-weight: var(--font-weight-medium);
+  transform: translateX(6px) scale(1.02);
+  position: relative;
+}
+
+/* Always show glow for active items */
+.nav-item.active::before {
+  opacity: 1;
+  background: linear-gradient(45deg, 
+    #60a5fa, #8b5cf6, #06b6d4, #60a5fa);
+  background-size: 200% 200%;
+  animation: aws-active-glow 2s ease-in-out infinite alternate;
+}
+
+@keyframes aws-active-glow {
+  0% { background-position: 0% 50%; }
+  100% { background-position: 100% 50%; }
+}
+
+.nav-item.active::after {
+  opacity: 1;
+  background: radial-gradient(circle at center, 
+    rgba(96, 165, 250, 0.2) 0%, 
+    rgba(139, 92, 246, 0.1) 50%, 
+    transparent 70%);
+}
+
+/* Active indicator line */
+.nav-item.active {
+  box-shadow: 
+    0 8px 25px rgba(96, 165, 250, 0.4),
+    inset 0 0 20px rgba(96, 165, 250, 0.1);
+}
+
+.nav-item-icon {
+  flex-shrink: 0;
+}
+
+.nav-item-label {
+  flex: 1;
+  font-size: var(--font-size-sm);
+}
+
+.nav-item-arrow {
+  flex-shrink: 0;
+  margin-left: auto;
+}
+
+.sidebar-footer {
+  padding: var(--space-4) var(--space-6);
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+  background: rgba(255, 255, 255, 0.03);
+  backdrop-filter: blur(10px);
+}
+
+.progress-summary h4 {
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-semibold);
+  color: #f8fafc;
+  margin: 0 0 var(--space-3) 0;
+  text-shadow: 0 0 10px rgba(248, 250, 252, 0.3);
+}
+
+.progress-item {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  margin-bottom: var(--space-2);
+  font-size: var(--font-size-xs);
+}
+
+.progress-item span:first-child {
+  flex: 1;
+  color: #94a3b8;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.progress-item .progress {
+  width: 60px;
+  height: 4px;
+}
+
+.progress-text {
+  width: 30px;
+  text-align: right;
+  color: var(--color-text-muted);
+  font-weight: var(--font-weight-medium);
+}
+
+/* ===== RESPONSIVE SIDEBAR ===== */
+@media (min-width: 1024px) {
+  .sidebar {
+    position: relative;
+    transform: translateX(0);
+    box-shadow: 
+      0 25px 50px rgba(0, 0, 0, 0.25),
+      inset -1px 0 0 rgba(96, 165, 250, 0.1);
+    border-right: 2px solid transparent;
+    border-image: linear-gradient(180deg, rgba(96, 165, 250, 0.3), rgba(139, 92, 246, 0.3)) 1;
+  }
+  
+  .sidebar-close-btn {
+    display: none;
+  }
+  
+  .main-content {
+    margin-left: var(--sidebar-width);
+  }
+  
+  .main-content.sidebar-open {
+    margin-left: var(--sidebar-width);
+  }
+}
+
+@media (max-width: 768px) {
+  .sidebar {
+    width: 100%;
+  }
+}
+
+/* ===== APP LAYOUT UPDATES ===== */
+.app-layout {
+  display: flex;
+  min-height: 100vh;
+  background-color: var(--aws-gray-50);
+  position: relative;
+}
+
+/* Remove the problematic desktop layout that was causing the 20% offset */
+@media (min-width: 1024px) {
+  .sidebar {
+    position: fixed;
+    transform: translateX(-100%);
+  }
+  
+  .sidebar.open {
+    transform: translateX(0);
+  }
+  
+  .main-content {
+    margin-left: 0;
+    width: 100%;
+  }
+  
+  .main-content.sidebar-open {
+    margin-left: 0;
+  }
+}

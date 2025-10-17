@@ -18,6 +18,9 @@ import Progress from './pages/Progress'
 import Notes from './pages/Notes'
 import Profile from './pages/Profile'
 
+// Test Component
+import TestComponent from './components/TestComponent'
+
 // Context
 import { AuthProvider } from './context/AuthContext'
 import { LearningProvider } from './context/LearningContext'
@@ -57,6 +60,8 @@ function App() {
   if (isLoading) {
     return <LoadingSpinner />
   }
+
+  console.log('App render - sidebarOpen:', sidebarOpen)
 
   return (
     <AuthProvider>
@@ -107,8 +112,15 @@ function App() {
               <main className="page-content">
                 <Routes>
                   <Route path="/" element={<Dashboard />} />
+                  <Route path="/test" element={<TestComponent />} />
                   <Route path="/learning-path" element={<LearningPath />} />
                   <Route path="/modules/:moduleId" element={<ModuleDetail />} />
+                  <Route path="/modules/java" element={<ModuleDetail />} />
+                  <Route path="/modules/spring" element={<ModuleDetail />} />
+                  <Route path="/modules/react" element={<ModuleDetail />} />
+                  <Route path="/modules/data-structures" element={<ModuleDetail />} />
+                  <Route path="/modules/algorithms" element={<ModuleDetail />} />
+                  <Route path="/modules/system-design" element={<ModuleDetail />} />
                   <Route path="/topics/:topicId" element={<TopicDetail />} />
                   <Route path="/interview-prep" element={<InterviewPrep />} />
                   <Route path="/code-playground" element={<CodePlayground />} />
@@ -119,14 +131,14 @@ function App() {
               </main>
             </div>
 
-            {/* Overlay for mobile sidebar */}
-            {sidebarOpen && (
-              <div 
-                className="sidebar-overlay"
-                onClick={closeSidebar}
-                aria-hidden="true"
-              />
-            )}
+          {/* Overlay for sidebar */}
+          {sidebarOpen && (
+            <div 
+              className="sidebar-overlay show"
+              onClick={closeSidebar}
+              aria-hidden="true"
+            />
+          )}
           </div>
         </Router>
       </LearningProvider>

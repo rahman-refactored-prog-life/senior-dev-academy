@@ -1,0 +1,425 @@
+/**
+ * AWS Console Sidebar - Modern Professional Design
+ * 
+ * Based on AWS IAM Console sidebar design from the README examples
+ * Clean white background, modern interactions, professional typography
+ */
+
+/* ===== SIDEBAR VARIABLES ===== */
+:root {
+  --sidebar-width: 280px;
+  --header-height: 64px;
+  --aws-bg-primary: #ffffff;
+  --aws-bg-secondary: #f9f9f9;
+  --aws-border-color: #d5dbdb;
+  --aws-text-primary: #16191f;
+  --aws-text-secondary: #414d5c;
+  --aws-text-muted: #687078;
+  --aws-blue-primary: #0073bb;
+  --aws-blue-light: #e7f3ff;
+  --aws-hover-bg: #f2f3f3;
+  --aws-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+/* ===== AWS CONSOLE SIDEBAR BASE ===== */
+.aws-console-sidebar {
+  position: fixed;
+  top: var(--header-height);
+  left: 0;
+  width: var(--sidebar-width);
+  height: calc(100vh - var(--header-height));
+  background: var(--aws-bg-primary);
+  border-right: 1px solid var(--aws-border-color);
+  box-shadow: var(--aws-shadow);
+  z-index: 1060;
+  transform: translateX(-100%);
+  transition: transform 0.25s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+}
+
+.aws-console-sidebar.open {
+  transform: translateX(0);
+}
+
+/* ===== SIDEBAR HEADER ===== */
+.aws-console-sidebar .sidebar-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px 20px;
+  border-bottom: 1px solid var(--aws-border-color);
+  background: var(--aws-bg-secondary);
+  min-height: 64px;
+  flex-shrink: 0;
+}
+
+.aws-console-sidebar .sidebar-brand {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.aws-console-sidebar .brand-icon {
+  color: var(--aws-text-primary);
+  width: 24px;
+  height: 24px;
+  transition: all 0.2s ease;
+}
+
+.aws-console-sidebar .brand-text {
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--aws-text-primary);
+  line-height: 1.2;
+  transition: all 0.2s ease;
+}
+
+.aws-console-sidebar .sidebar-brand:hover .brand-icon {
+  color: var(--aws-blue-primary);
+  transform: scale(1.05);
+}
+
+.aws-console-sidebar .sidebar-brand:hover .brand-text {
+  color: var(--aws-blue-primary);
+}
+
+/* ===== AWS CONSOLE NAVIGATION CLOSE BUTTON ===== */
+.aws-console-sidebar .sidebar-close-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  background: transparent;
+  border: 1px solid var(--aws-border-color);
+  border-radius: 4px;
+  color: var(--aws-text-secondary);
+  cursor: pointer;
+  transition: all 0.2s ease;
+  position: relative;
+  overflow: hidden;
+}
+
+.aws-console-sidebar .sidebar-close-btn::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: var(--aws-hover-bg);
+  opacity: 0;
+  transition: opacity 0.2s ease;
+}
+
+.aws-console-sidebar .sidebar-close-btn:hover {
+  background: var(--aws-hover-bg);
+  border-color: var(--aws-text-secondary);
+  color: var(--aws-text-primary);
+}
+
+.aws-console-sidebar .sidebar-close-btn:hover::before {
+  opacity: 1;
+}
+
+.aws-console-sidebar .sidebar-close-btn:active {
+  transform: scale(0.95);
+}
+
+/* ===== NAVIGATION SECTIONS ===== */
+.aws-console-sidebar .sidebar-nav {
+  flex: 1;
+  padding: 8px 0;
+  overflow-y: auto;
+}
+
+.aws-console-sidebar .nav-section {
+  margin-bottom: 16px;
+}
+
+.aws-console-sidebar .nav-section:last-child {
+  margin-bottom: 0;
+}
+
+.aws-console-sidebar .nav-section-title {
+  padding: 12px 20px 8px 20px;
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.8px;
+  color: var(--aws-text-muted);
+  margin: 0;
+  line-height: 1.2;
+}
+
+/* ===== NAVIGATION ITEMS ===== */
+.aws-console-sidebar .nav-items {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+}
+
+.aws-console-sidebar .nav-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 20px;
+  margin: 0;
+  color: var(--aws-text-primary);
+  text-decoration: none;
+  transition: all 0.2s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  border-radius: 0;
+  border-left: 3px solid transparent;
+  font-size: 14px;
+  font-weight: 400;
+  line-height: 1.4;
+  position: relative;
+  overflow: hidden;
+}
+
+.aws-console-sidebar .nav-item::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(90deg, 
+    rgba(0, 115, 187, 0.08) 0%, 
+    rgba(0, 115, 187, 0.02) 100%);
+  opacity: 0;
+  transition: opacity 0.2s ease;
+}
+
+.aws-console-sidebar .nav-item:hover {
+  background: var(--aws-hover-bg);
+  color: var(--aws-text-primary);
+  transform: translateX(2px);
+}
+
+.aws-console-sidebar .nav-item:hover::before {
+  opacity: 1;
+}
+
+.aws-console-sidebar .nav-item.active {
+  background: var(--aws-blue-light);
+  color: var(--aws-blue-primary);
+  border-left-color: var(--aws-blue-primary);
+  font-weight: 500;
+  transform: translateX(2px);
+}
+
+.aws-console-sidebar .nav-item.active::before {
+  opacity: 1;
+  background: linear-gradient(90deg, 
+    rgba(0, 115, 187, 0.12) 0%, 
+    rgba(0, 115, 187, 0.04) 100%);
+}
+
+.aws-console-sidebar .nav-item-icon {
+  width: 16px;
+  height: 16px;
+  color: inherit;
+  flex-shrink: 0;
+  transition: transform 0.2s ease;
+}
+
+.aws-console-sidebar .nav-item:hover .nav-item-icon {
+  transform: scale(1.1);
+}
+
+.aws-console-sidebar .nav-item-label {
+  flex: 1;
+  color: inherit;
+  font-weight: inherit;
+}
+
+.aws-console-sidebar .nav-item-arrow {
+  width: 14px;
+  height: 14px;
+  color: var(--aws-text-muted);
+  opacity: 0;
+  transition: all 0.2s ease;
+  transform: translateX(-4px);
+}
+
+.aws-console-sidebar .nav-item.active .nav-item-arrow {
+  opacity: 1;
+  color: var(--aws-blue-primary);
+  transform: translateX(0);
+}
+
+/* ===== SIDEBAR FOOTER ===== */
+.aws-console-sidebar .sidebar-footer {
+  padding: 16px 20px;
+  border-top: 1px solid var(--aws-border-color);
+  background: var(--aws-bg-secondary);
+  flex-shrink: 0;
+}
+
+.aws-console-sidebar .progress-summary h4 {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--aws-text-primary);
+  margin: 0 0 12px 0;
+  line-height: 1.3;
+}
+
+.aws-console-sidebar .progress-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 8px;
+  font-size: 11px;
+  line-height: 1.3;
+}
+
+.aws-console-sidebar .progress-item:last-child {
+  margin-bottom: 0;
+}
+
+.aws-console-sidebar .progress-item span:first-child {
+  flex: 1;
+  color: var(--aws-text-secondary);
+  font-weight: 400;
+}
+
+.aws-console-sidebar .progress-item span:last-child {
+  color: var(--aws-text-muted);
+  font-weight: 500;
+  min-width: 32px;
+  text-align: right;
+}
+
+.aws-console-sidebar .progress {
+  width: 60px;
+  height: 4px;
+  background: #e1e5e9;
+  border-radius: 2px;
+  overflow: hidden;
+}
+
+.aws-console-sidebar .progress-bar {
+  height: 100%;
+  background: linear-gradient(90deg, var(--aws-blue-primary) 0%, #4a9eff 100%);
+  border-radius: 2px;
+  transition: width 0.3s ease;
+}
+
+/* ===== SIDEBAR OVERLAY ===== */
+.sidebar-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.4);
+  z-index: 1050;
+  opacity: 0;
+  visibility: hidden;
+  transition: all 0.25s ease;
+  backdrop-filter: blur(2px);
+}
+
+.sidebar-overlay.show {
+  opacity: 1;
+  visibility: visible;
+}
+
+/* ===== RESPONSIVE DESIGN ===== */
+@media (min-width: 1024px) {
+  .aws-console-sidebar {
+    box-shadow: var(--aws-shadow);
+  }
+}
+
+@media (max-width: 1023px) {
+  .aws-console-sidebar {
+    width: 100%;
+    max-width: 320px;
+  }
+}
+
+@media (max-width: 768px) {
+  .aws-console-sidebar {
+    width: 100vw;
+    max-width: none;
+  }
+  
+  .aws-console-sidebar .sidebar-header {
+    padding: 12px 16px;
+  }
+  
+  .aws-console-sidebar .nav-item {
+    padding: 12px 16px;
+  }
+  
+  .aws-console-sidebar .nav-section-title {
+    padding: 12px 16px 8px 16px;
+  }
+}
+
+/* ===== SCROLLBAR STYLING ===== */
+.aws-console-sidebar::-webkit-scrollbar {
+  width: 6px;
+}
+
+.aws-console-sidebar::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.aws-console-sidebar::-webkit-scrollbar-thumb {
+  background: var(--aws-border-color);
+  border-radius: 3px;
+}
+
+.aws-console-sidebar::-webkit-scrollbar-thumb:hover {
+  background: var(--aws-text-muted);
+}
+
+/* ===== FOCUS STATES FOR ACCESSIBILITY ===== */
+.aws-console-sidebar .nav-item:focus {
+  outline: 2px solid var(--aws-blue-primary);
+  outline-offset: -2px;
+}
+
+.aws-console-sidebar .sidebar-close-btn:focus {
+  outline: 2px solid var(--aws-blue-primary);
+  outline-offset: 2px;
+}
+
+/* ===== LOADING STATE ===== */
+.aws-console-sidebar.loading {
+  pointer-events: none;
+}
+
+.aws-console-sidebar.loading .nav-item {
+  opacity: 0.6;
+}
+
+/* ===== SEARCH INTEGRATION (FUTURE) ===== */
+.aws-console-sidebar .sidebar-search {
+  padding: 12px 20px;
+  border-bottom: 1px solid var(--aws-border-color);
+}
+
+.aws-console-sidebar .search-input {
+  width: 100%;
+  padding: 8px 12px;
+  border: 1px solid var(--aws-border-color);
+  border-radius: 4px;
+  font-size: 14px;
+  background: var(--aws-bg-primary);
+  color: var(--aws-text-primary);
+}
+
+.aws-console-sidebar .search-input:focus {
+  outline: none;
+  border-color: var(--aws-blue-primary);
+  box-shadow: 0 0 0 2px rgba(0, 115, 187, 0.2);
+}

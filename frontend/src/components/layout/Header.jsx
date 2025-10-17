@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import { 
   Menu, 
   Search, 
@@ -28,8 +28,19 @@ const Header = ({ onToggleSidebar }) => {
   const [searchQuery, setSearchQuery] = useState('')
   const [showUserMenu, setShowUserMenu] = useState(false)
   const [showNotifications, setShowNotifications] = useState(false)
+  const [isScrolled, setIsScrolled] = useState(false)
   const { user } = useAuth()
   const { learningStats } = useLearning()
+
+  // Add scroll effect for sticky navigation
+  useEffect(() => {
+    const handleScroll = () => {
+      setIsScrolled(window.scrollY > 10)
+    }
+
+    window.addEventListener('scroll', handleScroll)
+    return () => window.removeEventListener('scroll', handleScroll)
+  }, [])
 
   const handleSearch = (e) => {
     e.preventDefault()
@@ -67,7 +78,7 @@ const Header = ({ onToggleSidebar }) => {
   const unreadCount = notifications.filter(n => n.unread).length
 
   return (
-    <header className="header">
+    <header className={`header sticky-nav ${isScrolled ? 'scrolled' : ''}`}>
       <div className="header-content">
         {/* Left Section */}
         <div className="header-left">
