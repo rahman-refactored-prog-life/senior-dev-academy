@@ -15582,8 +15582,7 @@ if (require.main === module) {
         topicRepository.save(topic);
         
         log.info("✅ Created Database Integration: MongoDB & Mongoose topic");
-    }   
- }
+    }
     
     // ==================== TOPIC 11: REST API Integration - SpaceX Project ====================
     
@@ -16200,7 +16199,7 @@ USER nodejs
 EXPOSE 3000
 
 # Health check
-HEALTHCHECK --interval=30s --timeout=3s --start-period=5s --retries=3 \\
+HEALTHCHECK --interval=30s --timeout=3s --start-period=5s --retries=3 \\\$
     CMD node healthcheck.js
 
 # Start application
@@ -16265,12 +16264,12 @@ jobs:
       
       - name: Deploy to AWS
         env:
-          AWS_ACCESS_KEY_ID: \${{ secrets.AWS_ACCESS_KEY_ID }}
-          AWS_SECRET_ACCESS_KEY: \${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          AWS_ACCESS_KEY_ID: \\\${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: \\\${{ secrets.AWS_SECRET_ACCESS_KEY }}
         run: |
-          aws ecr get-login-password --region us-east-1 | docker login --username AWS --password-stdin \${{ secrets.ECR_REGISTRY }}
-          docker build -t \${{ secrets.ECR_REGISTRY }}/spacex-tracker:latest .
-          docker push \${{ secrets.ECR_REGISTRY }}/spacex-tracker:latest
+          aws ecr get-login-password --region us-east-1 | docker login --username AWS --password-stdin \\\${{ secrets.ECR_REGISTRY }}
+          docker build -t \\\${{ secrets.ECR_REGISTRY }}/spacex-tracker:latest .
+          docker push \\\${{ secrets.ECR_REGISTRY }}/spacex-tracker:latest
           aws ecs update-service --cluster production --service spacex-tracker --force-new-deployment
                         </code></pre>
                     </div>
@@ -16509,14 +16508,14 @@ class RealTimeServer {
     
     setupSocketHandlers() {
         this.io.on('connection', (socket) => {
-            console.log(\`✅ Client connected: \${socket.id}\`);
+            console.log(\`✅ Client connected: \\${socket.id}\`);
             
             // Authentication
             socket.on('authenticate', async (token) => {
                 try {
                     const user = await this.verifyToken(token);
                     socket.user = user;
-                    socket.join(\`user:\${user.id}\`);
+                    socket.join(\`user:\\${user.id}\`);
                     socket.emit('authenticated', { user });
                 } catch (error) {
                     socket.emit('auth_error', { message: 'Invalid token' });
@@ -16526,8 +16525,8 @@ class RealTimeServer {
             
             // Join launch tracking room
             socket.on('track_launch', (launchId) => {
-                socket.join(\`launch:\${launchId}\`);
-                console.log(\`User \${socket.user.id} tracking launch \${launchId}\`);
+                socket.join(\`launch:\\${launchId}\`);
+                console.log(\`User \\${socket.user.id} tracking launch \\${launchId}\`);
             });
             
             // Real-time chat
@@ -16541,27 +16540,27 @@ class RealTimeServer {
                 };
                 
                 // Broadcast to room
-                this.io.to(\`launch:\${data.launchId}\`).emit('new_message', message);
+                this.io.to(\`launch:\\${data.launchId}\`).emit('new_message', message);
                 
                 // Store in Redis
-                await this.redis.lpush(\`messages:\${data.launchId}\`, JSON.stringify(message));
+                await this.redis.lpush(\`messages:\\${data.launchId}\`, JSON.stringify(message));
             });
             
             // Disconnect handling
             socket.on('disconnect', () => {
-                console.log(\`❌ Client disconnected: \${socket.id}\`);
+                console.log(\`❌ Client disconnected: \\${socket.id}\`);
             });
         });
     }
     
     // Broadcast launch updates
     async broadcastLaunchUpdate(launchId, update) {
-        this.io.to(\`launch:\${launchId}\`).emit('launch_update', update);
+        this.io.to(\`launch:\\${launchId}\`).emit('launch_update', update);
     }
     
     start(port = 3000) {
         this.server.listen(port, () => {
-            console.log(\`🚀 Real-time server running on port \${port}\`);
+            console.log(\`🚀 Real-time server running on port \\${port}\`);
         });
     }
 }
@@ -17088,7 +17087,7 @@ class PerformanceMonitor {
     setupObservers() {
         const obs = new PerformanceObserver((items) => {
             items.getEntries().forEach((entry) => {
-                console.log(\`\${entry.name}: \${entry.duration}ms\`);
+                console.log(\`\\${entry.name}: \\${entry.duration}ms\`);
             });
         });
         obs.observe({ entryTypes: ['measure', 'function'] });
@@ -17104,10 +17103,10 @@ class PerformanceMonitor {
     }
     
     async profileFunction(fn, name) {
-        performance.mark(\`\${name}-start\`);
+        performance.mark(\`\\${name}-start\`);
         const result = await fn();
-        performance.mark(\`\${name}-end\`);
-        performance.measure(name, \`\${name}-start\`, \`\${name}-end\`);
+        performance.mark(\`\\${name}-end\`);
+        performance.measure(name, \`\\${name}-start\`, \`\\${name}-end\`);
         return result;
     }
 }
@@ -17344,7 +17343,7 @@ const fs = require('fs');
 class ProductionDebugger {
     static captureHeapSnapshot(filename) {
         const snapshotStream = v8.writeHeapSnapshot(filename);
-        console.log(\`Heap snapshot written to \${snapshotStream}\`);
+        console.log(\`Heap snapshot written to \\${snapshotStream}\`);
         return snapshotStream;
     }
     
@@ -17367,7 +17366,7 @@ class ProductionDebugger {
         h.enable();
         
         setInterval(() => {
-            console.log(\`Event Loop Delay: \${h.mean}ms (max: \${h.max}ms)\`);
+            console.log(\`Event Loop Delay: \\${h.mean}ms (max: \\${h.max}ms)\`);
         }, 5000);
     }
 }
@@ -17474,7 +17473,7 @@ class LoadBalancer {
         setInterval(() => {
             this.servers.forEach(async (server) => {
                 try {
-                    const response = await fetch(\`\${server}/health\`);
+                    const response = await fetch(\`\\${server}/health\`);
                     this.healthStatus.set(server, response.ok);
                 } catch (error) {
                     this.healthStatus.set(server, false);
@@ -17517,3 +17516,5 @@ module.exports = { MultiLayerCache, LoadBalancer };
         
         log.info("✅ Created Scalability Patterns topic");
     }
+
+}
