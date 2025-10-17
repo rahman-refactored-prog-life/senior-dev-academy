@@ -10,7 +10,10 @@ Create a single source of truth that makes senior-level technical interviews at 
 
 ### **Backend Development**
 - **Java**: Complete zero-to-expert (fundamentals → JVM internals → performance tuning)
-- **Node.js**: Complete zero-to-expert (fundamentals → advanced patterns → microservices)
+- **Node.js**: Complete zero-to-expert mastery (EXPANDED to 25 topics)
+  - ZeroToMastery foundation with hands-on projects (NASA, Planets, Pong)
+  - FAANG Senior enhancement for L5/L6 interview readiness
+  - 700+ interview questions with production deployment patterns
 - **Databases**: Complete expert-level (SQL, NoSQL, distributed systems, optimization)
 
 ### **Frontend Development** 

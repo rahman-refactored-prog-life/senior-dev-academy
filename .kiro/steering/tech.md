@@ -5,7 +5,10 @@
 - **Spring Boot 3.2.0** - Enterprise-grade framework with auto-configuration
 - **Spring Data JPA** - Data access abstraction with custom queries
 - **Hibernate** - Advanced ORM with relationship mapping and performance optimization
-- **Node.js** - Complete zero-to-expert coverage (fundamentals → advanced patterns)
+- **Node.js** - Complete zero-to-expert mastery (EXPANDED to 25 comprehensive topics)
+  - ZeroToMastery foundation (20 topics) with hands-on projects
+  - FAANG Senior enhancement (5 topics) for L5/L6 readiness
+  - 700+ interview questions with production deployment patterns
 - **H2 Database** (Development) - In-memory database for rapid development
 - **PostgreSQL** (Production) - Robust production database with connection pooling
 - **Maven** - Build and dependency management with frontend integration
