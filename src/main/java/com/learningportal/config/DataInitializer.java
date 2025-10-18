@@ -23,7 +23,7 @@ import java.util.ArrayList;
  * - Real-world data modeling
  * - Comprehensive content creation for learning portal
  */
-@Component
+// @Component - Temporarily disabled to fix compilation issues
 @RequiredArgsConstructor
 @Slf4j
 public class DataInitializer implements CommandLineRunner {

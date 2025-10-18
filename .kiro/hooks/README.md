@@ -2,9 +2,61 @@
 
 This directory contains agent hooks that automate repetitive tasks and ensure consistency across the development workflow.
 
-## 🚀 Available Hooks
+## 🚀 Available Hooks (22 Comprehensive Automation Tools)
 
-### 1. **Session Completion Automation** 
+### **🚨 CRITICAL PRIORITY HOOKS**
+
+### 1. **Session Startup Context Loader** 🔥
+**File**: `session-startup-context-loader.md`  
+**Trigger**: Automatic at session start + Manual - say "load complete context"  
+**Purpose**: Automatically reads all critical .md files at session start for complete context
+
+**What it does**:
+- ✅ Reads all 19+ critical documentation files in correct order
+- ✅ Cross-validates information across multiple sources
+- ✅ Generates comprehensive session startup summary
+- ✅ Provides exact continuation point for development
+- ✅ Ensures zero context loss at session start
+
+**Time Saved**: 15-20 minutes of context gathering per session
+
+---
+
+### 2. **Bulletproof Session Handoff** 🛡️
+**File**: `bulletproof-session-handoff.md`  
+**Trigger**: Manual - say "end session" or "session handoff"  
+**Purpose**: Creates comprehensive session handoff ensuring zero context loss
+
+**What it does**:
+- ✅ Updates all 15+ tracking files with session information
+- ✅ Validates progress against actual implementation
+- ✅ Creates comprehensive session summary and next actions
+- ✅ Ensures bulletproof context preservation for next session
+- ✅ Commits all changes with detailed documentation
+
+**Time Saved**: 20-25 minutes of session documentation per session
+
+---
+
+### 3. **Specs-Based Task Executor** ⚡
+**File**: `specs-based-task-executor.md`  
+**Trigger**: Manual - say "execute task" or "implement task"  
+**Purpose**: Systematically execute spec tasks with validation and progress tracking
+
+**What it does**:
+- ✅ Executes individual tasks following spec requirements exactly
+- ✅ Validates against acceptance criteria continuously
+- ✅ Updates task completion status in real-time
+- ✅ Maintains quality standards throughout implementation
+- ✅ Provides clear continuation point for next task
+
+**Time Saved**: 10-15 minutes of task setup and validation per task
+
+---
+
+### **🔧 AUTOMATION AND WORKFLOW HOOKS**
+
+### 4. **Session Completion Automation** 
 **File**: `session-completion-automation.md`  
 **Trigger**: Manual - say "complete session" or "summarize and commit"  
 **Purpose**: Fully automate session completion workflow
@@ -81,7 +133,39 @@ User: "implement topics 11-15"
 
 ---
 
-### 7. **Session Continuity Brief** 🎯
+### 7. **Comprehensive Framework Validator** 🔍
+**File**: `comprehensive-framework-validator.md`  
+**Trigger**: Manual - say "validate framework" or "framework status"  
+**Purpose**: Validates entire framework integrity and identifies gaps
+
+**What it does**:
+- ✅ Validates all 6+ specs have complete requirements, design, and tasks
+- ✅ Checks all 22+ hooks are properly configured and functional
+- ✅ Verifies all 15+ documentation files are current and consistent
+- ✅ Identifies gaps or inconsistencies with prioritized recommendations
+- ✅ Generates comprehensive readiness assessment
+
+**Time Saved**: 30+ minutes of manual framework validation
+
+---
+
+### 8. **Intelligent Spec Recommender** 🧠
+**File**: `intelligent-spec-recommender.md`  
+**Trigger**: Manual - say "recommend spec" or "what should I work on"  
+**Purpose**: Analyzes current state and recommends optimal spec execution strategies
+
+**What it does**:
+- ✅ Analyzes current technical environment and progress
+- ✅ Assesses user goals, timeline, and constraints
+- ✅ Recommends optimal spec execution order and strategies
+- ✅ Provides personalized roadmap and milestone planning
+- ✅ Identifies risks and mitigation strategies
+
+**Time Saved**: 15-20 minutes of planning and decision making
+
+---
+
+### 9. **Session Continuity Brief** 🎯
 **File**: `session-continuity-brief.md`  
 **Trigger**: Manual - say "generate continuity brief" or "session status"  
 **Purpose**: Generate comprehensive session state for seamless pickup

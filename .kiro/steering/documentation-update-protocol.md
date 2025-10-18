@@ -1,18 +1,60 @@
 # Documentation Update Protocol
 
-## Mandatory Post-Phase Documentation Updates
+## **ENHANCED SPECS-BASED DOCUMENTATION PROTOCOL**
 
-After EVERY phase implementation, the following 9 files MUST be updated in this exact order:
+This protocol has been enhanced for systematic specs-based development with bulletproof context preservation and automated validation.
+
+## **🚨 CRITICAL: SESSION STARTUP PROTOCOL**
+
+### **MANDATORY: Read All .md Files at Session Start**
+Before ANY development work, the following files MUST be read in this exact order:
+
+#### **Phase 1: Core Context (CRITICAL - READ FIRST)**
+1. `COMPLETE_PROJECT_CONTEXT.md` - Complete scope and gap analysis
+2. `CURRENT_STATUS.md` - Real-time development state  
+3. `PROJECT_SCOPE_AND_TRACKING.md` - Master project reference
+4. `FRAMEWORK_COMPLETION_SUMMARY.md` - Complete framework status
+
+#### **Phase 2: Active Specs (HIGH PRIORITY)**
+5. `.kiro/specs/SPECS_OVERVIEW.md` - All available specs
+6. Current spec `requirements.md` - What to build
+7. Current spec `design.md` - How to build it
+8. Current spec `tasks.md` - Step-by-step implementation
+
+#### **Phase 3: Protocols and Standards (HIGH PRIORITY)**
+9. `PROJECT_AUTOMATION_MANAGER.md` - Automation framework
+10. `.kiro/steering/documentation-update-protocol.md` - This file
+11. `.kiro/steering/specs-based-development-enforcement.md` - Development methodology
+12. `.kiro/steering/world-class-learning-standards.md` - Quality standards
+
+#### **Phase 4: Automation and Hooks (MEDIUM PRIORITY)**
+13. `.kiro/hooks/README.md` - Available automation hooks
+14. All relevant hook files for current development phase
+
+#### **Phase 5: Additional Context (MEDIUM PRIORITY)**
+15. `AUTOMATION_REVIEW_CHECKLIST.md` - Quality validation
+16. `SENIOR_DEVELOPER_READINESS_ANALYSIS.md` - FAANG readiness
+17. `DEVELOPMENT_GUIDE.md` - Technical implementation guide
+18. `PROJECT_CONVERSATION_LOG.md` - Complete conversation history
+19. `README.md` - Project overview and setup
+
+## Mandatory Post-Task Documentation Updates
+
+After EVERY task implementation (not just phases), the following files MUST be updated in this exact order:
 
 ### **🚨 CRITICAL: BULLETPROOF CONTEXT PRESERVATION SYSTEM**
-**All documentation updates must ensure absolute zero context loss:**
-- **Triple Redundancy**: Critical information stored in 3+ locations (primary, secondary, tertiary)
+**All documentation updates must ensure absolute zero context loss with automated validation:**
+- **Quintuple Redundancy**: Critical information stored in 5+ locations (specs, status, context, automation, conversation)
+- **Automated Git Integration**: Every successful task completion automatically committed with comprehensive documentation
+- **Specs-Based Validation**: All progress validated against spec requirements and tasks
 - **Cross-Validation**: Multiple sources confirm same information for accuracy
-- **Automated Validation**: Scripts verify completeness after every session
+- **Automated Validation**: Scripts verify completeness after every task and session
 - **Recovery Testing**: Regular validation of context recovery procedures
 - **Compilation Tracking**: Technical state preserved with exact environment details
-- **Continuation Points**: Exact next actions clearly defined for seamless pickup
+- **Task-Level Tracking**: Exact task completion status and next task clearly defined
 - **Session State**: Complete technical environment and progress preserved
+- **Spec Compliance**: All work validated against spec requirements and acceptance criteria
+- **Version Control Integration**: Complete change history with context preserved in git commits
 
 ### **🚨 CRITICAL: EXPANDED NODE.JS SCOPE INTEGRATION**
 **All documentation updates must reflect the expanded Node.js curriculum:**
@@ -75,11 +117,13 @@ After EVERY phase implementation, the following 9 files MUST be updated in this 
 - Update FAANG readiness assessment
 - Document progress toward senior developer goals
 
-### 9. Git Commit
-- Stage all modified files
-- Create descriptive commit message with phase details
-- Include progress summary and next steps
-- Push to remote repository
+### 9. Automated Git Integration
+- **MANDATORY**: Use `automated-git-integration` hook for all commits
+- Stage all modified files with comprehensive change analysis
+- Generate intelligent commit message with task details and progress
+- Include session context, specs references, and continuation points
+- Validate all quality gates before commit
+- Push to remote repository with complete documentation
 
 ## Update Template Structure
 

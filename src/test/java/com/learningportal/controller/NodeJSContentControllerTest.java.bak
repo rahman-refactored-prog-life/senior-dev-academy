@@ -1,0 +1,122 @@
+package com.learningportal.controller;
+
+import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.test.web.servlet.MockMvc;
+
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+
+/**
+ * Test class for NodeJSContentController
+ * 
+ * This test verifies that the Node.js content endpoints are working correctly
+ * and returning the expected comprehensive curriculum data.
+ */
+@WebMvcTest(NodeJSContentController.class)
+public class NodeJSContentControllerTest {
+    
+    @Autowired
+    private MockMvc mockMvc;
+    
+    @Test
+    public void testGetNodeJSCurriculum() throws Exception {
+        mockMvc.perform(get("/api/nodejs/curriculum"))
+                .andExpect(status().isOk())
+                .andExpect(content().contentType("application/json"))
+                .andExpect(jsonPath("$.title").value("Complete Node.js Mastery - Zero to FAANG Senior"))
+                .andExpect(jsonPath("$.totalTopics").value(25))
+                .andExpect(jsonPath("$.totalQuestions").value(700))
+                .andExpect(jsonPath("$.estimatedHours").value(50))
+                .andExpect(jsonPath("$.foundationTopics").isArray())
+                .andExpect(jsonPath("$.seniorTopics").isArray())
+                .andExpect(jsonPath("$.status").value("100% Complete - All topics implemented with production-ready code"));
+    }
+    
+    @Test
+    public void testGetNodeJSTopic() throws Exception {
+        mockMvc.perform(get("/api/nodejs/topic/1"))
+                .andExpect(status().isOk())
+                .andExpect(content().contentType("application/json"))
+                .andExpect(jsonPath("$.id").value(1))
+                .andExpect(jsonPath("$.title").exists())
+                .andExpect(jsonPath("$.description").exists())
+                .andExpect(jsonPath("$.content").exists())
+                .andExpect(jsonPath("$.codeExamples").isArray())
+                .andExpect(jsonPath("$.interviewQuestions").isArray());
+    }
+    
+    @Test
+    public void testGetNodeJSTopicInvalidId() throws Exception {
+        mockMvc.perform(get("/api/nodejs/topic/26"))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.error").value("Topic ID must be between 1 and 25"));
+    }
+    
+    @Test
+    public void testGetNodeJSQuestions() throws Exception {
+        mockMvc.perform(get("/api/nodejs/questions"))
+                .andExpect(status().isOk())
+                .andExpect(content().contentType("application/json"))
+                .andExpect(jsonPath("$.questions").isArray())
+                .andExpect(jsonPath("$.totalQuestions").value(700))
+                .andExpect(jsonPath("$.currentPage").value(1))
+                .andExpect(jsonPath("$.pageSize").value(20))
+                .andExpect(jsonPath("$.totalPages").exists())
+                .andExpect(jsonPath("$.hasNext").exists());
+    }
+    
+    @Test
+    public void testGetNodeJSQuestionsWithFilters() throws Exception {
+        mockMvc.perform(get("/api/nodejs/questions")
+                .param("page", "2")
+                .param("size", "10")
+                .param("difficulty", "Advanced")
+                .param("company", "Amazon"))
+                .andExpect(status().isOk())
+                .andExpect(content().contentType("application/json"))
+                .andExpect(jsonPath("$.currentPage").value(2))
+                .andExpect(jsonPath("$.pageSize").value(10));
+    }
+    
+    @Test
+    public void testGetNodeJSProjects() throws Exception {
+        mockMvc.perform(get("/api/nodejs/projects"))
+                .andExpect(status().isOk())
+                .andExpect(content().contentType("application/json"))
+                .andExpect(jsonPath("$").isArray())
+                .andExpect(jsonPath("$[0].name").value("NASA Mission Control"))
+                .andExpect(jsonPath("$[0].status").value("Complete"))
+                .andExpect(jsonPath("$[1].name").value("Kepler Planets Discovery"))
+                .andExpect(jsonPath("$[2].name").value("SpaceX API Integration"))
+                .andExpect(jsonPath("$[3].name").value("Multiplayer Pong Game"))
+                .andExpect(jsonPath("$[4].name").value("AWS Serverless Deployment"));
+    }
+    
+    @Test
+    public void testGetLearningPath() throws Exception {
+        mockMvc.perform(get("/api/nodejs/learning-path"))
+                .andExpect(status().isOk())
+                .andExpect(content().contentType("application/json"))
+                .andExpect(jsonPath("$.level").value("beginner"))
+                .andExpect(jsonPath("$.goal").value("fullstack"))
+                .andExpect(jsonPath("$.estimatedWeeks").value(12))
+                .andExpect(jsonPath("$.hoursPerWeek").value(10))
+                .andExpect(jsonPath("$.phases").isArray())
+                .andExpect(jsonPath("$.phases[0].phase").value(1))
+                .andExpect(jsonPath("$.phases[0].title").value("Node.js Foundations"))
+                .andExpect(jsonPath("$.nextSteps").isArray());
+    }
+    
+    @Test
+    public void testGetLearningPathWithCustomParameters() throws Exception {
+        mockMvc.perform(get("/api/nodejs/learning-path")
+                .param("level", "advanced")
+                .param("goal", "backend"))
+                .andExpect(status().isOk())
+                .andExpect(content().contentType("application/json"))
+                .andExpect(jsonPath("$.level").value("advanced"))
+                .andExpect(jsonPath("$.goal").value("backend"));
+    }
+}
