@@ -41,10 +41,11 @@ const Sidebar = ({ isOpen, onClose }) => {
       title: 'Learning Modules',
       items: [
         { path: '/modules/java', label: 'Java Fundamentals', icon: Coffee },
+        { path: '/modules/nodejs', label: 'Node.js', icon: Zap },
         { path: '/modules/spring', label: 'Spring Framework', icon: Leaf },
         { path: '/modules/react', label: 'React Development', icon: Atom },
         { path: '/modules/data-structures', label: 'Data Structures', icon: Database },
-        { path: '/modules/algorithms', label: 'Algorithms', icon: Zap },
+        { path: '/modules/algorithms', label: 'Algorithms', icon: Code },
         { path: '/modules/system-design', label: 'System Design', icon: Network }
       ]
     },
@@ -99,8 +100,9 @@ const Sidebar = ({ isOpen, onClose }) => {
                     <Link
                       key={itemIndex}
                       to={item.path}
-                      className={`nav-item ${isActive ? 'active' : ''}`}
+                      className={`nav-item ${isActive ? 'active' : ''} ${item.highlight ? 'highlight' : ''}`}
                       onClick={onClose}
+                      title={item.highlight ? 'Complete Node.js curriculum with 25 topics and 700+ questions!' : ''}
                     >
                       <Icon className="nav-item-icon" size={18} />
                       <span className="nav-item-label">{item.label}</span>

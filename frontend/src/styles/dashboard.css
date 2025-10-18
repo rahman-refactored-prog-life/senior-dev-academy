@@ -5,6 +5,19 @@
   margin: 0 auto;
 }
 
+/* Completion Badge */
+.completion-badge {
+  background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+  color: white;
+  padding: 4px 12px;
+  border-radius: 16px;
+  font-size: 12px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  box-shadow: 0 2px 8px rgba(16, 185, 129, 0.3);
+}
+
 .dashboard-header {
   display: flex;
   align-items: flex-start;

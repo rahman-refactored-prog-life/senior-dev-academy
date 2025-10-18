@@ -56,6 +56,16 @@ export const LearningProvider = ({ children }) => {
           completionRate: 75
         },
         {
+          id: 'nodejs',
+          name: 'Node.js Development',
+          description: 'Learn Node.js fundamentals and backend development',
+          category: 'Node.js',
+          difficultyLevel: 'Beginner to Intermediate',
+          estimatedHours: 30,
+          topicCount: 8,
+          completionRate: 0
+        },
+        {
           id: 2,
           name: 'Spring Framework',
           description: 'Learn Spring Boot, Security, and Data',

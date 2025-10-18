@@ -93,50 +93,7 @@ const Dashboard = () => {
 
   return (
     <div className="dashboard">
-      {/* 🎉 Node.js Completion Celebration Banner */}
-      <div className="achievement-banner" style={{
-        background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
-        padding: '24px',
-        borderRadius: '12px',
-        marginBottom: '24px',
-        color: 'white',
-        boxShadow: '0 8px 32px rgba(102, 126, 234, 0.3)'
-      }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
-          <div style={{ fontSize: '48px' }}>🎉</div>
-          <div style={{ flex: 1 }}>
-            <h2 style={{ margin: 0, fontSize: '24px', fontWeight: 'bold' }}>
-              Node.js Complete Mastery Achieved!
-            </h2>
-            <p style={{ margin: '8px 0 0 0', opacity: 0.9 }}>
-              🏆 All 25 topics complete • 700+ interview questions mastered • 50+ hours of expert content
-            </p>
-            <div style={{ marginTop: '12px', display: 'flex', gap: '12px', flexWrap: 'wrap' }}>
-              <span style={{ background: 'rgba(255,255,255,0.2)', padding: '4px 12px', borderRadius: '16px', fontSize: '14px' }}>
-                ✅ ZeroToMastery Foundation
-              </span>
-              <span style={{ background: 'rgba(255,255,255,0.2)', padding: '4px 12px', borderRadius: '16px', fontSize: '14px' }}>
-                ✅ FAANG Senior Enhancement
-              </span>
-              <span style={{ background: 'rgba(255,255,255,0.2)', padding: '4px 12px', borderRadius: '16px', fontSize: '14px' }}>
-                ✅ Production Projects
-              </span>
-            </div>
-          </div>
-          <Link 
-            to="/modules/nodejs" 
-            className="btn"
-            style={{ 
-              background: 'white', 
-              color: '#667eea',
-              border: 'none',
-              fontWeight: 'bold'
-            }}
-          >
-            View Achievement →
-          </Link>
-        </div>
-      </div>
+
 
       {/* Welcome Section */}
       <div className="dashboard-header">
@@ -282,12 +239,15 @@ const Dashboard = () => {
           </div>
         </div>
 
+
+
         {/* Quick Actions */}
         <div className="dashboard-section">
           <div className="section-header">
             <h2>Quick Actions</h2>
           </div>
           <div className="quick-actions">
+
             <Link to="/interview-prep" className="quick-action-btn aws-glow-card">
               <MessageSquare size={24} />
               <span>Practice Interview Questions</span>
