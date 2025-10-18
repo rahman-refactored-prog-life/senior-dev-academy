@@ -136,7 +136,7 @@ public class UserProgressService {
         List<Milestone> upcomingMilestones = calculateUpcomingMilestones(user, allProgress);
         
         return new LearningAnalytics(
-            averageProgress != null ? averageProgress : 0.0,
+            averageProgress,
             totalTimeSpent != null ? totalTimeSpent : 0,
             currentStreak,
             longestStreak,

@@ -118,7 +118,7 @@ public class LearningModuleController {
             
             CategoryModulesResponse response = new CategoryModulesResponse(
                 cat.getDisplayName(),
-                getCategory Description(cat),
+                getCategoryDescription(cat),
                 modulesWithStats.stream()
                     .map(mws -> convertToModuleWithStatsResponse(mws))
                     .toList()

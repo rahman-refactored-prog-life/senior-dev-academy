@@ -51,9 +51,9 @@ spring:
 
 # Server Configuration
 server:
-  port: 8080
+  port: 3002
   servlet:
-    context-path: /api
+    context-path: /
     
 # Actuator Configuration (for monitoring and health checks)
 management:
