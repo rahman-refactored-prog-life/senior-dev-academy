@@ -81,6 +81,33 @@ User: "implement topics 11-15"
 
 ---
 
+### 7. **Session Continuity Brief** 🎯
+**File**: `session-continuity-brief.md`  
+**Trigger**: Manual - say "generate continuity brief" or "session status"  
+**Purpose**: Generate comprehensive session state for seamless pickup
+
+**What it does**:
+- ✅ Analyzes current project state and progress
+- ✅ Checks application and database status
+- ✅ Identifies exact continuation point
+- ✅ Provides ready-to-execute startup commands
+- ✅ Generates complete context transfer summary
+- ✅ Creates actionable next steps checklist
+
+**Time Saved**: 10-15 minutes of context gathering per new session
+
+**Example Output**:
+```
+🎯 SESSION CONTINUITY BRIEF
+Last Phase: Node.js Topic 15/25 - Event Loop Mastery
+Progress: 60% complete (15/25 topics, 450/700+ questions)
+Application: Running at http://localhost:3002
+Next Action: Implement Topic 16 - Streams and Buffers
+Estimated Time: 45 minutes
+```
+
+---
+
 ## 🎯 Recommended Workflow
 
 ### For Single Topic Implementation:
@@ -163,6 +190,7 @@ git status
 | Quick commit | "commit" or "save progress" | Auto-commit current changes |
 | End session | "complete session" | Full docs + commit + summary |
 | Keep going | "continue implementation" | Implements remaining topics |
+| Get session status | "generate continuity brief" | Complete session state summary |
 
 ---
 
