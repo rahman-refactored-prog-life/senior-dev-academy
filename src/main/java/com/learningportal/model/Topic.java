@@ -1,210 +1,145 @@
 package com.learningportal.model;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
+import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
-import jakarta.validation.constraints.Size;
-import lombok.Data;
-import lombok.EqualsAndHashCode;
-import lombok.NoArgsConstructor;
-import lombok.AllArgsConstructor;
+import jakarta.validation.constraints.Positive;
+import java.util.Objects;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
 
-/**
- * Topic Entity - Represents individual topics within a learning module
- * 
- * Examples: "Variables and Data Types", "Spring Boot Auto-Configuration", etc.
- * 
- * Key Learning Points Demonstrated:
- * - @ManyToOne relationship (Many topics belong to one module)
- * - @OneToMany with mappedBy (One topic has many questions)
- * - JSON handling with @Lob for storing structured data
- * - Enum usage for categorization
- * - Cascade operations and fetch strategies
- * - Bidirectional relationships
- */
 @Entity
 @Table(name = "topics")
+
 @EntityListeners(AuditingEntityListener.class)
-@Data
-@NoArgsConstructor
-@AllArgsConstructor
-@EqualsAndHashCode(callSuper = false, exclude = {"module", "questions"})
+@Schema(description = "Individual topic within a learning module")
 public class Topic {
-    
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Schema(description = "Unique identifier for the topic", example = "1")
     private Long id;
-    
+
     @NotBlank(message = "Topic title is required")
-    @Size(max = 200, message = "Topic title must not exceed 200 characters")
-    @Column(name = "title", nullable = false, length = 200)
+    @Column(nullable = false, length = 300)
+    @Schema(description = "Title of the topic", example = "Java Basics: Variables and Data Types")
     private String title;
-    
+
     @NotBlank(message = "Topic description is required")
-    @Size(max = 1000, message = "Description must not exceed 1000 characters")
-    @Column(name = "description", nullable = false, length = 1000)
+    @Column(nullable = false, length = 1000)
+    @Schema(description = "Brief description of the topic")
     private String description;
-    
-    /**
-     * Main content of the topic stored as HTML/Markdown
-     * Using @Lob for large text content
-     */
+
     @Lob
-    @Column(name = "content", columnDefinition = "TEXT")
+    @Column(columnDefinition = "TEXT")
+    @Schema(description = "Complete content of the topic including HTML, code examples, and explanations")
     private String content;
-    
-    /**
-     * Code examples stored as JSON string
-     * Example: [{"language": "java", "code": "public class...", "explanation": "..."}]
-     */
-    @Lob
-    @Column(name = "code_examples", columnDefinition = "TEXT")
-    private String codeExamples;
-    
-    /**
-     * Key concepts covered in this topic (stored as JSON array)
-     * Example: ["Variables", "Data Types", "Type Casting"]
-     */
-    @Lob
-    @Column(name = "key_concepts", columnDefinition = "TEXT")
-    private String keyConcepts;
-    
-    @NotNull(message = "Topic type is required")
-    @Enumerated(EnumType.STRING)
-    @Column(name = "topic_type", nullable = false)
-    private TopicType topicType;
-    
+
+    @Positive(message = "Estimated minutes must be positive")
     @Column(name = "estimated_minutes")
+    @Schema(description = "Estimated time to complete this topic in minutes", example = "45")
     private Integer estimatedMinutes;
-    
+
     @Column(name = "sort_order")
-    private Integer sortOrder = 0;
-    
-    @Column(name = "active", nullable = false)
-    private Boolean active = true;
-    
-    /**
-     * Difficulty level for this specific topic
-     * Can be different from the module's overall difficulty
-     */
-    @Enumerated(EnumType.STRING)
-    @Column(name = "difficulty_level")
-    private LearningModule.DifficultyLevel difficultyLevel;
-    
-    @CreatedDate
-    @Column(name = "created_at", nullable = false, updatable = false)
-    private LocalDateTime createdAt;
-    
-    @LastModifiedDate
-    @Column(name = "updated_at")
-    private LocalDateTime updatedAt;
-    
-    /**
-     * Many-to-One relationship with LearningModule
-     * 
-     * Key Learning Points:
-     * - @ManyToOne: Many topics belong to one module
-     * - @JoinColumn: Specifies the foreign key column
-     * - FetchType.LAZY: Module is loaded only when accessed (performance optimization)
-     */
+    @Schema(description = "Sort order within the module", example = "1")
+    private Integer sortOrder;
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "module_id", nullable = false)
+    @JsonBackReference
+    @Schema(description = "The learning module this topic belongs to")
     private LearningModule module;
-    
-    /**
-     * One-to-Many relationship with InterviewQuestion
-     * 
-     * Key Learning Points:
-     * - mappedBy: Indicates this is the inverse side of the relationship
-     * - CascadeType.ALL: All operations cascade to questions
-     * - FetchType.LAZY: Questions loaded only when needed
-     * - orphanRemoval: Removes questions when they're removed from this collection
-     */
-    @OneToMany(mappedBy = "topic", cascade = CascadeType.ALL, fetch = FetchType.LAZY, orphanRemoval = true)
-    private List<InterviewQuestion> questions = new ArrayList<>();
-    
-    /**
-     * Topic Types - Different kinds of learning content
-     */
-    public enum TopicType {
-        THEORY("Theory"),
-        PRACTICAL("Practical"),
-        CODE_EXAMPLE("Code Example"),
-        EXERCISE("Exercise"),
-        QUIZ("Quiz"),
-        PROJECT("Project"),
-        INTERVIEW_PREP("Interview Preparation"),
-        BEST_PRACTICES("Best Practices"),
-        TROUBLESHOOTING("Troubleshooting"),
-        PERFORMANCE("Performance Optimization");
-        
-        private final String displayName;
-        
-        TopicType(String displayName) {
-            this.displayName = displayName;
-        }
-        
-        public String getDisplayName() {
-            return displayName;
-        }
+
+    @CreatedDate
+    @Column(name = "created_at", nullable = false, updatable = false)
+    @Schema(description = "Creation timestamp")
+    private LocalDateTime createdAt;
+
+    @LastModifiedDate
+    @Column(name = "updated_at")
+    @Schema(description = "Last update timestamp")
+    private LocalDateTime updatedAt;
+
+    // Helper methods
+    @Schema(description = "Get the module ID this topic belongs to")
+    public Long getModuleId() {
+        return module != null ? module.getId() : null;
     }
-    
-    /**
-     * Convenience method to add a question to this topic
-     * Demonstrates proper bidirectional relationship management
-     */
-    public void addQuestion(InterviewQuestion question) {
-        questions.add(question);
-        question.setTopic(this);
+
+    @Schema(description = "Get the module name this topic belongs to")
+    public String getModuleName() {
+        return module != null ? module.getName() : null;
     }
-    
-    /**
-     * Convenience method to remove a question from this topic
-     */
-    public void removeQuestion(InterviewQuestion question) {
-        questions.remove(question);
-        question.setTopic(null);
+
+    @Schema(description = "Get estimated time in hours (rounded)")
+    public double getEstimatedHours() {
+        return estimatedMinutes != null ? Math.round((estimatedMinutes / 60.0) * 100.0) / 100.0 : 0.0;
     }
-    
-    /**
-     * Get the number of questions for this topic
-     */
-    public int getQuestionCount() {
-        return questions != null ? questions.size() : 0;
+
+    @Schema(description = "Check if topic has content")
+    public boolean hasContent() {
+        return content != null && !content.trim().isEmpty();
     }
-    
-    /**
-     * Check if this topic has any code examples
-     */
-    public boolean hasCodeExamples() {
-        return codeExamples != null && !codeExamples.trim().isEmpty();
+
+    @Schema(description = "Get content length")
+    public int getContentLength() {
+        return content != null ? content.length() : 0;
     }
-    
-    /**
-     * Get estimated reading time in a human-readable format
-     */
-    public String getEstimatedTimeFormatted() {
-        if (estimatedMinutes == null) {
-            return "Unknown";
-        }
-        
-        if (estimatedMinutes < 60) {
-            return estimatedMinutes + " minutes";
-        } else {
-            int hours = estimatedMinutes / 60;
-            int minutes = estimatedMinutes % 60;
-            if (minutes == 0) {
-                return hours + " hour" + (hours > 1 ? "s" : "");
-            } else {
-                return hours + "h " + minutes + "m";
-            }
-        }
+
+    // Standard Java getters and setters (replacing Lombok @Data)
+    public Long getId() { return id; }
+    public void setId(Long id) { this.id = id; }
+
+    public String getTitle() { return title; }
+    public void setTitle(String title) { this.title = title; }
+
+    public String getDescription() { return description; }
+    public void setDescription(String description) { this.description = description; }
+
+    public String getContent() { return content; }
+    public void setContent(String content) { this.content = content; }
+
+    public Integer getEstimatedMinutes() { return estimatedMinutes; }
+    public void setEstimatedMinutes(Integer estimatedMinutes) { this.estimatedMinutes = estimatedMinutes; }
+
+    public Integer getSortOrder() { return sortOrder; }
+    public void setSortOrder(Integer sortOrder) { this.sortOrder = sortOrder; }
+
+    public LearningModule getModule() { return module; }
+    public void setModule(LearningModule module) { this.module = module; }
+
+    public LocalDateTime getCreatedAt() { return createdAt; }
+    public void setCreatedAt(LocalDateTime createdAt) { this.createdAt = createdAt; }
+
+    public LocalDateTime getUpdatedAt() { return updatedAt; }
+    public void setUpdatedAt(LocalDateTime updatedAt) { this.updatedAt = updatedAt; }
+
+    // Standard equals and hashCode (excluding module to avoid circular references)
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Topic topic = (Topic) o;
+        return Objects.equals(id, topic.id) && Objects.equals(title, topic.title);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id, title);
+    }
+
+    @Override
+    public String toString() {
+        return "Topic{" +
+                "id=" + id +
+                ", title='" + title + '\'' +
+                ", estimatedMinutes=" + estimatedMinutes +
+                ", sortOrder=" + sortOrder +
+                ", moduleId=" + getModuleId() +
+                '}';
     }
 }

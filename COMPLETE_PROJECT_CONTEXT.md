@@ -852,3 +852,29 @@ From the previous session analysis, several critical automation and session mana
 **🚨 CRITICAL INSIGHT**: The project needs **fundamentals-first implementation** with **spec-driven development** to prevent further context loss and technical debt accumulation.
 
 **⚠️ CONTEXT LOSS PREVENTION**: This file ensures no scope elements are ever forgotten again and provides realistic assessment of project state.
+
+## Want Senior Developer Amazon Interview Level preparation on these topics
+- java - from absolutely beginner to an expert
+- spring, hibernate, swagger etc all the relevant backend technologies
+- React - from absolute beginner to Senior SDE at Amazon 
+- Node JS - from absolute beginner to Senior SDE at Amazon 
+- All the topics for all these subjects explained in detailed
+- keeping in mind learner has absolutely zero experience 
+- Detailed explanation of concepts, real world examples and comprisons 
+- Real World Analogies 
+- Visualizations
+- Embedded interview questions with a code editor to practice them
+- all the questions asked in all the FAANG and other big companies 8000+ or whichever highest is possible 
+- code implementations, explanations, brute force to most efficient 
+- questions tagged nice in wich companies they were asked 
+- Embedded questions in relevant sections and a central page with all the questions and editor with same approach, implementations in different languages, brute force to most efficient with visualizations and explanations 
+- ver rich note taking feature - same as FAANG, relevant sections embedded and one central 
+- With options to added, delete or modify the notes 
+- DS&A - all the Data structures expla
+- System design 
+- Cloud 
+- Backtracking and recursion 
+- Dynamic programming 
+- every single DS&A that's out there in the world that people might not even have heard of 
+- leadership principles and relevant questions 
+- Data bases - SQL NoSql

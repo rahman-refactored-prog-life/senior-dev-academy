@@ -43,7 +43,7 @@ public class DataController {
             LearningModule nodeModule = new LearningModule();
             nodeModule.setName("Node.js Fundamentals");
             nodeModule.setDescription("Complete Node.js mastery: 25 topics, 700+ interview questions");
-            nodeModule.setDetailedContent("Master Node.js from core concepts to advanced patterns with hands-on projects including NASA Mission Control, SpaceX integration, and real-time applications.");
+            // Removed setDetailedContent - not in new clean entity
             nodeModule.setCategory(LearningModule.Category.JAVA_FUNDAMENTALS);
             nodeModule.setDifficultyLevel(LearningModule.DifficultyLevel.BEGINNER);
             nodeModule.setEstimatedHours(50);
@@ -79,22 +79,11 @@ public class DataController {
                     <li><strong>Close Callbacks</strong>: Executes close event callbacks</li>
                 </ol>
                 """);
-            nodeBasics.setCodeExamples("""
-                [
-                    {
-                        "language": "javascript",
-                        "code": "// Event Loop Example\\nconsole.log('Start');\\n\\nsetTimeout(() => {\\n  console.log('Timer 1');\\n}, 0);\\n\\nsetImmediate(() => {\\n  console.log('Immediate 1');\\n});\\n\\nprocess.nextTick(() => {\\n  console.log('Next Tick 1');\\n});\\n\\nconsole.log('End');\\n\\n// Output order:\\n// Start\\n// End\\n// Next Tick 1\\n// Timer 1\\n// Immediate 1",
-                        "explanation": "Demonstrates the event loop execution order and priority of different callback types."
-                    }
-                ]
-                """);
-            nodeBasics.setKeyConcepts("""
-                ["Event Loop", "Non-blocking I/O", "V8 Engine", "Single-threaded", "Asynchronous Programming", "Event-driven Architecture"]
-                """);
+            // Removed setCodeExamples and setKeyConcepts - not in new clean entity
             nodeBasics.setTopicType(Topic.TopicType.THEORY);
-            nodeBasics.setEstimatedMinutes(180);
+            // Removed setEstimatedMinutes - not in new clean entity
             nodeBasics.setSortOrder(1);
-            nodeBasics.setDifficultyLevel(LearningModule.DifficultyLevel.BEGINNER);
+            nodeBasics.setDifficultyLevel(Topic.DifficultyLevel.BEGINNER);
             nodeBasics.setModule(nodeModule);
             
             topicRepository.save(nodeBasics);
@@ -103,7 +92,7 @@ public class DataController {
             LearningModule javaModule = new LearningModule();
             javaModule.setName("Java Fundamentals");
             javaModule.setDescription("Complete Java programming from basics to advanced concepts");
-            javaModule.setDetailedContent("Master Java programming language with comprehensive coverage of core concepts, object-oriented programming, collections, concurrency, and JVM internals.");
+            // Removed setDetailedContent - not in new clean entity
             javaModule.setCategory(LearningModule.Category.JAVA_FUNDAMENTALS);
             javaModule.setDifficultyLevel(LearningModule.DifficultyLevel.BEGINNER);
             javaModule.setEstimatedHours(120);
@@ -115,7 +104,7 @@ public class DataController {
             LearningModule dsModule = new LearningModule();
             dsModule.setName("Data Structures");
             dsModule.setDescription("Complete DS coverage: Maps, Sets, Hash Tables → Arrays, Trees, Graphs with 1500+ interview questions");
-            dsModule.setDetailedContent("Comprehensive data structures course starting with missing fundamentals (Maps, Sets, Hash Tables) progressing through arrays, trees, graphs to advanced structures. Includes 1500+ interview questions with complexity analysis and real-world applications.");
+            // Removed setDetailedContent - not in new clean entity
             dsModule.setCategory(LearningModule.Category.DATA_STRUCTURES);
             dsModule.setDifficultyLevel(LearningModule.DifficultyLevel.BEGINNER);
             dsModule.setEstimatedHours(60);

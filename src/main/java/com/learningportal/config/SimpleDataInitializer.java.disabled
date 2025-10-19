@@ -1,0 +1,83 @@
+package com.learningportal.config;
+
+import com.learningportal.model.LearningModule;
+import com.learningportal.model.Topic;
+import com.learningportal.repository.LearningModuleRepository;
+import com.learningportal.repository.TopicRepository;
+import lombok.RequiredArgsConstructor;
+import org.springframework.boot.CommandLineRunner;
+import org.springframework.stereotype.Component;
+
+/**
+ * Simple Data Initializer - Minimal working version
+ * Populates database with Node.js content using proper JPA entities
+ */
+@Component
+@RequiredArgsConstructor
+public class SimpleDataInitializer implements CommandLineRunner {
+    
+    private final LearningModuleRepository moduleRepository;
+    private final TopicRepository topicRepository;
+    
+    @Override
+    public void run(String... args) throws Exception {
+        if (moduleRepository.count() == 0) {
+            createNodeJSModule();
+        }
+    }
+    
+    private void createNodeJSModule() {
+        // Create Node.js module
+        LearningModule nodeModule = new LearningModule();
+        nodeModule.setName("Node.js Fundamentals to Expert");
+        nodeModule.setDescription("Complete Node.js mastery: from basics to advanced concepts, frameworks, and enterprise patterns");
+        nodeModule.setCategory(LearningModule.Category.JAVA_FUNDAMENTALS);
+        nodeModule.setDifficultyLevel(LearningModule.DifficultyLevel.INTERMEDIATE);
+        nodeModule.setEstimatedHours(50);
+        nodeModule.setSortOrder(1);
+        nodeModule.setActive(true);
+        
+        LearningModule savedModule = moduleRepository.save(nodeModule);
+        
+        // Create topics
+        createTopic(savedModule, 1, "Node.js Core Concepts and Event Loop", 
+            "Understanding Node.js fundamentals, event loop, and asynchronous programming",
+            "<h2>🚀 Node.js Fundamentals</h2><p>Node.js is a JavaScript runtime built on Chrome's V8 JavaScript engine.</p><h3>Key Concepts:</h3><ul><li>Event-driven, non-blocking I/O model</li><li>Single-threaded event loop</li><li>NPM package manager</li></ul>",
+            Topic.DifficultyLevel.BEGINNER, Topic.TopicType.THEORY);
+            
+        createTopic(savedModule, 2, "Asynchronous Programming: Callbacks, Promises, Async/Await", 
+            "Master asynchronous patterns in Node.js",
+            "<h2>⚡ Asynchronous Programming</h2><p>Learn callbacks, promises, and async/await patterns.</p><h3>Examples:</h3><pre><code>async function example() { const data = await fetch('/api'); }</code></pre>",
+            Topic.DifficultyLevel.INTERMEDIATE, Topic.TopicType.CODE_EXAMPLE);
+            
+        createTopic(savedModule, 3, "Express.js Framework and Middleware", 
+            "Building web applications with Express.js",
+            "<h2>🌐 Express.js Framework</h2><p>Express.js is the most popular Node.js web framework.</p><h3>Basic App:</h3><pre><code>const express = require('express'); const app = express();</code></pre>",
+            Topic.DifficultyLevel.INTERMEDIATE, Topic.TopicType.PRACTICAL);
+            
+        createTopic(savedModule, 4, "File I/O and Streams", 
+            "Working with files and streams in Node.js",
+            "<h2>📁 File System and Streams</h2><p>Master file operations and streaming data.</p><h3>Reading Files:</h3><pre><code>const fs = require('fs'); fs.readFile('data.txt', callback);</code></pre>",
+            Topic.DifficultyLevel.INTERMEDIATE, Topic.TopicType.CODE_EXAMPLE);
+            
+        createTopic(savedModule, 5, "Database Integration: MongoDB and PostgreSQL", 
+            "Connecting Node.js with databases",
+            "<h2>🗄️ Database Integration</h2><p>Connect Node.js with MongoDB and PostgreSQL.</p><h3>MongoDB:</h3><pre><code>const mongoose = require('mongoose'); mongoose.connect('mongodb://localhost');</code></pre>",
+            Topic.DifficultyLevel.ADVANCED, Topic.TopicType.PRACTICAL);
+    }
+    
+    private void createTopic(LearningModule module, int sortOrder, String title, String description, 
+                           String content, Topic.DifficultyLevel difficulty, Topic.TopicType type) {
+        Topic topic = new Topic();
+        topic.setTitle(title);
+        topic.setDescription(description);
+        topic.setContent(content);
+        topic.setModule(module);
+        topic.setDifficultyLevel(difficulty);
+        topic.setTopicType(type);
+        topic.setSortOrder(sortOrder);
+        topic.setActive(true);
+        
+        topicRepository.save(topic);
+    }
+}
