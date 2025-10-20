@@ -24,7 +24,7 @@ import java.util.Map;
 import java.util.Optional;
 
 @RestController
-@RequestMapping("/api/modules")
+@RequestMapping("/modules")
 @Tag(name = "Learning Modules", description = "API for managing learning modules")
 @CrossOrigin(origins = "*", maxAge = 3600)
 public class LearningModuleController {

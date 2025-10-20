@@ -19,12 +19,12 @@ public interface TopicRepository extends JpaRepository<Topic, Long> {
     /**
      * Find topics by module ID
      */
-    List<Topic> findByModuleIdOrderBySortOrderAsc(Long moduleId);
+    List<Topic> findByModule_IdOrderBySortOrderAsc(Long moduleId);
 
     /**
      * Find topics by module ID with pagination
      */
-    Page<Topic> findByModuleIdOrderBySortOrderAsc(Long moduleId, Pageable pageable);
+    Page<Topic> findByModule_IdOrderBySortOrderAsc(Long moduleId, Pageable pageable);
 
     /**
      * Find topics by title containing (case-insensitive search)
@@ -36,25 +36,12 @@ public interface TopicRepository extends JpaRepository<Topic, Long> {
      */
     Page<Topic> findByDescriptionContainingIgnoreCaseOrderBySortOrderAsc(String description, Pageable pageable);
 
-    /**
-     * Search topics by title, description, or content
-     */
-    @Query("SELECT t FROM Topic t WHERE " +
-           "LOWER(t.title) LIKE LOWER(CONCAT('%', :searchTerm, '%')) OR " +
-           "LOWER(t.description) LIKE LOWER(CONCAT('%', :searchTerm, '%')) OR " +
-           "LOWER(t.content) LIKE LOWER(CONCAT('%', :searchTerm, '%')) " +
-           "ORDER BY t.sortOrder ASC")
-    Page<Topic> searchTopics(@Param("searchTerm") String searchTerm, Pageable pageable);
+
 
     /**
-     * Find topics by module and search term
+     * Find topics by module and title containing search term
      */
-    @Query("SELECT t FROM Topic t WHERE t.module.id = :moduleId AND " +
-           "(UPPER(t.title) LIKE UPPER(CONCAT('%', :searchTerm, '%')) OR " +
-           "UPPER(t.description) LIKE UPPER(CONCAT('%', :searchTerm, '%')) OR " +
-           "UPPER(t.content) LIKE UPPER(CONCAT('%', :searchTerm, '%'))) " +
-           "ORDER BY t.sortOrder ASC")
-    Page<Topic> searchTopicsByModule(@Param("moduleId") Long moduleId, @Param("searchTerm") String searchTerm, Pageable pageable);
+    Page<Topic> findByModule_IdAndTitleContainingIgnoreCaseOrderBySortOrderAsc(Long moduleId, String searchTerm, Pageable pageable);
 
     /**
      * Find topic with module information
@@ -69,43 +56,36 @@ public interface TopicRepository extends JpaRepository<Topic, Long> {
     List<Topic> findByEstimatedMinutesBetween(@Param("minMinutes") Integer minMinutes, @Param("maxMinutes") Integer maxMinutes);
 
     /**
-     * Get topics statistics
+     * Get total count of topics
      */
-    @Query("SELECT " +
-           "COUNT(t) as totalTopics, " +
-           "AVG(t.estimatedMinutes) as avgMinutes, " +
-           "SUM(t.estimatedMinutes) as totalMinutes, " +
-           "COUNT(CASE WHEN t.content IS NOT NULL AND LENGTH(t.content) > 0 THEN 1 END) as topicsWithContent " +
-           "FROM Topic t")
-    Object[] getTopicsStatistics();
+    long count();
 
     /**
      * Find topics without content
      */
-    @Query("SELECT t FROM Topic t WHERE t.content IS NULL OR LENGTH(TRIM(t.content)) = 0 ORDER BY t.sortOrder ASC")
+    @Query("SELECT t FROM Topic t WHERE t.content IS NULL OR t.content = '' ORDER BY t.sortOrder ASC")
     List<Topic> findTopicsWithoutContent();
 
     /**
      * Find topics with content
      */
-    @Query("SELECT t FROM Topic t WHERE t.content IS NOT NULL AND LENGTH(TRIM(t.content)) > 0 ORDER BY t.sortOrder ASC")
+    @Query("SELECT t FROM Topic t WHERE t.content IS NOT NULL AND t.content != '' ORDER BY t.sortOrder ASC")
     List<Topic> findTopicsWithContent();
 
     /**
-     * Get longest topics by content length
+     * Find topics with content (simplified)
      */
-    @Query("SELECT t FROM Topic t WHERE t.content IS NOT NULL ORDER BY LENGTH(t.content) DESC")
-    List<Topic> findLongestTopics(Pageable pageable);
+    List<Topic> findByContentIsNotNullOrderBySortOrderAsc();
 
     /**
      * Count topics by module
      */
-    long countByModuleId(Long moduleId);
+    long countByModule_Id(Long moduleId);
 
     /**
      * Check if topic exists by title in module
      */
-    boolean existsByTitleIgnoreCaseAndModuleId(String title, Long moduleId);
+    boolean existsByTitleIgnoreCaseAndModule_Id(String title, Long moduleId);
 
     /**
      * Find next topic in module
@@ -130,4 +110,14 @@ public interface TopicRepository extends JpaRepository<Topic, Long> {
      */
     @Query("SELECT t FROM Topic t JOIN t.module m WHERE m.difficultyLevel = :difficultyLevel ORDER BY m.sortOrder ASC, t.sortOrder ASC")
     List<Topic> findByModuleDifficultyLevel(@Param("difficultyLevel") com.learningportal.model.LearningModule.DifficultyLevel difficultyLevel);
+
+    /**
+     * Count topics with null module (for schema validation)
+     */
+    long countByModuleIsNull();
+
+    /**
+     * Count topics with non-null module (for schema validation)
+     */
+    long countByModuleIsNotNull();
 }

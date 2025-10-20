@@ -51,11 +51,11 @@ spring:
     livereload:
       enabled: true
 
-# Server Configuration
+# Server Configuration - REST API Server
 server:
-  port: 3008
+  port: 9090
   servlet:
-    context-path: /
+    context-path: /api
     
 # Actuator Configuration (for monitoring and health checks)
 management:

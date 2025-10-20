@@ -116,4 +116,9 @@ public interface LearningModuleRepository extends JpaRepository<LearningModule, 
      * Count modules by difficulty level
      */
     long countByDifficultyLevel(LearningModule.DifficultyLevel difficultyLevel);
+
+    /**
+     * Find module by name (case-insensitive)
+     */
+    Optional<LearningModule> findByNameIgnoreCase(String name);
 }

@@ -16,7 +16,7 @@ import java.util.*;
  * - Production-ready code examples and best practices
  */
 @RestController
-@RequestMapping("/api/nodejs")
+@RequestMapping("/nodejs")
 @CrossOrigin(origins = "*")
 public class NodeJSContentController {
     

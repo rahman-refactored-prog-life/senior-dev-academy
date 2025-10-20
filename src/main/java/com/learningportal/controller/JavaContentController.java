@@ -16,7 +16,7 @@ import java.util.*;
  * - 500+ Java interview questions with detailed solutions
  */
 @RestController
-@RequestMapping("/api/java")
+@RequestMapping("/java")
 @CrossOrigin(origins = "*")
 public class JavaContentController {
     

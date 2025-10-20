@@ -19,12 +19,12 @@ public interface InterviewQuestionRepository extends JpaRepository<InterviewQues
     /**
      * Find questions by module ID
      */
-    List<InterviewQuestion> findByModuleIdOrderByIdAsc(Long moduleId);
+    List<InterviewQuestion> findByModule_IdOrderByIdAsc(Long moduleId);
 
     /**
      * Find questions by module ID with pagination
      */
-    Page<InterviewQuestion> findByModuleIdOrderByIdAsc(Long moduleId, Pageable pageable);
+    Page<InterviewQuestion> findByModule_IdOrderByIdAsc(Long moduleId, Pageable pageable);
 
     /**
      * Find questions by difficulty level
@@ -45,7 +45,7 @@ public interface InterviewQuestionRepository extends JpaRepository<InterviewQues
      * Search questions by question text
      */
     @Query("SELECT q FROM InterviewQuestion q WHERE " +
-           "LOWER(q.question) LIKE LOWER(CONCAT('%', :searchTerm, '%')) " +
+           "q.question LIKE %:searchTerm% " +
            "ORDER BY q.id ASC")
     Page<InterviewQuestion> searchByQuestion(@Param("searchTerm") String searchTerm, Pageable pageable);
 
@@ -53,8 +53,8 @@ public interface InterviewQuestionRepository extends JpaRepository<InterviewQues
      * Search questions by question or answer text
      */
     @Query("SELECT q FROM InterviewQuestion q WHERE " +
-           "LOWER(q.question) LIKE LOWER(CONCAT('%', :searchTerm, '%')) OR " +
-           "LOWER(q.answer) LIKE LOWER(CONCAT('%', :searchTerm, '%')) " +
+           "q.question LIKE %:searchTerm% OR " +
+           "q.answer LIKE %:searchTerm% " +
            "ORDER BY q.id ASC")
     Page<InterviewQuestion> searchQuestions(@Param("searchTerm") String searchTerm, Pageable pageable);
 
@@ -98,7 +98,7 @@ public interface InterviewQuestionRepository extends JpaRepository<InterviewQues
     /**
      * Find questions without answers
      */
-    @Query("SELECT q FROM InterviewQuestion q WHERE q.answer IS NULL OR LENGTH(TRIM(q.answer)) = 0 ORDER BY q.id ASC")
+    @Query("SELECT q FROM InterviewQuestion q WHERE q.answer IS NULL OR q.answer = '' ORDER BY q.id ASC")
     List<InterviewQuestion> findQuestionsWithoutAnswers();
 
     /**
@@ -137,7 +137,7 @@ public interface InterviewQuestionRepository extends JpaRepository<InterviewQues
     /**
      * Count questions by module
      */
-    long countByModuleId(Long moduleId);
+    long countByModule_Id(Long moduleId);
 
     /**
      * Find random questions by difficulty
@@ -152,7 +152,7 @@ public interface InterviewQuestionRepository extends JpaRepository<InterviewQues
     /**
      * Find questions by tags containing
      */
-    @Query("SELECT q FROM InterviewQuestion q WHERE LOWER(q.tags) LIKE LOWER(CONCAT('%', :tag, '%')) ORDER BY q.id ASC")
+    @Query("SELECT q FROM InterviewQuestion q WHERE q.tags LIKE %:tag% ORDER BY q.id ASC")
     Page<InterviewQuestion> findByTagsContaining(@Param("tag") String tag, Pageable pageable);
 
     /**
@@ -165,10 +165,10 @@ public interface InterviewQuestionRepository extends JpaRepository<InterviewQues
      * Advanced search with multiple filters
      */
     @Query("SELECT q FROM InterviewQuestion q WHERE " +
-           "(:company IS NULL OR LOWER(q.company) = LOWER(:company)) AND " +
-           "(:topic IS NULL OR LOWER(q.topic) = LOWER(:topic)) AND " +
+           "(:company IS NULL OR q.company = :company) AND " +
+           "(:topic IS NULL OR q.topic = :topic) AND " +
            "(:difficulty IS NULL OR q.difficulty = :difficulty) AND " +
-           "(:searchTerm IS NULL OR LOWER(q.question) LIKE LOWER(CONCAT('%', :searchTerm, '%'))) " +
+           "(:searchTerm IS NULL OR q.question LIKE %:searchTerm%) " +
            "ORDER BY q.id ASC")
     Page<InterviewQuestion> findWithFilters(
         @Param("company") String company,
@@ -177,4 +177,14 @@ public interface InterviewQuestionRepository extends JpaRepository<InterviewQues
         @Param("searchTerm") String searchTerm,
         Pageable pageable
     );
+
+    /**
+     * Count questions with null module (for schema validation)
+     */
+    long countByModuleIsNull();
+
+    /**
+     * Count questions with non-null module (for schema validation)
+     */
+    long countByModuleIsNotNull();
 }

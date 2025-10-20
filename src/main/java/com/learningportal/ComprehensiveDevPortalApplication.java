@@ -50,8 +50,8 @@ import org.springframework.transaction.annotation.EnableTransactionManagement;
     ),
     servers = {
         @Server(
-            url = "http://localhost:3008",
-            description = "Development Server"
+            url = "http://localhost:9090/api/v1",
+            description = "Development REST API Server"
         ),
         @Server(
             url = "https://api.faangmastery.com",
@@ -68,12 +68,11 @@ public class ComprehensiveDevPortalApplication {
             
             🚀 FAANG Senior Developer Mastery Portal Started Successfully!
             
-            📚 Access Points:
-            • Application: http://localhost:3008
-            • Swagger UI: http://localhost:3008/swagger-ui.html
-            • API Docs: http://localhost:3008/v3/api-docs
-
-            • Actuator: http://localhost:3008/actuator
+            📚 REST API Access Points:
+            • API Base: http://localhost:9090/api/v1
+            • Swagger UI: http://localhost:9090/api/v1/swagger-ui.html
+            • API Docs: http://localhost:9090/api/v1/v3/api-docs
+            • Actuator: http://localhost:9090/api/v1/actuator
             
             🎯 Features Available:
             • 500+ comprehensive learning topics

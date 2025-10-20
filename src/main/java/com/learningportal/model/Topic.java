@@ -19,6 +19,24 @@ import java.time.LocalDateTime;
 @Schema(description = "Individual topic within a learning module")
 public class Topic {
 
+    @Schema(description = "Types of topic content")
+    public enum TopicType {
+        LEARNING_CONTENT("Learning Content"),
+        INTERVIEW_QUESTION("Interview Question"),
+        CODE_EXAMPLE("Code Example"),
+        PRACTICE_EXERCISE("Practice Exercise");
+
+        private final String displayName;
+
+        TopicType(String displayName) {
+            this.displayName = displayName;
+        }
+
+        public String getDisplayName() {
+            return displayName;
+        }
+    }
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Schema(description = "Unique identifier for the topic", example = "1")
@@ -47,6 +65,11 @@ public class Topic {
     @Column(name = "sort_order")
     @Schema(description = "Sort order within the module", example = "1")
     private Integer sortOrder;
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "topic_type", nullable = false)
+    @Schema(description = "Type of topic content")
+    private TopicType topicType = TopicType.LEARNING_CONTENT;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "module_id", nullable = false)
@@ -108,6 +131,9 @@ public class Topic {
 
     public Integer getSortOrder() { return sortOrder; }
     public void setSortOrder(Integer sortOrder) { this.sortOrder = sortOrder; }
+
+    public TopicType getTopicType() { return topicType; }
+    public void setTopicType(TopicType topicType) { this.topicType = topicType; }
 
     public LearningModule getModule() { return module; }
     public void setModule(LearningModule module) { this.module = module; }
