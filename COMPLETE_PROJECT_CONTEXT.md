@@ -230,12 +230,12 @@ This is **THE MOST COMPREHENSIVE LEARNING PORTAL IN THE WORLD** for **AMAZON SEN
 - Distributed Databases & Sharding
 - Database Administration & Security
 
-#### **5. CLOUD & AWS (FUNDAMENTALS MISSING)**
-- **❌ CLOUD FUNDAMENTALS**: 0/4 topics (0% complete)
-  - ❌ **What is Cloud Computing** (IaaS, PaaS, SaaS basics)
-  - ❌ **Basic Cloud Concepts** (Regions, availability zones, scalability)
-  - ❌ **Cloud vs On-Premise** (Benefits, trade-offs, use cases)
-  - ❌ **Cloud Security Basics** (Shared responsibility model)
+#### **5. CLOUD & AWS (COMPLETE CERTIFICATION PATH - FUNDAMENTALS MISSING)**
+- **❌ AWS CERTIFIED CLOUD PRACTITIONER**: 0/4 topics (0% complete)
+  - ❌ **Cloud Concepts** (26% of exam - What is cloud computing, cloud economics, design principles)
+  - ❌ **Security & Compliance** (25% of exam - Shared responsibility model, AWS security services)
+  - ❌ **Technology** (33% of exam - AWS services overview, deployment methods, connectivity)
+  - ❌ **Billing & Pricing** (16% of exam - Pricing models, billing tools, cost optimization)
 - **❌ AWS FUNDAMENTALS**: 0/5 topics (0% complete)
   - ❌ **AWS Account & Console Basics** (Account setup, navigation)
   - ❌ **Core Compute Services** (EC2 basics, instance types)
@@ -243,8 +243,9 @@ This is **THE MOST COMPREHENSIVE LEARNING PORTAL IN THE WORLD** for **AMAZON SEN
   - ❌ **Core Database Services** (RDS basics, database types)
   - ❌ **Basic Networking** (VPC basics, security groups)
 
-**❌ ADVANCED AWS TOPICS** (Only after fundamentals):
-- AWS Solutions Architect Associate Exam Prep
+**✅ ADVANCED AWS CERTIFICATIONS** (Added to project scope):
+- **✅ AWS Certified Solutions Architect Associate**: Architecture patterns, cost optimization, security frameworks
+- **✅ AWS Certified Machine Learning Engineer Associate**: ML services, data engineering, model deployment, MLOps
 - Advanced Architecture Patterns
 - Multi-cloud & Hybrid Strategies
 - DevOps & Infrastructure as Code
@@ -853,6 +854,60 @@ From the previous session analysis, several critical automation and session mana
 
 **⚠️ CONTEXT LOSS PREVENTION**: This file ensures no scope elements are ever forgotten again and provides realistic assessment of project state.
 
+---
+
+## 📋 **UPDATED IMPLEMENTATION SEQUENCE WITH AWS CERTIFICATIONS**
+
+### **Phase 1: Core Technologies (Foundation)**
+1. ✅ **Java** (beginner → expert) - Complete ecosystem coverage
+2. ✅ **Spring, Hibernate, Swagger** (all backend technologies) - Enterprise-grade mastery
+3. ✅ **React** (beginner → Senior SDE Amazon) - Modern frontend excellence
+4. ✅ **Node.js** (beginner → Senior SDE Amazon) - 25 topics, 700+ questions
+
+### **Phase 2: Computer Science Fundamentals**
+5. ✅ **Data Structures & Algorithms** - Every DS in the world, all algorithm patterns
+
+### **Phase 3: Learning Experience Features**
+6. ✅ **Zero Experience Support** - Real-world analogies, detailed explanations
+7. ✅ **Visualizations** - Interactive D3.js/Three.js animations
+8. ✅ **Embedded Examples & Interview Questions** - Monaco code editor integration
+9. ✅ **Rich Note-Taking** - Embedded + central with full CRUD operations
+
+### **Phase 4: Interview Preparation System**
+10. ✅ **8000+ FAANG Questions** - All major companies with frequency data
+11. ✅ **Multi-Language Implementations** - Brute force → optimal progression
+12. ✅ **Company Attribution** - Question tagging with specific companies
+13. ✅ **Dual Organization** - Embedded in topics + central FAANG hub
+
+### **Phase 5: AWS Cloud Certifications (COMPLETE)**
+14. ✅ **AWS Certified Cloud Practitioner** - Foundational certification (ADDED)
+15. ✅ **AWS Certified Solutions Architect Associate** - Architecture and design patterns
+16. ✅ **AWS Certified Machine Learning Engineer Associate** - ML engineering certification (ADDED)
+
+### **AWS Certification Details Added:**
+
+#### **AWS Certified Cloud Practitioner**
+- **Cloud Concepts** (26% of exam): What is cloud computing, cloud economics, design principles
+- **Security & Compliance** (25% of exam): Shared responsibility model, AWS security services
+- **Technology** (33% of exam): AWS services overview, deployment methods, connectivity
+- **Billing & Pricing** (16% of exam): Pricing models, billing tools, cost optimization
+- **Target Audience**: Absolute beginners to cloud computing
+- **Prerequisites**: None - foundational certification
+- **Learning Approach**: Zero-experience support with real-world analogies
+
+#### **AWS Certified Machine Learning Engineer Associate**
+- **ML Fundamentals**: Machine learning concepts and AWS ML services
+- **Data Engineering**: S3, Glue, Kinesis, EMR for ML data pipelines
+- **Model Development**: SageMaker for training, tuning, and experimentation
+- **ML Operations**: Model deployment, monitoring, and lifecycle management
+- **Target Audience**: Developers moving into ML engineering roles
+- **Prerequisites**: Basic programming and cloud knowledge
+- **Learning Approach**: Hands-on labs with real ML projects
+
+**Status**: ✅ **BOTH AWS CERTIFICATIONS SUCCESSFULLY ADDED TO PROJECT SCOPE**
+
+---
+
 ## Want Senior Developer Amazon Interview Level preparation on these topics
 - java - from absolutely beginner to an expert
 - spring, hibernate, swagger etc all the relevant backend technologies
@@ -863,14 +918,14 @@ From the previous session analysis, several critical automation and session mana
 - Detailed explanation of concepts, real world examples and comprisons 
 - Real World Analogies 
 - Visualizations
-- Embedded interview questions with a code editor to practice them
+- Embedded example and interview questions with a code editor to practice them in relevant sections and in one cetral FAANG section
 - all the questions asked in all the FAANG and other big companies 8000+ or whichever highest is possible 
 - code implementations, explanations, brute force to most efficient 
 - questions tagged nice in wich companies they were asked 
 - Embedded questions in relevant sections and a central page with all the questions and editor with same approach, implementations in different languages, brute force to most efficient with visualizations and explanations 
 - ver rich note taking feature - same as FAANG, relevant sections embedded and one central 
 - With options to added, delete or modify the notes 
-- DS&A - all the Data structures expla
+- DS&A - all the Data structures explained 
 - System design 
 - Cloud 
 - Backtracking and recursion 

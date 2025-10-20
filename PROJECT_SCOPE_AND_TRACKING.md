@@ -12,7 +12,9 @@ Build **THE MOST COMPREHENSIVE LEARNING PORTAL IN THE WORLD** for **AMAZON SENIO
 - **Algorithms & Data Structures**: **ABSOLUTELY EXTENSIVE** - Every data structure in the world
 - **Dynamic Programming & Recursion**: All patterns and optimization techniques
 - **System Design**: Scalability, distributed systems, real-world case studies
-- **AWS Solutions Architect Associate**: Complete exam preparation (zero to exam-ready)
+- **AWS Certified Cloud Practitioner**: Foundational cloud certification (zero to exam-ready)
+- **AWS Certified Solutions Architect Associate**: Complete exam preparation (zero to exam-ready)
+- **AWS Certified Machine Learning Engineer Associate**: ML engineering certification (zero to exam-ready)
 - **Cloud Architecture**: All cloud topics connected to senior developer requirements
 
 #### **🏆 AMAZON LEADERSHIP PRINCIPLES & BEHAVIORAL MASTERY**
@@ -345,16 +347,28 @@ Create a single source of truth that makes senior-level technical interviews at 
     - Prometheus, Grafana, ELK stack, distributed tracing
     - *Integrated: 70+ Monitoring questions with alerting strategies*
 
-- **Cloud & AWS (General + Solutions Architect Associate)**
+- **Cloud & AWS (Complete Certification Path)**
+  - **AWS Certified Cloud Practitioner**
+    - Cloud concepts and economics fundamentals
+    - AWS global infrastructure and core services overview
+    - Security and compliance in the AWS cloud
+    - Billing, pricing models, and cost optimization basics
+    - *Integrated: 200+ Cloud Practitioner exam questions with detailed explanations*
   - **AWS Core Services**
     - EC2, VPC, S3, RDS, Lambda, API Gateway
     - *Integrated: 150+ AWS services questions with architecture examples*
-  - **AWS Solutions Architect Associate Exam Prep**
+  - **AWS Certified Solutions Architect Associate Exam Prep**
     - Complete certification preparation curriculum
     - Practice exams with detailed explanations
     - Architecture design patterns and best practices
     - Cost optimization and security frameworks
     - *Integrated: 200+ SAA exam questions with scenario-based solutions*
+  - **AWS Certified Machine Learning Engineer Associate**
+    - ML fundamentals and AWS ML services (SageMaker, Comprehend, Rekognition)
+    - Data engineering for ML (S3, Glue, Kinesis, EMR)
+    - Model development, training, and hyperparameter tuning
+    - ML operations, deployment, and monitoring
+    - *Integrated: 150+ ML Engineer exam questions with hands-on scenarios*
   - **Multi-Cloud and Hybrid Architectures**
     - Azure, GCP comparison and integration patterns
     - *Integrated: 50+ Multi-cloud questions with migration strategies*
