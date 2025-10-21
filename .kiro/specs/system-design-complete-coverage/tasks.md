@@ -223,12 +223,70 @@ This document outlines the systematic implementation tasks for building comprehe
 
 ### Phase 4: Amazon Integration and Real-World Case Studies (6 tasks)
 
+### **🚀 SYSTEM DESIGN: 7 COMPREHENSIVE HANDS-ON PROJECTS**
+
+- [ ] **PROJECT 1: URL Shortener (Bit.ly Clone)** (Scalability + Caching)
+  - Design scalable URL shortening service like bit.ly
+  - Implement custom short URL generation algorithms
+  - Add caching with Redis and CDN distribution
+  - Create analytics and click tracking system
+  - Deploy with AWS Auto Scaling and CloudFront
+  - _Skills: Scalability, Caching, Analytics, Load balancing_
+
+- [ ] **PROJECT 2: Chat Application (WhatsApp Scale)** (Real-time + Distributed)
+  - Build real-time messaging system for millions of users
+  - Implement WebSocket connections with horizontal scaling
+  - Add message delivery guarantees and offline support
+  - Create group chat and media sharing features
+  - Deploy with AWS ECS, ElastiCache, and API Gateway WebSocket
+  - _Skills: Real-time systems, WebSocket scaling, Message queues, Distributed architecture_
+
+- [ ] **PROJECT 3: Social Media Feed (Twitter/Instagram)** (Microservices + Performance)
+  - Design news feed generation for social media platform
+  - Implement timeline algorithms and content ranking
+  - Add microservices architecture with service mesh
+  - Create content delivery and media processing pipeline
+  - Deploy with AWS EKS, DynamoDB, and Kinesis
+  - _Skills: Microservices, Feed algorithms, Content delivery, Media processing_
+
+- [ ] **PROJECT 4: Video Streaming Platform (Netflix Scale)** (CDN + Storage)
+  - Build video streaming service with global distribution
+  - Implement adaptive bitrate streaming and transcoding
+  - Add content recommendation and search systems
+  - Create user analytics and viewing history tracking
+  - Deploy with AWS CloudFront, S3, and MediaConvert
+  - _Skills: Video streaming, CDN, Transcoding, Recommendation systems_
+
+- [ ] **PROJECT 5: E-Commerce Platform (Amazon Scale)** (High Availability + Consistency)
+  - Design high-availability e-commerce system
+  - Implement inventory management and order processing
+  - Add payment processing and fraud detection
+  - Create search and recommendation engines
+  - Deploy with AWS RDS Multi-AZ, DynamoDB, and Lambda
+  - _Skills: High availability, ACID transactions, Search, Payment systems_
+
+- [ ] **PROJECT 6: Ride-Sharing Service (Uber Scale)** (Geospatial + Real-time)
+  - Build ride-sharing platform with real-time matching
+  - Implement geospatial indexing and location tracking
+  - Add dynamic pricing and route optimization
+  - Create driver and rider mobile app backends
+  - Deploy with AWS Location Services, Kinesis, and DynamoDB
+  - _Skills: Geospatial systems, Real-time matching, Dynamic pricing, Mobile backends_
+
+- [ ] **PROJECT 7: Search Engine (Google Scale)** (Big Data + Distributed Computing)
+  - Design web search engine with crawling and indexing
+  - Implement distributed search algorithms and ranking
+  - Add real-time query processing and auto-complete
+  - Create web crawler and content analysis pipeline
+  - Deploy with AWS EMR, Elasticsearch, and Lambda
+  - _Skills: Search algorithms, Big data processing, Distributed computing, Web crawling_
+
 - [ ] 4.1 Build comprehensive Amazon system case studies
-  - Create Amazon retail architecture case study with authentic details
-  - Implement AWS services architecture with real service examples
-  - Add Prime Video streaming architecture with performance details
-  - Build Alexa voice service architecture with distributed processing
-  - Create Amazon logistics and fulfillment system architecture
+  - Execute all 7 progressive system design projects with increasing complexity
+  - Create detailed architecture documentation and trade-off analysis
+  - Add Amazon service integration and cost optimization strategies
+  - Build project portfolio suitable for Amazon L5/L6 system design interviews
+  - Validate against Amazon Well-Architected Framework and production standards
   - _Requirements: 4.1, 4.3_
 
 - [ ] 4.2 Implement Amazon architectural decision frameworks
