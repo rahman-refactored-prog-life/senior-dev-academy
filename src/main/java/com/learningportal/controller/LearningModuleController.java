@@ -12,6 +12,8 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -49,6 +51,7 @@ public class LearningModuleController {
         @ApiResponse(responseCode = "500", description = "Internal server error")
     })
     @GetMapping
+    @Cacheable(value = "learningModules", key = "#page + '_' + #size + '_' + (#search != null ? #search : 'all')")
     public ResponseEntity<Page<LearningModule>> getAllModules(
             @Parameter(description = "Page number (0-based)", example = "0")
             @RequestParam(defaultValue = "0") int page,

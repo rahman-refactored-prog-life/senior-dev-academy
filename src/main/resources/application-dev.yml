@@ -1,69 +1,62 @@
-# Spring Boot Configuration - Development Profile (Default)
-# This file demonstrates YAML configuration with externalized environment-specific values
-# All sensitive and environment-specific values use ${ENV_VAR:default_value} pattern
+# Development Profile Configuration
+# Activated with: --spring.profiles.active=dev or SPRING_PROFILES_ACTIVE=dev
 
 spring:
   application:
     name: ${APP_NAME:comprehensive-dev-portal}
   
-  # Database Configuration - Externalized for environment-specific values
+  # Database Configuration - PostgreSQL for Development
   datasource:
-    # PostgreSQL Database - Uses environment variables with sensible defaults
     url: ${DB_URL:jdbc:postgresql://localhost:5432/devportalkirostart}
     driverClassName: ${DB_DRIVER:org.postgresql.Driver}
     username: ${DB_USERNAME:postgres}
     password: ${DB_PASSWORD:password}
     
-    # Connection Pool Configuration (HikariCP) - Optimized for Performance
+    # Connection Pool Configuration (HikariCP)
     hikari:
-      maximum-pool-size: 20          # Increased for better concurrency
-      minimum-idle: 5               # Higher minimum for faster response
-      idle-timeout: 300000          # 5 minutes
-      connection-timeout: 20000     # 20 seconds
-      max-lifetime: 1200000         # 20 minutes
-      leak-detection-threshold: 60000 # 1 minute
-      pool-name: "HikariCP-DevPortal"
+      maximum-pool-size: ${DB_POOL_MAX_SIZE:20}
+      minimum-idle: ${DB_POOL_MIN_IDLE:5}
+      idle-timeout: ${DB_POOL_IDLE_TIMEOUT:300000}
+      connection-timeout: ${DB_POOL_CONNECTION_TIMEOUT:20000}
+      max-lifetime: ${DB_POOL_MAX_LIFETIME:1200000}
+      leak-detection-threshold: ${DB_POOL_LEAK_DETECTION:60000}
+      pool-name: "HikariCP-DevPortal-Dev"
       connection-test-query: "SELECT 1"
     
-  # JPA/Hibernate Configuration - Optimized for Performance
+  # JPA/Hibernate Configuration
   jpa:
     database-platform: org.hibernate.dialect.PostgreSQLDialect
     hibernate:
-      ddl-auto: create-drop  # Creates schema on startup, drops on shutdown
-    show-sql: true  # Shows SQL queries in console (great for learning!)
-    format-sql: true
+      ddl-auto: ${JPA_DDL_AUTO:create-drop}
+    show-sql: ${JPA_SHOW_SQL:true}
+    format-sql: ${JPA_FORMAT_SQL:true}
     properties:
       hibernate:
         format_sql: true
         use_sql_comments: true
-        # Performance optimizations
         jdbc:
-          batch_size: 25
+          batch_size: ${JPA_BATCH_SIZE:25}
           batch_versioned_data: true
         order_inserts: true
         order_updates: true
-        # Query optimization
-        default_batch_fetch_size: 16
-        # Connection and caching
+        default_batch_fetch_size: ${JPA_FETCH_SIZE:16}
         connection:
           provider_disables_autocommit: true
-        # Lazy loading optimization
         enable_lazy_load_no_trans: false
-        # Statistics for monitoring
         generate_statistics: true
       
-  # Security Configuration - Externalized credentials
+  # Security Configuration
   security:
     user:
       name: ${SECURITY_USER_NAME:admin}
       password: ${SECURITY_USER_PASSWORD:admin123}
       roles: ${SECURITY_USER_ROLES:ADMIN}
       
-  # Cache Configuration - Enhanced for Performance
+  # Cache Configuration
   cache:
-    type: caffeine
+    type: ${CACHE_TYPE:caffeine}
     caffeine:
-      spec: maximumSize=1000,expireAfterWrite=10m,expireAfterAccess=5m
+      spec: ${CACHE_SPEC:maximumSize=1000,expireAfterWrite=10m,expireAfterAccess=5m}
     cache-names:
       - learningModules
       - learningStats
@@ -77,19 +70,21 @@ spring:
     livereload:
       enabled: true
 
-# Server Configuration - REST API Server (Externalized)
+# Server Configuration
 server:
   port: ${SERVER_PORT:3008}
   servlet:
     context-path: ${SERVER_CONTEXT_PATH:/api}
     
-# Actuator Configuration (for monitoring and health checks)
+# Actuator Configuration
 management:
   endpoints:
     web:
       exposure:
-        include: health,info,metrics,prometheus
+        include: health,info,metrics,prometheus,env
   endpoint:
+    health:
+      show-details: ${MANAGEMENT_HEALTH_SHOW_DETAILS:always}
     metrics:
       enabled: true
     prometheus:
@@ -97,12 +92,9 @@ management:
   metrics:
     export:
       prometheus:
-        enabled: true,metrics,env
-  endpoint:
-    health:
-      show-details: always
+        enabled: true
       
-# Logging Configuration - Externalized log levels
+# Logging Configuration
 logging:
   level:
     root: ${LOGGING_LEVEL_ROOT:INFO}
@@ -113,7 +105,7 @@ logging:
   pattern:
     console: "%d{yyyy-MM-dd HH:mm:ss} - %msg%n"
   file:
-    name: ${LOGGING_FILE:logs/application.log}
+    name: ${LOGGING_FILE:logs/dev-application.log}
     max-size: ${LOGGING_FILE_MAX_SIZE:10MB}
     max-history: ${LOGGING_FILE_MAX_HISTORY:30}
     
@@ -122,12 +114,17 @@ app:
   name: Comprehensive Developer Portal
   version: 1.0.0
   description: The most comprehensive learning portal for Java, Spring, React, and System Design
+  environment: development
+  
+  # Performance Monitoring
+  performance:
+    monitoring-enabled: ${PERFORMANCE_MONITORING_ENABLED:true}
+    slow-query-threshold: ${PERFORMANCE_SLOW_QUERY_THRESHOLD:1000}
+    request-timeout: ${PERFORMANCE_REQUEST_TIMEOUT:30000}
+  
+  # Feature Flags
   features:
-    - Java Fundamentals to Advanced
-    - Spring Framework Ecosystem
-    - React Development
-    - Data Structures & Algorithms
-    - System Design
-    - Interview Preparation
-    - Interactive Code Editor
-    - Progress Tracking
+    code-execution: ${FEATURE_CODE_EXECUTION:true}
+    ai-assistance: ${FEATURE_AI_ASSISTANCE:true}
+    progress-analytics: ${FEATURE_PROGRESS_ANALYTICS:true}
+    social-features: ${FEATURE_SOCIAL_FEATURES:false}

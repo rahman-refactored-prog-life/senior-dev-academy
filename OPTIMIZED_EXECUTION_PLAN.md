@@ -19,28 +19,28 @@
 
 
 ### **PHASE 3: INTERACTIVE LEARNING FEATURES (4 specs)**
-17. **monaco-code-editor-integration** - Code editor with multi-language execution
-18. **visualization-engine** - Interactive visualizations and animations
-19. **multi-language-code-implementation** - Multi-language code examples
-20. **rich-note-taking-system** - Embedded + central note-taking
+7. **monaco-code-editor-integration** - Code editor with multi-language execution
+8. **visualization-engine** - Interactive visualizations and animations
+9. **multi-language-code-implementation** - Multi-language code examples
+0. **rich-note-taking-system** - Embedded + central note-taking
 
 ### **PHASE 4: CORE BACKEND TECHNOLOGIES (2 specs)**
-7. **java-complete-ecosystem** - Java + Spring + Hibernate (beginner to expert)
-8. **database-systems-complete-spec** - SQL + NoSQL comprehensive
+11. **java-complete-ecosystem** - Java + Spring + Hibernate (beginner to expert)
+12. **database-systems-complete-spec** - SQL + NoSQL comprehensive
 
 ### **PHASE 5: CORE FRONTEND TECHNOLOGIES (2 specs)**
-9. **react-complete-mastery** - React (beginner to Amazon Senior SDE)
-10. **nodejs-complete-mastery** - Node.js (beginner to Amazon Senior SDE)
+13. **react-complete-mastery** - React (beginner to Amazon Senior SDE)
+14. **nodejs-complete-mastery** - Node.js (beginner to Amazon Senior SDE)
 
 ### **PHASE 6: COMPUTER SCIENCE FUNDAMENTALS (3 specs)**
-11. **data-structures-complete-universe** - Every DS that exists (with visualizations)
-12. **algorithms-complete-mastery** - All algorithms (DP, backtracking, recursion, etc.)
-13. **system-design-complete-coverage** - Scalable systems design
+15. **data-structures-complete-universe** - Every DS that exists (with visualizations)
+16. **algorithms-complete-mastery** - All algorithms (DP, backtracking, recursion, etc.)
+17. **system-design-complete-coverage** - Scalable systems design
 
 ### **PHASE 6.5: ADVANCED ARCHITECTURE & SECURITY (3 specs)**
-14. **distributed-systems-mastery** - CAP theorem, consensus algorithms, Amazon-scale patterns
-15. **microservices-architecture-complete** - Service mesh, API gateways, observability
-16. **security-and-compliance-mastery** - OWASP, encryption, AWS security, compliance frameworks
+18. **distributed-systems-mastery** - CAP theorem, consensus algorithms, Amazon-scale patterns
+19. **microservices-architecture-complete** - Service mesh, API gateways, observability
+20. **security-and-compliance-mastery** - OWASP, encryption, AWS security, compliance frameworks
 
 
 ### **PHASE 7: INTERVIEW PREPARATION SYSTEM (3 specs)**

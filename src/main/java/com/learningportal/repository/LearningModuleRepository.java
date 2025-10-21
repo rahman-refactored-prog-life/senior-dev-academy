@@ -6,8 +6,10 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.jpa.repository.QueryHints;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
+import jakarta.persistence.QueryHint;
 
 import java.util.List;
 import java.util.Optional;
@@ -121,4 +123,55 @@ public interface LearningModuleRepository extends JpaRepository<LearningModule, 
      * Find module by name (case-insensitive)
      */
     Optional<LearningModule> findByNameIgnoreCase(String name);
+
+    /**
+     * Performance-optimized queries with batch fetching
+     */
+    
+    /**
+     * Find modules with batch fetching for better performance
+     */
+    @Query("SELECT m FROM LearningModule m ORDER BY m.sortOrder ASC")
+    @QueryHints({
+        @QueryHint(name = "org.hibernate.fetchSize", value = "50"),
+        @QueryHint(name = "org.hibernate.readOnly", value = "true")
+    })
+    List<LearningModule> findAllOptimized();
+
+    /**
+     * Find modules by category with optimized fetching
+     */
+    @Query("SELECT m FROM LearningModule m WHERE m.category = :category ORDER BY m.sortOrder ASC")
+    @QueryHints({
+        @QueryHint(name = "org.hibernate.fetchSize", value = "25"),
+        @QueryHint(name = "org.hibernate.cacheable", value = "true")
+    })
+    List<LearningModule> findByCategoryOptimized(@Param("category") LearningModule.Category category);
+
+    /**
+     * Batch update sort orders for performance
+     */
+    @org.springframework.data.jpa.repository.Modifying
+    @Query("UPDATE LearningModule m SET m.sortOrder = :sortOrder WHERE m.id = :id")
+    int updateSortOrder(@Param("id") Long id, @Param("sortOrder") Integer sortOrder);
+
+    /**
+     * Get lightweight module summaries for performance
+     */
+    @Query("SELECT new com.learningportal.dto.ModuleSummaryDto(m.id, m.name, m.category, m.difficultyLevel, m.estimatedHours) " +
+           "FROM LearningModule m ORDER BY m.sortOrder ASC")
+    List<Object[]> findModuleSummaries();
+
+    /**
+     * Count total estimated hours efficiently
+     */
+    @Query("SELECT COALESCE(SUM(m.estimatedHours), 0) FROM LearningModule m")
+    Integer getTotalEstimatedHours();
+
+    /**
+     * Find modules with pagination and sorting optimized
+     */
+    @Query(value = "SELECT m FROM LearningModule m ORDER BY m.sortOrder ASC",
+           countQuery = "SELECT COUNT(m) FROM LearningModule m")
+    Page<LearningModule> findAllOptimizedPaged(Pageable pageable);
 }

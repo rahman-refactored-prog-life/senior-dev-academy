@@ -1,0 +1,38 @@
+# Test configuration - uses same PostgreSQL as production
+spring:
+  datasource:
+    url: jdbc:postgresql://localhost:5432/${DB_NAME:learningportal}
+    driver-class-name: org.postgresql.Driver
+    username: ${DB_USERNAME:postgres}
+    password: ${DB_PASSWORD:password}
+  
+  jpa:
+    hibernate:
+      ddl-auto: validate
+    show-sql: false
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+        format_sql: false
+  
+  logging:
+    level:
+      com.learningportal: INFO
+      org.springframework.web: INFO
+      org.hibernate: WARN
+      org.springframework.security: WARN
+      org.testcontainers: INFO
+  
+  security:
+    user:
+      name: test
+      password: test
+      roles: USER
+
+# Test-specific configurations
+test:
+  database:
+    cleanup: true
+  
+  mock:
+    external-services: true

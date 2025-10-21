@@ -1,0 +1,70 @@
+# Test Configuration Profile
+# Optimized for fast test execution and isolated test environment
+
+spring:
+  # Database Configuration for Tests
+  datasource:
+    url: jdbc:h2:mem:testdb;DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE
+    driver-class-name: org.h2.Driver
+    username: sa
+    password: password
+    
+  # JPA Configuration for Tests
+  jpa:
+    hibernate:
+      ddl-auto: create-drop
+    show-sql: false
+    properties:
+      hibernate:
+        format_sql: false
+        dialect: org.hibernate.dialect.H2Dialect
+        
+  # H2 Console (disabled in tests)
+  h2:
+    console:
+      enabled: false
+      
+  # Flyway (disabled for tests - using create-drop)
+  flyway:
+    enabled: false
+    
+  # Cache Configuration (simple for tests)
+  cache:
+    type: simple
+    
+  # Security Configuration for Tests
+  security:
+    user:
+      name: testuser
+      password: testpass
+      roles: USER,ADMIN
+      
+# Logging Configuration for Tests
+logging:
+  level:
+    com.learningportal: INFO
+    org.springframework.web: WARN
+    org.springframework.security: WARN
+    org.hibernate: WARN
+    org.springframework.test: INFO
+  pattern:
+    console: "%d{HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n"
+    
+# Actuator Configuration for Tests
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics
+  endpoint:
+    health:
+      show-details: always
+      
+# Test-specific Configuration
+test:
+  database:
+    cleanup: true
+  performance:
+    timeout: 30000
+  coverage:
+    minimum: 80

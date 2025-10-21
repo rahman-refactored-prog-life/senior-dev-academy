@@ -26,6 +26,13 @@ import TestComponent from './components/TestComponent'
 // Context
 import { AuthProvider } from './context/AuthContext'
 import { LearningProvider } from './context/LearningContext'
+import { ThemeProvider } from './context/ThemeContext'
+
+// Styles
+import './styles/design-tokens.css'
+import './styles/world-class-learning-design.css'
+import './styles/themes.css'
+import './styles/global.css'
 
 /**
  * Main Application Component
@@ -66,9 +73,10 @@ function App() {
   console.log('App render - sidebarOpen:', sidebarOpen)
 
   return (
-    <AuthProvider>
-      <LearningProvider>
-        <Router>
+    <ThemeProvider>
+      <AuthProvider>
+        <LearningProvider>
+          <Router>
           <div className="app-layout">
             {/* Toast Notifications */}
             <Toaster
@@ -144,9 +152,10 @@ function App() {
             />
           )}
           </div>
-        </Router>
-      </LearningProvider>
-    </AuthProvider>
+          </Router>
+        </LearningProvider>
+      </AuthProvider>
+    </ThemeProvider>
   )
 }
 

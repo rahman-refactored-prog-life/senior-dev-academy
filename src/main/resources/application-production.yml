@@ -1,31 +1,34 @@
-# Production Configuration with PostgreSQL
-# This configuration demonstrates production-ready settings
+# Production Profile Configuration
+# Activated with: --spring.profiles.active=production or SPRING_PROFILES_ACTIVE=production
+# All sensitive values MUST be provided via environment variables in production
 
 spring:
   application:
-    name: senior-dev-academy
+    name: ${APP_NAME:senior-dev-academy}
   
-  # PostgreSQL Database Configuration - devacademykiro database
+  # PostgreSQL Database Configuration - Fully Externalized
   datasource:
-    url: jdbc:postgresql://localhost:5432/devacademykiro
-    username: postgres
-    password: password
-    driver-class-name: org.postgresql.Driver
+    url: ${DB_URL:jdbc:postgresql://localhost:5432/devacademykiro}
+    username: ${DB_USERNAME:postgres}
+    password: ${DB_PASSWORD}  # REQUIRED: Must be set via environment variable
+    driver-class-name: ${DB_DRIVER:org.postgresql.Driver}
     
-    # Connection Pool Configuration (HikariCP)
+    # Connection Pool Configuration (HikariCP) - Externalized
     hikari:
-      maximum-pool-size: 20
-      minimum-idle: 5
-      idle-timeout: 300000
-      connection-timeout: 20000
-      leak-detection-threshold: 60000
+      maximum-pool-size: ${DB_POOL_MAX_SIZE:20}
+      minimum-idle: ${DB_POOL_MIN_IDLE:5}
+      idle-timeout: ${DB_POOL_IDLE_TIMEOUT:300000}
+      connection-timeout: ${DB_POOL_CONNECTION_TIMEOUT:20000}
+      max-lifetime: ${DB_POOL_MAX_LIFETIME:1200000}
+      leak-detection-threshold: ${DB_POOL_LEAK_DETECTION:60000}
+      pool-name: "HikariCP-DevPortal-Prod"
       
   # JPA/Hibernate Configuration for PostgreSQL
   jpa:
     database-platform: org.hibernate.dialect.PostgreSQLDialect
     hibernate:
-      ddl-auto: validate  # Use validate in production, never create-drop
-    show-sql: false  # Disable SQL logging in production
+      ddl-auto: ${JPA_DDL_AUTO:validate}  # Use validate in production, never create-drop
+    show-sql: ${JPA_SHOW_SQL:false}  # Disable SQL logging in production
     properties:
       hibernate:
         format_sql: false
@@ -42,30 +45,30 @@ spring:
           region:
             factory_class: org.hibernate.cache.jcache.JCacheRegionFactory
             
-  # Security Configuration
+  # Security Configuration - REQUIRED environment variables
   security:
     user:
-      name: ${ADMIN_USERNAME:admin}
-      password: ${ADMIN_PASSWORD:SecurePassword123!}
-      roles: ADMIN
+      name: ${SECURITY_USER_NAME}  # REQUIRED: Must be set via environment variable
+      password: ${SECURITY_USER_PASSWORD}  # REQUIRED: Must be set via environment variable
+      roles: ${SECURITY_USER_ROLES:ADMIN}
       
-  # Cache Configuration (Redis in production)
+  # Cache Configuration (Redis in production) - Externalized
   cache:
-    type: redis
+    type: ${CACHE_TYPE:redis}
     redis:
-      time-to-live: 600000  # 10 minutes
+      time-to-live: ${CACHE_TTL:600000}  # 10 minutes default
       
-  # Redis Configuration
+  # Redis Configuration - Externalized
   redis:
     host: ${REDIS_HOST:localhost}
     port: ${REDIS_PORT:6379}
     password: ${REDIS_PASSWORD:}
-    timeout: 2000ms
+    timeout: ${REDIS_TIMEOUT:2000ms}
     jedis:
       pool:
-        max-active: 8
-        max-idle: 8
-        min-idle: 0
+        max-active: ${REDIS_POOL_MAX_ACTIVE:8}
+        max-idle: ${REDIS_POOL_MAX_IDLE:8}
+        min-idle: ${REDIS_POOL_MIN_IDLE:0}
 
 # Server Configuration
 server:
@@ -98,20 +101,21 @@ management:
       prometheus:
         enabled: true
         
-# Logging Configuration for Production
+# Logging Configuration for Production - Externalized
 logging:
   level:
-    com.learningportal: INFO
-    org.springframework.security: WARN
-    org.hibernate.SQL: WARN
-    org.hibernate.type.descriptor.sql.BasicBinder: WARN
+    root: ${LOGGING_LEVEL_ROOT:INFO}
+    com.learningportal: ${LOGGING_LEVEL_APP:INFO}
+    org.springframework.security: ${LOGGING_LEVEL_SECURITY:WARN}
+    org.hibernate.SQL: ${LOGGING_LEVEL_SQL:WARN}
+    org.hibernate.type.descriptor.sql.BasicBinder: ${LOGGING_LEVEL_SQL_PARAMS:WARN}
   pattern:
     console: "%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{36} - %msg%n"
     file: "%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{36} - %msg%n"
   file:
-    name: logs/senior-dev-academy.log
-    max-size: 10MB
-    max-history: 30
+    name: ${LOGGING_FILE:logs/senior-dev-academy.log}
+    max-size: ${LOGGING_FILE_MAX_SIZE:10MB}
+    max-history: ${LOGGING_FILE_MAX_HISTORY:30}
     
 # Custom Application Properties
 app:
@@ -119,35 +123,41 @@ app:
   version: 1.0.0
   description: The most comprehensive learning portal for senior developer preparation
   
-  # Security settings
+  # Security settings - Externalized
   security:
     jwt:
-      secret: ${JWT_SECRET:MySecretKey}
-      expiration: 86400000  # 24 hours
+      secret: ${JWT_SECRET}  # REQUIRED: Must be set via environment variable
+      expiration: ${JWT_EXPIRATION:86400000}  # 24 hours default
       
-  # File upload settings
+  # File upload settings - Externalized
   upload:
-    max-file-size: 10MB
-    max-request-size: 50MB
+    max-file-size: ${UPLOAD_MAX_FILE_SIZE:10MB}
+    max-request-size: ${UPLOAD_MAX_REQUEST_SIZE:50MB}
     upload-dir: ${UPLOAD_DIR:./uploads}
     
-  # Email configuration (for notifications)
+  # Email configuration (for notifications) - Externalized
   mail:
     host: ${MAIL_HOST:smtp.gmail.com}
     port: ${MAIL_PORT:587}
-    username: ${MAIL_USERNAME:}
-    password: ${MAIL_PASSWORD:}
+    username: ${MAIL_USERNAME}  # REQUIRED if email enabled
+    password: ${MAIL_PASSWORD}  # REQUIRED if email enabled
     
-  # External API configurations
+  # External API configurations - Externalized
   external-apis:
     github:
       token: ${GITHUB_TOKEN:}
     stackoverflow:
       key: ${STACKOVERFLOW_KEY:}
       
-  # Feature flags
+  # Feature flags - Externalized
   features:
-    code-execution: true
-    ai-assistance: true
-    progress-analytics: true
-    social-features: false
+    code-execution: ${FEATURE_CODE_EXECUTION:true}
+    ai-assistance: ${FEATURE_AI_ASSISTANCE:true}
+    progress-analytics: ${FEATURE_PROGRESS_ANALYTICS:true}
+    social-features: ${FEATURE_SOCIAL_FEATURES:false}
+    
+  # Performance settings - Externalized
+  performance:
+    monitoring-enabled: ${PERFORMANCE_MONITORING_ENABLED:true}
+    slow-query-threshold: ${PERFORMANCE_SLOW_QUERY_THRESHOLD:1000}
+    request-timeout: ${PERFORMANCE_REQUEST_TIMEOUT:30000}
