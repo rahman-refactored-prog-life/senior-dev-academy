@@ -20,47 +20,46 @@ This specification defines the requirements for implementing a comprehensive Jav
 **User Story:** As a zero-experience learner, I want complete Java coverage from absolute basics to expert level, so that I can become qualified for Amazon Senior SDE positions.
 
 #### Acceptance Criteria
-1. THE Java_Learning_System SHALL provide 100+ comprehensive Java topics covering fundamentals through advanced concepts
-2. THE Java_Learning_System SHALL include Java basics (variables, data types, operators, control structures) with real-world analogies
-3. THE Java_Learning_System SHALL cover Object-Oriented Programming (classes, objects, inheritance, polymorphism, encapsulation, abstraction) with practical examples
-4. THE Java_Learning_System SHALL include Collections Framework (List, Set, Map, Queue) with performance analysis and use cases
-5. THE Java_Learning_System SHALL provide Exception Handling (try-catch, custom exceptions, best practices) with enterprise patterns
-6. THE Java_Learning_System SHALL cover Generics and Type Safety with advanced use cases and wildcards
-7. THE Java_Learning_System SHALL include Lambda Expressions and Streams with functional programming concepts
-8. THE Java_Learning_System SHALL provide Concurrency (threads, synchronization, concurrent collections, executor framework) with real-world scenarios
+1. THE Java_Learning_System SHALL provide 100+ comprehensive Java topics covering fundamentals through advanced concepts with Amazon-scale examples and enterprise patterns
+2. WHEN a zero-experience user accesses Java basics, THE Java_Learning_System SHALL present variables, data types, operators, and control structures with real-world Amazon analogies and interactive code examples
+3. WHILE learning Object-Oriented Programming, THE Java_Learning_System SHALL demonstrate classes, objects, inheritance, polymorphism, encapsulation, and abstraction using Amazon system design patterns and enterprise examples
+4. IF a user studies Collections Framework, THEN THE Java_Learning_System SHALL provide List, Set, Map, and Queue implementations with Amazon performance requirements and scalability considerations
+5. WHERE Exception Handling is covered, THE Java_Learning_System SHALL include try-catch blocks, custom exceptions, and Amazon enterprise error handling patterns with production-ready examples
 9. THE Java_Learning_System SHALL cover JVM Internals (memory management, garbage collection, performance tuning) with profiling techniques
 10. THE Java_Learning_System SHALL include Design Patterns (all 23 GoF patterns) with Java implementations and use cases
 
-### Requirement 2: Zero-Experience Learning Support
-**User Story:** As someone with absolutely no programming experience, I want detailed explanations with real-world analogies, so that I can understand complex Java concepts easily.
+### Requirement 2: Amazon-Calibrated Zero-Experience Learning Support
+
+**User Story:** As someone with absolutely no programming experience preparing for Amazon Senior SDE roles, I want detailed explanations with Amazon-scale analogies and enterprise development standards, so that I can understand complex Java concepts and meet Amazon L3-L6 competency requirements.
 
 #### Acceptance Criteria
-1. THE Java_Learning_System SHALL provide real-world analogies for every complex concept (variables as storage boxes, classes as blueprints, inheritance as family traits)
-2. THE Java_Learning_System SHALL include step-by-step explanations starting from absolute basics with no assumed prior knowledge
-3. THE Java_Learning_System SHALL provide visual diagrams and illustrations for abstract concepts (memory allocation, object relationships, inheritance hierarchies)
-4. THE Java_Learning_System SHALL include progressive complexity with each topic building on previously learned concepts
-5. THE Java_Learning_System SHALL provide multiple learning approaches (visual, textual, hands-on) to accommodate different learning styles
-6. THE Java_Learning_System SHALL include common beginner mistakes and how to avoid them with detailed explanations
-7. THE Java_Learning_System SHALL provide glossary definitions for all technical terms with simple explanations
+1. THE Java_Learning_System SHALL provide Amazon-scale analogies for every complex concept using Amazon business examples (variables as Amazon inventory slots, classes as Amazon service blueprints, inheritance as Amazon organizational hierarchy)
+2. WHEN a zero-experience user begins learning, THE Java_Learning_System SHALL present step-by-step explanations aligned with Amazon coding standards and enterprise development practices
+3. WHILE learning abstract concepts, THE Java_Learning_System SHALL provide visual diagrams illustrating Amazon system architectures (memory allocation like Amazon warehouse management, object relationships like Amazon service dependencies)
+4. IF a user encounters learning difficulties, THEN THE Java_Learning_System SHALL provide Amazon Leadership Principles-based problem-solving approaches and enterprise debugging methodologies
+5. WHERE multiple learning approaches are needed, THE Java_Learning_System SHALL accommodate different learning styles while maintaining Amazon professional development standards and enterprise-grade practices
 
-### Requirement 3: Interactive Code Editor Integration
-**User Story:** As a learner, I want to practice Java code directly in the browser with immediate feedback, so that I can learn through hands-on experience.
+### Requirement 3: Enterprise-Grade Interactive Code Editor with Amazon Standards
 
-#### Acceptance Criteria
-1. THE Java_Learning_System SHALL integrate Monaco Editor with full Java syntax highlighting and error detection
-2. THE Java_Learning_System SHALL provide real-time code compilation and execution with output display
-3. THE Java_Learning_System SHALL include code templates and examples for every topic with editable implementations
-4. THE Java_Learning_System SHALL provide intelligent code completion and suggestions based on Java language features
-5. THE Java_Learning_System SHALL include debugging capabilities with step-through execution and variable inspection
-6. THE Java_Learning_System SHALL save user code progress automatically with version history and recovery options
-7. THE Java_Learning_System SHALL provide code sharing and collaboration features for peer learning
-8. THE Java_Learning_System SHALL include performance analysis tools showing execution time and memory usage
-
-### Requirement 4: Embedded Interview Questions System
-**User Story:** As a FAANG interview candidate, I want Java interview questions embedded in relevant topics with multiple solution approaches, so that I can practice immediately after learning concepts.
+**User Story:** As an Amazon Senior SDE candidate, I want to practice Java code with enterprise-grade tools and Amazon coding standards, so that I can develop production-ready code that meets Amazon's quality and performance requirements.
 
 #### Acceptance Criteria
-1. THE Java_Learning_System SHALL embed 500+ real FAANG interview questions within relevant Java topics
+1. THE Java_Learning_System SHALL integrate Monaco Editor with Amazon coding standards validation, enterprise-grade syntax highlighting, and OWASP security scanning
+2. WHEN code is written, THE Java_Learning_System SHALL provide real-time compilation with Amazon performance benchmarks and enterprise error reporting
+3. WHILE practicing coding, THE Java_Learning_System SHALL include Amazon-approved code templates and enterprise design patterns with production-ready implementations
+4. IF code quality issues are detected, THEN THE Java_Learning_System SHALL provide Amazon code review standards feedback and enterprise remediation suggestions
+5. WHERE debugging is required, THE Java_Learning_System SHALL include enterprise debugging capabilities with Amazon operational excellence practices and production troubleshooting methodologies
+
+### Requirement 4: Amazon-Focused Interview Questions with Enterprise Development Standards
+
+**User Story:** As an Amazon Senior SDE candidate, I want Java interview questions embedded with Amazon Leadership Principles integration and enterprise development standards, so that I can practice Amazon-style problem-solving and demonstrate L5/L6 competency.
+
+#### Acceptance Criteria
+1. THE Java_Learning_System SHALL embed 500+ authentic Amazon and FAANG interview questions within relevant Java topics with Amazon Leadership Principles integration and enterprise solution patterns
+2. WHEN practicing interview questions, THE Java_Learning_System SHALL provide Amazon-style evaluation criteria including code quality, scalability, and operational excellence considerations
+3. WHILE solving problems, THE Java_Learning_System SHALL demonstrate multiple solution approaches with Amazon performance requirements and enterprise architecture patterns
+4. IF suboptimal solutions are provided, THEN THE Java_Learning_System SHALL guide users toward Amazon-approved optimization techniques and enterprise best practices
+5. WHERE advanced topics are covered, THE Java_Learning_System SHALL include Amazon L5/L6 level questions with system design integration and enterprise-grade complexity
 2. THE Java_Learning_System SHALL provide multiple solution approaches (brute force to optimal) with complexity analysis
 3. THE Java_Learning_System SHALL include company attribution showing which companies (Amazon, Google, Meta, Microsoft, Apple) asked each question
 4. THE Java_Learning_System SHALL provide detailed explanations of problem-solving approaches and optimization techniques
@@ -134,15 +133,35 @@ This specification defines the requirements for implementing a comprehensive Jav
 7. THE Java_Learning_System SHALL provide Performance Optimization techniques with profiling and monitoring
 8. THE Java_Learning_System SHALL include Security Best Practices with OWASP guidelines and implementations
 
-### Requirement 10: Assessment and Certification Preparation
-**User Story:** As a certification candidate, I want comprehensive assessment tools and practice exams, so that I can validate my Java expertise and prepare for certifications.
+### Requirement 10: Amazon L3-L6 Competency Assessment and Enterprise Certification
+
+**User Story:** As an Amazon Senior SDE candidate, I want comprehensive assessment tools aligned with Amazon competency levels and enterprise development standards, so that I can validate my readiness for Amazon L5/L6 roles and demonstrate enterprise-grade Java expertise.
 
 #### Acceptance Criteria
-1. THE Java_Learning_System SHALL provide comprehensive practice exams covering all Java topics with detailed explanations
-2. THE Java_Learning_System SHALL include Oracle Java certification preparation with exam-specific content and strategies
-3. THE Java_Learning_System SHALL provide timed assessments simulating real interview and certification conditions
-4. THE Java_Learning_System SHALL include adaptive testing with difficulty adjustment based on performance
-5. THE Java_Learning_System SHALL provide detailed performance analysis with strengths and improvement areas
-6. THE Java_Learning_System SHALL include certification roadmap guidance with recommended learning paths
-7. THE Java_Learning_System SHALL provide mock interview simulations with behavioral and technical components
-8. THE Java_Learning_System SHALL include industry benchmark comparisons with skill validation certificates
+1. THE Java_Learning_System SHALL provide Amazon L3-L6 competency assessments covering all Java topics with Amazon Leadership Principles integration and enterprise development standards
+2. WHEN taking assessments, THE Java_Learning_System SHALL simulate Amazon interview conditions including system design integration, behavioral components, and enterprise problem-solving scenarios
+3. WHILE evaluating performance, THE Java_Learning_System SHALL provide Amazon-calibrated scoring with L3-L6 competency mapping and enterprise skill validation
+4. IF competency gaps are identified, THEN THE Java_Learning_System SHALL provide targeted Amazon-focused improvement plans with enterprise development training
+5. WHERE certification is pursued, THE Java_Learning_System SHALL include Oracle Java certification preparation integrated with Amazon hiring requirements and enterprise development standards
+
+### Requirement 11: Enterprise-Grade Development Lifecycle Integration
+
+**User Story:** As an enterprise Java developer preparing for Amazon Senior SDE roles, I want comprehensive coverage of enterprise development lifecycle and Amazon operational excellence, so that I can demonstrate production-ready development skills and Amazon-level operational competency.
+
+#### Acceptance Criteria
+1. THE Java_Learning_System SHALL provide complete Software Development Lifecycle (SDLC) coverage including Amazon development practices, enterprise requirements gathering, design documentation, and operational excellence
+2. WHEN learning development practices, THE Java_Learning_System SHALL include Amazon code review standards, enterprise testing strategies, CI/CD pipelines, and production deployment procedures
+3. WHILE studying quality assurance, THE Java_Learning_System SHALL demonstrate Amazon quality gates, enterprise security scanning, performance testing, and operational monitoring
+4. IF production issues arise, THEN THE Java_Learning_System SHALL provide Amazon incident response procedures, enterprise debugging methodologies, and operational troubleshooting
+5. WHERE operational excellence is required, THE Java_Learning_System SHALL include Amazon monitoring practices, enterprise logging strategies, and production support procedures
+
+### Requirement 12: Amazon Leadership Principles Integration in Technical Learning
+
+**User Story:** As an Amazon Senior SDE candidate, I want Amazon Leadership Principles integrated throughout Java technical learning, so that I can demonstrate both technical competency and Amazon cultural alignment in L5/L6 interviews.
+
+#### Acceptance Criteria
+1. THE Java_Learning_System SHALL integrate all 16 Amazon Leadership Principles throughout Java technical content with authentic scenarios and behavioral applications
+2. WHEN solving technical problems, THE Java_Learning_System SHALL demonstrate Customer Obsession through user-focused code design and enterprise customer impact considerations
+3. WHILE making architectural decisions, THE Java_Learning_System SHALL apply Ownership principles in code responsibility, enterprise system ownership, and operational accountability
+4. IF innovation opportunities arise, THEN THE Java_Learning_System SHALL demonstrate Invent and Simplify through elegant Java solutions and enterprise architecture optimization
+5. WHERE technical leadership is required, THE Java_Learning_System SHALL integrate Learn and Be Curious through continuous improvement, enterprise technology adoption, and Amazon innovation practices
