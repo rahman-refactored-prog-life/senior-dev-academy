@@ -69,15 +69,16 @@ public class ComprehensiveDevPortalApplication {
             🚀 FAANG Senior Developer Mastery Portal Started Successfully!
             
             📚 REST API Access Points:
-            • API Base: http://localhost:9090/api/v1
-            • Swagger UI: http://localhost:9090/api/v1/swagger-ui.html
-            • API Docs: http://localhost:9090/api/v1/v3/api-docs
-            • Actuator: http://localhost:9090/api/v1/actuator
+            • API Base: http://localhost:3008/api
+            • Learning Modules: http://localhost:3008/api/modules
+            • Swagger UI: http://localhost:3008/api/swagger-ui/index.html
+            • API Docs: http://localhost:3008/api/v3/api-docs
+            • Health Check: http://localhost:3008/api/actuator/health
             
             🎯 Features Available:
             • 500+ comprehensive learning topics
             • 10,800+ real interview questions
-            • Interactive code examples
+            • Interactive code examples with PostgreSQL
             • Progress tracking
             • Advanced search & filtering
             

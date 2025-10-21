@@ -1,25 +1,31 @@
--- PostgreSQL Database Setup for FAANG Senior Developer Mastery Portal
--- Run this script to set up the database and schema
+-- Database setup for Comprehensive Developer Portal
+-- PostgreSQL 18 compatible
 
--- Connect to PostgreSQL as superuser (postgres)
--- psql -U postgres -h localhost
+-- Create database if it doesn't exist
+-- Note: This needs to be run as postgres user
 
--- Create the database if it doesn't exist
-CREATE DATABASE devacademykiro;
+-- Create the database
+CREATE DATABASE devacademykirostart
+    WITH 
+    OWNER = postgres
+    ENCODING = 'UTF8'
+    LC_COLLATE = 'en_US.UTF-8'
+    LC_CTYPE = 'en_US.UTF-8'
+    TABLESPACE = pg_default
+    CONNECTION LIMIT = -1;
 
--- Connect to the devacademykiro database
-\c devacademykiro;
+-- Grant privileges
+GRANT ALL PRIVILEGES ON DATABASE devacademykirostart TO postgres;
 
--- Create a user for the application (optional, for better security)
--- CREATE USER faang_user WITH PASSWORD 'secure_password_123';
+-- Connect to the database and create schema
+\c devacademykirostart;
 
--- Verify setup
-SELECT current_database(), current_user;
+-- Create schema for our application
+CREATE SCHEMA IF NOT EXISTS public;
 
--- Show existing tables (should be empty initially)
-\dt
+-- Grant usage on schema
+GRANT ALL ON SCHEMA public TO postgres;
+GRANT ALL ON SCHEMA public TO public;
 
-COMMENT ON DATABASE devacademykiro IS 'FAANG Senior Developer Mastery Portal Database';
-
--- Exit
-\q
+-- Show database info
+SELECT 'Database devacademykirostart created successfully!' as status;
