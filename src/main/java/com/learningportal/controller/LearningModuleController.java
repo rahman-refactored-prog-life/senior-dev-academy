@@ -1,7 +1,7 @@
 package com.learningportal.controller;
 
 import com.learningportal.model.LearningModule;
-import com.learningportal.repository.LearningModuleRepository;
+import com.learningportal.service.LearningModuleService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -9,6 +9,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.persistence.EntityNotFoundException;
 import jakarta.validation.Valid;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -33,11 +34,11 @@ public class LearningModuleController {
 
     private static final Logger log = LoggerFactory.getLogger(LearningModuleController.class);
     
-    private final LearningModuleRepository moduleRepository;
+    private final LearningModuleService learningModuleService;
     
-    // Manual constructor injection (replacing @RequiredArgsConstructor)
-    public LearningModuleController(LearningModuleRepository moduleRepository) {
-        this.moduleRepository = moduleRepository;
+    // Manual constructor injection
+    public LearningModuleController(LearningModuleService learningModuleService) {
+        this.learningModuleService = learningModuleService;
     }
 
     @Operation(
@@ -68,10 +69,10 @@ public class LearningModuleController {
             
             if (search != null && !search.trim().isEmpty()) {
                 log.info("Searching modules with term: {}", search);
-                modules = moduleRepository.searchModules(search.trim(), pageable);
+                modules = learningModuleService.searchModules(search.trim(), pageable);
             } else {
                 log.info("Fetching all modules - page: {}, size: {}", page, size);
-                modules = moduleRepository.findAll(pageable);
+                modules = learningModuleService.getAllModules(pageable);
             }
             
             log.info("Found {} modules", modules.getTotalElements());
@@ -108,30 +109,25 @@ public class LearningModuleController {
         try {
             log.info("Fetching module with ID: {}", id);
             
-            Optional<LearningModule> moduleOpt;
+            LearningModule module;
             
             if (includeTopics && includeQuestions) {
-                moduleOpt = moduleRepository.findByIdWithTopics(id)
-                    .map(module -> {
-                        // Also load questions
-                        return moduleRepository.findByIdWithQuestions(id).orElse(module);
-                    });
+                // For now, just get with topics (questions loading can be enhanced later)
+                module = learningModuleService.getModuleByIdWithTopics(id);
             } else if (includeTopics) {
-                moduleOpt = moduleRepository.findByIdWithTopics(id);
+                module = learningModuleService.getModuleByIdWithTopics(id);
             } else if (includeQuestions) {
-                moduleOpt = moduleRepository.findByIdWithQuestions(id);
+                module = learningModuleService.getModuleByIdWithQuestions(id);
             } else {
-                moduleOpt = moduleRepository.findById(id);
+                module = learningModuleService.getModuleById(id);
             }
             
-            if (moduleOpt.isPresent()) {
-                log.info("Found module: {}", moduleOpt.get().getName());
-                return ResponseEntity.ok(moduleOpt.get());
-            } else {
-                log.warn("Module not found with ID: {}", id);
-                return ResponseEntity.notFound().build();
-            }
+            log.info("Found module: {}", module.getName());
+            return ResponseEntity.ok(module);
             
+        } catch (EntityNotFoundException e) {
+            log.warn("Module not found with ID: {}", id);
+            return ResponseEntity.notFound().build();
         } catch (Exception e) {
             log.error("Error fetching module with ID: {}", id, e);
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
@@ -154,7 +150,7 @@ public class LearningModuleController {
         
         try {
             log.info("Fetching modules by category: {}", category);
-            List<LearningModule> modules = moduleRepository.findByCategoryOrderBySortOrderAsc(category);
+            List<LearningModule> modules = learningModuleService.getModulesByCategory(category);
             log.info("Found {} modules for category: {}", modules.size(), category);
             return ResponseEntity.ok(modules);
             
@@ -180,7 +176,7 @@ public class LearningModuleController {
         
         try {
             log.info("Fetching modules by difficulty: {}", difficulty);
-            List<LearningModule> modules = moduleRepository.findByDifficultyLevelOrderBySortOrderAsc(difficulty);
+            List<LearningModule> modules = learningModuleService.getModulesByDifficulty(difficulty);
             log.info("Found {} modules for difficulty: {}", modules.size(), difficulty);
             return ResponseEntity.ok(modules);
             
@@ -202,20 +198,7 @@ public class LearningModuleController {
     public ResponseEntity<Map<String, Object>> getModulesStatistics() {
         try {
             log.info("Fetching modules statistics");
-            
-            Object[] stats = moduleRepository.getModulesStatistics();
-            
-            Map<String, Object> statistics = Map.of(
-                "totalModules", stats[0] != null ? stats[0] : 0L,
-                "totalTopics", stats[1] != null ? stats[1] : 0L,
-                "totalQuestions", stats[2] != null ? stats[2] : 0L,
-                "totalEstimatedHours", stats[3] != null ? stats[3] : 0L,
-                "averageTopicsPerModule", stats[0] != null && (Long)stats[0] > 0 ? 
-                    ((Long)stats[1]) / ((Long)stats[0]) : 0L,
-                "averageQuestionsPerModule", stats[0] != null && (Long)stats[0] > 0 ? 
-                    ((Long)stats[2]) / ((Long)stats[0]) : 0L
-            );
-            
+            Map<String, Object> statistics = learningModuleService.getModulesStatistics();
             log.info("Statistics: {}", statistics);
             return ResponseEntity.ok(statistics);
             
@@ -241,7 +224,7 @@ public class LearningModuleController {
         try {
             log.info("Fetching top {} popular modules", limit);
             Pageable pageable = PageRequest.of(0, limit);
-            List<LearningModule> modules = moduleRepository.findPopularModules(pageable);
+            List<LearningModule> modules = learningModuleService.getPopularModules(pageable);
             log.info("Found {} popular modules", modules.size());
             return ResponseEntity.ok(modules);
             
@@ -270,17 +253,13 @@ public class LearningModuleController {
         
         try {
             log.info("Creating new module: {}", module.getName());
-            
-            // Check if module with same name already exists
-            if (moduleRepository.existsByNameIgnoreCase(module.getName())) {
-                log.warn("Module with name '{}' already exists", module.getName());
-                return ResponseEntity.status(HttpStatus.CONFLICT).build();
-            }
-            
-            LearningModule savedModule = moduleRepository.save(module);
+            LearningModule savedModule = learningModuleService.createModule(module);
             log.info("Created module with ID: {}", savedModule.getId());
             return ResponseEntity.status(HttpStatus.CREATED).body(savedModule);
             
+        } catch (IllegalArgumentException e) {
+            log.warn("Module creation failed: {}", e.getMessage());
+            return ResponseEntity.status(HttpStatus.CONFLICT).build();
         } catch (Exception e) {
             log.error("Error creating module", e);
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
@@ -309,27 +288,16 @@ public class LearningModuleController {
         
         try {
             log.info("Updating module with ID: {}", id);
-            
-            Optional<LearningModule> existingModuleOpt = moduleRepository.findById(id);
-            if (existingModuleOpt.isEmpty()) {
-                log.warn("Module not found with ID: {}", id);
-                return ResponseEntity.notFound().build();
-            }
-            
-            LearningModule existingModule = existingModuleOpt.get();
-            
-            // Update fields
-            existingModule.setName(moduleUpdate.getName());
-            existingModule.setDescription(moduleUpdate.getDescription());
-            existingModule.setCategory(moduleUpdate.getCategory());
-            existingModule.setDifficultyLevel(moduleUpdate.getDifficultyLevel());
-            existingModule.setEstimatedHours(moduleUpdate.getEstimatedHours());
-            existingModule.setSortOrder(moduleUpdate.getSortOrder());
-            
-            LearningModule savedModule = moduleRepository.save(existingModule);
+            LearningModule savedModule = learningModuleService.updateModule(id, moduleUpdate);
             log.info("Updated module: {}", savedModule.getName());
             return ResponseEntity.ok(savedModule);
             
+        } catch (EntityNotFoundException e) {
+            log.warn("Module not found with ID: {}", id);
+            return ResponseEntity.notFound().build();
+        } catch (IllegalArgumentException e) {
+            log.warn("Module update failed: {}", e.getMessage());
+            return ResponseEntity.status(HttpStatus.CONFLICT).build();
         } catch (Exception e) {
             log.error("Error updating module with ID: {}", id, e);
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
@@ -352,16 +320,13 @@ public class LearningModuleController {
         
         try {
             log.info("Deleting module with ID: {}", id);
-            
-            if (!moduleRepository.existsById(id)) {
-                log.warn("Module not found with ID: {}", id);
-                return ResponseEntity.notFound().build();
-            }
-            
-            moduleRepository.deleteById(id);
+            learningModuleService.deleteModule(id);
             log.info("Deleted module with ID: {}", id);
             return ResponseEntity.noContent().build();
             
+        } catch (EntityNotFoundException e) {
+            log.warn("Module not found with ID: {}", id);
+            return ResponseEntity.notFound().build();
         } catch (Exception e) {
             log.error("Error deleting module with ID: {}", id, e);
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();

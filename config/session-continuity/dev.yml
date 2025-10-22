@@ -1,0 +1,120 @@
+# Session Continuity System - Development Environment Configuration
+
+spring:
+  profiles:
+    active: dev
+  
+  datasource:
+    url: jdbc:h2:mem:devportal
+    username: sa
+    password: password
+    driver-class-name: org.h2.Driver
+  
+  jpa:
+    hibernate:
+      ddl-auto: create-drop
+    show-sql: true
+    properties:
+      hibernate:
+        format_sql: true
+  
+  h2:
+    console:
+      enabled: true
+      path: /h2-console
+
+server:
+  port: 8080
+  servlet:
+    context-path: /
+
+logging:
+  level:
+    com.learningportal.continuity: DEBUG
+    org.springframework.web: DEBUG
+  file:
+    name: logs/session-continuity-dev.log
+  pattern:
+    file: "%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{36} - %msg%n"
+
+# Session Continuity Configuration
+session-continuity:
+  enabled: true
+  
+  # Context Capture Settings
+  capture:
+    auto-capture: true
+    capture-interval: 30s
+    timeout: 5s
+    parallel-processing: true
+    
+  # Documentation Synchronization
+  documentation:
+    sync-enabled: true
+    sync-interval: 60s
+    validation-enabled: true
+    required-files: 11
+    consistency-check: true
+    
+  # Quality Gates Configuration
+  quality-gates:
+    compilation:
+      enabled: true
+      block-on-failure: false  # Allow development with warnings
+      timeout: 30s
+    documentation:
+      enabled: true
+      required-files: 11
+      consistency-threshold: 0.9
+    progress:
+      enabled: true
+      accuracy-threshold: 0.9
+    quality-assurance:
+      enabled: true
+      strict-mode: false
+      
+  # Context Recovery Settings
+  recovery:
+    auto-recovery: true
+    confidence-threshold: 0.8
+    max-attempts: 3
+    fallback-enabled: true
+    
+  # Performance Configuration
+  performance:
+    capture-parallel: true
+    sync-async: true
+    cache-enabled: true
+    cache-size: 500
+    monitoring-enabled: false
+    
+  # Storage Configuration
+  storage:
+    base-path: data/session-continuity
+    backup-path: backups/session-continuity
+    redundancy-layers: 4
+    compression-enabled: false
+    
+  # Security Settings (Development)
+  security:
+    encryption-enabled: false
+    audit-logging: false
+    access-control: false
+
+# Management and Monitoring
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics,env,configprops
+  endpoint:
+    health:
+      show-details: always
+  metrics:
+    export:
+      simple:
+        enabled: true
+
+# Development-specific settings
+debug: true
+trace: false

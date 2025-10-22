@@ -241,6 +241,8 @@ public class PerformanceMonitoringService {
         return Math.max(0, 100 - (heapUsagePercent * 2));
     }
 
+
+
     /**
      * Performance Report class
      */

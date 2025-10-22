@@ -1,0 +1,161 @@
+# Session Continuity System - Staging Environment Configuration
+
+spring:
+  profiles:
+    active: staging
+  
+  datasource:
+    url: jdbc:postgresql://staging-db.session-continuity.local:5432/session_continuity_staging
+    username: ${DB_USERNAME:session_continuity_user}
+    password: ${DB_PASSWORD:staging_password}
+    driver-class-name: org.postgresql.Driver
+    hikari:
+      maximum-pool-size: 10
+      minimum-idle: 2
+      connection-timeout: 30000
+      idle-timeout: 600000
+      max-lifetime: 1800000
+  
+  jpa:
+    hibernate:
+      ddl-auto: validate
+    show-sql: false
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+        format_sql: false
+        jdbc:
+          batch_size: 20
+        order_inserts: true
+        order_updates: true
+
+server:
+  port: 8080
+  servlet:
+    context-path: /
+  compression:
+    enabled: true
+  http2:
+    enabled: true
+
+logging:
+  level:
+    com.learningportal.continuity: INFO
+    org.springframework.web: WARN
+    org.hibernate.SQL: WARN
+  file:
+    name: logs/session-continuity-staging.log
+    max-size: 100MB
+    max-history: 30
+  pattern:
+    file: "%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{36} - %msg%n"
+
+# Session Continuity Configuration
+session-continuity:
+  enabled: true
+  
+  # Context Capture Settings
+  capture:
+    auto-capture: true
+    capture-interval: 60s
+    timeout: 10s
+    parallel-processing: true
+    batch-size: 10
+    
+  # Documentation Synchronization
+  documentation:
+    sync-enabled: true
+    sync-interval: 120s
+    validation-enabled: true
+    required-files: 11
+    consistency-check: true
+    conflict-resolution: automatic
+    
+  # Quality Gates Configuration
+  quality-gates:
+    compilation:
+      enabled: true
+      block-on-failure: true
+      timeout: 60s
+      retry-attempts: 2
+    documentation:
+      enabled: true
+      required-files: 11
+      consistency-threshold: 0.95
+      cross-validation: true
+    progress:
+      enabled: true
+      accuracy-threshold: 0.95
+      real-time-validation: true
+    quality-assurance:
+      enabled: true
+      strict-mode: true
+      
+  # Context Recovery Settings
+  recovery:
+    auto-recovery: true
+    confidence-threshold: 0.9
+    max-attempts: 5
+    fallback-enabled: true
+    notification-enabled: true
+    
+  # Performance Configuration
+  performance:
+    capture-parallel: true
+    sync-async: true
+    cache-enabled: true
+    cache-size: 1000
+    monitoring-enabled: true
+    metrics-collection: true
+    
+  # Storage Configuration
+  storage:
+    base-path: /opt/session-continuity/data
+    backup-path: /opt/session-continuity/backups
+    redundancy-layers: 4
+    compression-enabled: true
+    encryption-enabled: false
+    
+  # Security Settings (Staging)
+  security:
+    encryption-enabled: false
+    audit-logging: true
+    access-control: true
+    session-timeout: 3600s
+
+# Management and Monitoring
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics,prometheus
+      base-path: /actuator
+  endpoint:
+    health:
+      show-details: when-authorized
+  metrics:
+    export:
+      prometheus:
+        enabled: true
+    tags:
+      environment: staging
+      service: session-continuity
+
+# Staging-specific settings
+debug: false
+trace: false
+
+# External service configurations
+external-services:
+  notification:
+    enabled: true
+    webhook-url: ${NOTIFICATION_WEBHOOK_URL:http://staging-notifications.local/webhook}
+  
+  monitoring:
+    enabled: true
+    endpoint: ${MONITORING_ENDPOINT:http://staging-monitoring.local/metrics}
+    
+  backup:
+    enabled: true
+    schedule: "0 2 * * *"  # Daily at 2 AM
+    retention-days: 30

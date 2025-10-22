@@ -120,4 +120,15 @@ public interface TopicRepository extends JpaRepository<Topic, Long> {
      * Count topics with non-null module (for schema validation)
      */
     long countByModuleIsNotNull();
+    
+    /**
+     * Search topics by title or description
+     */
+    @Query("SELECT t FROM Topic t WHERE LOWER(t.title) LIKE LOWER(CONCAT('%', :searchTerm, '%')) OR LOWER(t.description) LIKE LOWER(CONCAT('%', :searchTerm, '%')) ORDER BY t.sortOrder ASC")
+    List<Topic> searchTopics(@Param("searchTerm") String searchTerm);
+    
+    /**
+     * Find top 10 topics ordered by ID descending
+     */
+    List<Topic> findTop10ByOrderByIdDesc();
 }

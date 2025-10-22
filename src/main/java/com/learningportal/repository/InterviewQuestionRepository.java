@@ -187,4 +187,9 @@ public interface InterviewQuestionRepository extends JpaRepository<InterviewQues
      * Count questions with non-null module (for schema validation)
      */
     long countByModuleIsNotNull();
+    
+    /**
+     * Find questions by difficulty ordered by ID descending
+     */
+    List<InterviewQuestion> findByDifficultyOrderByIdDesc(InterviewQuestion.Difficulty difficulty);
 }

@@ -119,6 +119,8 @@ public class Topic {
 
     public String getTitle() { return title; }
     public void setTitle(String title) { this.title = title; }
+    
+    public String getName() { return title; } // Alias for title
 
     public String getDescription() { return description; }
     public void setDescription(String description) { this.description = description; }

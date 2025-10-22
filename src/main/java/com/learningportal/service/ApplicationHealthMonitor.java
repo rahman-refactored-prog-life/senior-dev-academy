@@ -58,4 +58,16 @@ public interface ApplicationHealthMonitor {
      * @return SelfHealingResult with actions taken
      */
     SelfHealingResult attemptSelfHealing(List<HealthIssue> issues);
+    
+    /**
+     * Generates comprehensive health report
+     * @return SystemHealthReport with detailed health information
+     */
+    SystemHealthReport generateHealthReport();
+    
+    /**
+     * Gets startup performance metrics
+     * @return StartupPerformanceMetrics with startup timing information
+     */
+    StartupPerformanceMetrics getStartupMetrics();
 }
